@@ -8,7 +8,7 @@ pac-new/
 ├── components/              # HTML Components
 │   ├── header.html         # Navigation và branding
 │   ├── hero.html          # Hero section với CTA
-│   ├── about.html         # Giới thiệu về PAC Group
+│   ├── about.html         # Giới thiệu về PAC Group (doanh nghiệp)
 │   ├── featured-programs.html  # Chương trình nổi bật
 │   ├── featured-services.html  # Dịch vụ chính
 │   ├── find-teacher.html      # Tìm giáo viên/cố vấn

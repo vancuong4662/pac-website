@@ -1,9 +1,9 @@
-# PAC Group - Component Structure
+# Unlock Your Career - Component Structure
 
 ## Components (8)
 - `header.html` - Navigation & branding
 - `hero.html` - Main hero section 
-- `about.html` - About PAC Group
+- `about.html` - About PAC Group (company info)
 - `featured-programs.html` - Featured programs
 - `featured-services.html` - Main services
 - `find-teacher.html` - Teacher/advisor finder

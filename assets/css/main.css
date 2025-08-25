@@ -22,47 +22,78 @@
 /* Global Colors - PAC Group Educational Consulting Color Scheme */
 :root { 
   --background-color: #ffffff; /* Main background */
-  --default-color: #4b5563; /* Body text - gray-600 */
-  --heading-color: #111827; /* Headings - gray-900 */
-  --accent-color: #1e3a8a; /* Primary blue - Deep professional blue */
+  --default-color: #374151; /* Body text - neutral dark gray */
+  --heading-color: #1f2937; /* Headings - darker gray */
+  --accent-color: #964bdf; /* PAC Primary Purple */
+  --accent-color-rgb: 150, 75, 223; /* PAC Primary Purple RGB for transparency */
   --surface-color: #ffffff; /* Card backgrounds */
   --contrast-color: #ffffff; /* Text on colored backgrounds */
   
-  /* Secondary colors */
+  /* PAC Brand Colors */
+  --brand-primary: #964bdf; /* PAC Purple - Main brand color */
+  --brand-secondary: #5d2e8b; /* PAC Dark Purple - Secondary brand */
+  --brand-accent: #fff200; /* PAC Yellow - Highlight/accent */
+  --brand-accent-rgb: 255, 242, 0; /* RGB for transparency usage */
+  
+  /* Supporting colors */
   --secondary-color: #059669; /* Success/growth green */
-  --accent-orange: #ea580c; /* Call-to-action orange */
-  --secondary-blue: #3b82f6; /* Lighter blue for highlights */
   --neutral-gray: #6b7280; /* Subtle elements */
+  --light-purple: rgba(150, 75, 223, 0.1); /* Light purple backgrounds */
   
   /* Background variations */
-  --bg-light: #f1f5f9; /* Light accent backgrounds */
-  --bg-secondary: #f8fafc; /* Section backgrounds */
+  --bg-light: #f8f9ff; /* Light purple tint backgrounds */
+  --bg-secondary: #fafafa; /* Neutral section backgrounds */
+  --bg-accent: rgba(255, 242, 0, 0.1); /* Light yellow backgrounds */
 }
 
 /* Nav Menu Colors - PAC Group Navigation */
 :root {
-  --nav-color: #4b5563;  /* Main navmenu links */
-  --nav-hover-color: #1e3a8a; /* Hover state - primary blue */
+  --nav-color: #374151;  /* Main navmenu links - neutral dark */
+  --nav-hover-color: #964bdf; /* Hover state - PAC primary purple */
   --nav-mobile-background-color: #ffffff; /* Mobile nav background */
   --nav-dropdown-background-color: #ffffff; /* Dropdown background */
-  --nav-dropdown-color: #4b5563; /* Dropdown link color */
-  --nav-dropdown-hover-color: #1e3a8a; /* Dropdown hover - primary blue */
+  --nav-dropdown-color: #374151; /* Dropdown link color */
+  --nav-dropdown-hover-color: #964bdf; /* Dropdown hover - PAC purple */
 }
 
-/* Color Presets - These classes override global colors when applied to any section or element, providing reuse of the sam color scheme. */
+/* Color Presets - These classes override global colors when applied to any section or element, providing reuse of the same color scheme. */
 
 .light-background {
-  --background-color: #f8fafc;
+  --background-color: #f8f9ff;
   --surface-color: #ffffff;
 }
 
 .dark-background {
-  --background-color: #1f2937;
+  --background-color: #5d2e8b;
   --default-color: #ffffff;
   --heading-color: #ffffff;
-  --surface-color: #374151;
+  --surface-color: #964bdf;
   --contrast-color: #ffffff;
 }
+
+.accent-background {
+  --background-color: #964bdf;
+  --default-color: #ffffff;
+  --heading-color: #ffffff;
+  --surface-color: rgba(255, 255, 255, 0.1);
+  --contrast-color: #ffffff;
+}
+
+.yellow-accent-background {
+  --background-color: #fff200;
+  --default-color: #1f2937;
+  --heading-color: #5d2e8b;
+  --surface-color: rgba(93, 46, 139, 0.1);
+  --contrast-color: #5d2e8b;
+}
+
+/* PAC Brand Utility Classes */
+.text-brand-primary { color: #964bdf !important; }
+.text-brand-secondary { color: #5d2e8b !important; }
+.text-brand-accent { color: #fff200 !important; }
+.bg-brand-primary { background-color: #964bdf !important; }
+.bg-brand-secondary { background-color: #5d2e8b !important; }
+.bg-brand-accent { background-color: #fff200 !important; }
 
 /* Smooth scroll */
 :root {
@@ -155,8 +186,10 @@ h6 {
 # Global Header
 --------------------------------------------------------------*/
 .header {
-  --background-color: rgba(255, 255, 255, 0);
-  color: var(--default-color);
+  --background-color: var(--brand-primary);
+  --nav-color: #ffffff;
+  --nav-hover-color: var(--brand-accent);
+  color: var(--contrast-color);
   background-color: var(--background-color);
   padding: 15px 0;
   transition: all 0.5s;
@@ -168,15 +201,15 @@ h6 {
 }
 
 .header .logo img {
-  max-height: 36px;
-  margin-right: 8px;
+  max-height: 48px;
+  margin-right: 12px;
 }
 
 .header .logo h1 {
   font-size: 30px;
   margin: 0;
   font-weight: 700;
-  color: var(--heading-color);
+  color: var(--contrast-color);
 }
 
 .header .logo h1 span {
@@ -185,19 +218,23 @@ h6 {
 
 .header .btn-getstarted,
 .header .btn-getstarted:focus {
-  color: var(--contrast-color);
-  background: var(--accent-color);
+  color: var(--brand-secondary);
+  background: var(--brand-accent);
   font-size: 14px;
   padding: 8px 26px;
   margin: 0;
-  border-radius: 4px;
+  border: none;
+  border-radius: 25px;
   transition: 0.3s;
+  font-weight: 600;
 }
 
 .header .btn-getstarted:hover,
 .header .btn-getstarted:focus:hover {
-  color: var(--contrast-color);
-  background: color-mix(in srgb, var(--accent-color), transparent 15%);
+  color: var(--brand-secondary);
+  background: color-mix(in srgb, var(--brand-accent), white 10%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 242, 0, 0.3);
 }
 
 @media (max-width: 1200px) {
@@ -223,7 +260,8 @@ h6 {
 /* Global Header on Scroll
 ------------------------------*/
 .scrolled .header {
-  --background-color: #ffffff;
+  --background-color: var(--brand-primary);
+  backdrop-filter: blur(10px);
 }
 
 /*--------------------------------------------------------------
@@ -266,7 +304,12 @@ h6 {
     font-size: 12px;
     line-height: 0;
     margin-left: 5px;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+  }
+
+  .navmenu .dropdown:hover > a i {
+    transform: rotate(180deg);
+    color: var(--brand-accent);
   }
 
   .navmenu li:last-child a {
@@ -281,29 +324,62 @@ h6 {
 
   .navmenu .dropdown ul {
     margin: 0;
-    padding: 10px 0;
-    background: var(--nav-dropdown-background-color);
+    padding: 15px 0;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
     display: block;
     position: absolute;
     visibility: hidden;
     left: 14px;
     top: 130%;
     opacity: 0;
-    transition: 0.3s;
-    border-radius: 4px;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 12px;
     z-index: 99;
-    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(150, 75, 223, 0.3), 
+                0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 242, 0, 0.3);
+    backdrop-filter: blur(10px);
+    min-width: 220px;
   }
 
   .navmenu .dropdown ul li {
-    min-width: 200px;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .navmenu .dropdown ul li:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .navmenu .dropdown ul a {
-    padding: 10px 20px;
-    font-size: 15px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
     text-transform: none;
-    color: var(--nav-dropdown-color);
+    color: var(--contrast-color);
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+    border-radius: 8px;
+    margin: 2px 8px;
+  }
+
+  .navmenu .dropdown ul a:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--brand-accent);
+    transition: width 0.3s ease;
+  }
+
+  .navmenu .dropdown ul a:hover:before {
+    width: 20px;
   }
 
   .navmenu .dropdown ul a i {
@@ -313,13 +389,17 @@ h6 {
   .navmenu .dropdown ul a:hover,
   .navmenu .dropdown ul .active:hover,
   .navmenu .dropdown ul li:hover>a {
-    color: var(--nav-dropdown-hover-color);
+    color: var(--brand-accent);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(8px);
+    padding-left: 32px;
   }
 
   .navmenu .dropdown:hover>ul {
     opacity: 1;
     top: 100%;
     visibility: visible;
+    transform: translateY(0);
   }
 
   .navmenu .dropdown .dropdown ul {
@@ -339,7 +419,7 @@ h6 {
 /* Navmenu - Mobile */
 @media (max-width: 1199px) {
   .mobile-nav-toggle {
-    color: var(--nav-color);
+    color: var(--contrast-color);
     font-size: 28px;
     line-height: 0;
     margin-right: 10px;
@@ -419,11 +499,12 @@ h6 {
     position: static;
     display: none;
     z-index: 99;
-    padding: 10px 0;
+    padding: 15px 0;
     margin: 10px 20px;
-    background-color: var(--nav-dropdown-background-color);
-    border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
-    box-shadow: none;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+    border: 1px solid rgba(255, 242, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(150, 75, 223, 0.2);
+    border-radius: 12px;
     transition: all 0.5s ease-in-out;
   }
 
@@ -6468,4 +6549,138 @@ section,
   padding-top: 60px;
   padding-bottom: 60px;
   /* Add your styles here */
+}
+
+/*--------------------------------------------------------------
+# PAC Brand Gradients & Effects
+--------------------------------------------------------------*/
+/* PAC Brand Gradients */
+.pac-gradient-primary {
+  background: linear-gradient(135deg, #964bdf 0%, #5d2e8b 100%);
+}
+
+.pac-gradient-accent {
+  background: linear-gradient(135deg, #964bdf 0%, #fff200 100%);
+}
+
+.pac-gradient-secondary {
+  background: linear-gradient(135deg, #5d2e8b 0%, #964bdf 100%);
+}
+
+/* PAC Brand Text Gradients */
+.pac-text-gradient {
+  background: linear-gradient(135deg, #964bdf 0%, #5d2e8b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pac-text-gradient-accent {
+  background: linear-gradient(135deg, #964bdf 0%, #fff200 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* PAC Brand Hover Effects */
+.pac-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.pac-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
+}
+
+/* PAC Brand Buttons */
+.btn-pac-primary {
+  background: linear-gradient(135deg, #964bdf 0%, #5d2e8b 100%);
+  color: #ffffff;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-pac-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(150, 75, 223, 0.4);
+  color: #ffffff;
+}
+
+.btn-pac-accent {
+  background: #fff200;
+  color: #5d2e8b;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-pac-accent:hover {
+  background: color-mix(in srgb, #fff200, white 10%);
+  color: #5d2e8b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 242, 0, 0.3);
+}
+
+/* PAC Brand Borders */
+.border-pac-primary { border-color: #964bdf !important; }
+.border-pac-secondary { border-color: #5d2e8b !important; }
+.border-pac-accent { border-color: #fff200 !important; }
+
+/* Enhanced PAC Accent Effects */
+.pac-accent-glow {
+  box-shadow: 0 0 20px rgba(255, 242, 0, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.pac-accent-glow:hover {
+  box-shadow: 0 0 30px rgba(255, 242, 0, 0.8);
+}
+
+/* PAC Brand Animated Elements */
+.pac-pulse {
+  animation: pac-pulse 2s infinite;
+}
+
+@keyframes pac-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pac-bounce {
+  animation: pac-bounce 1s ease-in-out infinite alternate;
+}
+
+@keyframes pac-bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+/* PAC Brand Icons with Accent */
+.pac-icon-accent {
+  background: linear-gradient(135deg, #fff200 0%, #964bdf 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+/* PAC Brand Highlight Boxes */
+.pac-highlight-box {
+  background: linear-gradient(135deg, rgba(255, 242, 0, 0.1) 0%, rgba(150, 75, 223, 0.1) 100%);
+  border-left: 4px solid #fff200;
+  padding: 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.pac-highlight-box:hover {
+  background: linear-gradient(135deg, rgba(255, 242, 0, 0.2) 0%, rgba(150, 75, 223, 0.2) 100%);
+  transform: translateY(-2px);
 }

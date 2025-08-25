@@ -1,7 +1,7 @@
-# PAC Group - Tư Vấn Giáo Dục Nghề Nghiệp
+# Unlock Your Career - Website Tư Vấn Giáo Dục
 
 ## Tổng Quan Dự Án
-PAC Group là nền tảng tư vấn giáo dục và định hướng nghề nghiệp hàng đầu Việt Nam, giúp học sinh và phụ huynh đưa ra những quyết định đúng đắn cho tương lai.
+"Unlock Your Career" là website tư vấn giáo dục và định hướng nghề nghiệp của PAC Group - doanh nghiệp hàng đầu Việt Nam, giúp học sinh và phụ huynh đưa ra những quyết định đúng đắn cho tương lai.
 
 ## Kiến Trúc Component-Based
 
@@ -11,7 +11,7 @@ pac-new/
 ├── components/              # HTML Components
 │   ├── header.html         # Navigation và branding
 │   ├── hero.html          # Hero section với CTA
-│   ├── about.html         # Giới thiệu về PAC Group
+│   ├── about.html         # Giới thiệu về PAC Group (doanh nghiệp)
 │   ├── featured-programs.html  # Chương trình nổi bật
 │   ├── featured-services.html  # Dịch vụ chính
 │   ├── find-teacher.html      # Tìm giáo viên/cố vấn
@@ -78,7 +78,7 @@ window.componentLoader.reloadComponent('hero', '#hero-section');
 ### Frontend
 - **HTML5** với semantic markup
 - **Bootstrap 5.3.7** cho responsive design
-- **Montserrat Font** theo PAC Group brand guidelines
+- **Montserrat Font** theo PAC Group brand guidelines cho website "Unlock Your Career"
 - **AOS** cho scroll animations
 - **GLightbox** cho lightbox functionality
 - **Swiper** cho carousels/sliders
@@ -94,7 +94,7 @@ window.componentLoader.reloadComponent('hero', '#hero-section');
 - **CORS-enabled** component access
 - **Preloader Integration** cho smooth UX
 
-## Color Palette (PAC Group)
+## Color Palette (PAC Group Brand)
 ```css
 :root {
   --default-color: #2c3e50;           /* Đen xanh chủ đạo */

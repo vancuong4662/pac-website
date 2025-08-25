@@ -3,7 +3,7 @@
 ## Frontend
 - **HTML5** với semantic markup
 - **Bootstrap 5.3.7** cho responsive design
-- **Montserrat Font** theo PAC Group brand guidelines
+- **Montserrat Font** theo PAC Group brand guidelines cho website "Unlock Your Career"
 - **AOS** cho scroll animations
 - **GLightbox** cho lightbox functionality
 - **Swiper** cho carousels/sliders
@@ -19,25 +19,32 @@
 - **CORS-enabled** component access
 - **Preloader Integration** cho smooth UX
 
-## Color Palette (PAC Group)
+## Color Palette (PAC Group Brand)
 ```css
 :root {
-  --default-color: #2c3e50;           /* Đen xanh chủ đạo */
-  --heading-color: #1a252f;           /* Đen đậm cho tiêu đề */
-  --accent-color: #3498db;            /* Xanh dương chính */
-  --accent-color-rgb: 52, 152, 219;   /* RGB của accent */
-  --surface-color: #ffffff;           /* Trắng */
-  --contrast-color: #ffffff;          /* Trắng tương phản */
+  /* Brand Colors - PAC Group Identity cho website "Unlock Your Career" */
+  --brand-primary: #964bdf;     /* PAC Purple - Main brand color */
+  --brand-secondary: #5d2e8b;   /* PAC Dark Purple - Secondary brand */
+  --brand-accent: #fff200;      /* PAC Yellow - Highlight/accent */
   
-  /* Backgrounds */
-  --background-color: #ffffff;        /* Nền trắng */
-  --hero-background-color: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  --accent-background-color: #3498db; /* Nền accent */
+  /* Base Colors */
+  --background-color: #ffffff;   /* Clean white background */
+  --default-color: #374151;     /* Body text - neutral dark gray */
+  --heading-color: #1f2937;     /* Headings - darker gray */
+  --accent-color: #964bdf;      /* Primary purple for interactions */
   
-  /* Additional colors */
-  --nav-color: #2c3e50;              /* Navigation text */
-  --nav-hover-color: #3498db;        /* Navigation hover */
-  --nav-mobile-background-color: rgba(44, 62, 80, 0.9);
+  /* Supporting Colors */
+  --secondary-color: #059669;   /* Success/growth green */
+  --neutral-gray: #6b7280;      /* Subtle elements */
+  
+  /* Background Variations */
+  --bg-light: #f8f9ff;         /* Light purple tint backgrounds */
+  --bg-secondary: #fafafa;      /* Neutral section backgrounds */
+  --bg-accent: rgba(255, 242, 0, 0.1); /* Light yellow backgrounds */
+  
+  /* Navigation Colors */
+  --nav-color: #374151;         /* Navigation text */
+  --nav-hover-color: #964bdf;   /* Navigation hover - PAC purple */
 }
 ```
 
