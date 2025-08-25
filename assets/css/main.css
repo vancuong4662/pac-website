@@ -554,9 +554,319 @@ h6 {
   position: relative;
 }
 
+/* Enhanced Footer with Background */
+.footer-enhanced {
+  background: linear-gradient(rgba(93, 46, 139, 0.5), rgba(150, 75, 223, 0.1)), 
+              url('../img/footer_covered.jpg') center/cover no-repeat;
+  color: var(--contrast-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(93, 46, 139, 0.8) 0%, 
+    rgba(150, 75, 223, 0.6) 50%, 
+    rgba(93, 46, 139, 0.9) 100%);
+  z-index: 1;
+}
+
+.footer-enhanced .container {
+  position: relative;
+  z-index: 2;
+}
+
 .footer .footer-top {
-  padding-top: 50px;
-  border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  padding-top: 60px;
+  padding-bottom: 40px;
+  border-top: none;
+}
+
+/* Responsive adjustments for company info */
+@media (max-width: 768px) {
+  .footer .company-info-section {
+    padding: 20px 15px;
+  }
+  
+  .footer .logo-brand-container {
+    padding: 20px 15px;
+    margin-bottom: 20px;
+  }
+  
+  .footer .footer-company-name {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .footer .logo-brand-container .footer-company-name {
+    font-size: 16px;
+    text-align: center;
+  }
+  
+  .footer .footer-business-info,
+  .footer .footer-contact-compact,
+  .footer .social-links-compact {
+    margin-bottom: 25px;
+    text-align: center;
+  }
+  
+  .footer .social-links-compact .social-links {
+    justify-content: center;
+  }
+}
+
+/* Navigation links equal spacing */
+@media (min-width: 992px) {
+  .footer .footer-links {
+    padding: 0 15px;
+  }
+}
+
+/* Footer Logo */
+.footer .footer-logo {
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.footer .footer-logo-img {
+  max-height: 60px;
+  margin-right: 15px;
+  filter: brightness(1.1);
+}
+
+.footer .footer-company-name {
+  color: var(--contrast-color);
+  font-family: var(--heading-font);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+
+/* Business Information */
+.footer .footer-business-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--brand-accent);
+}
+
+.footer .footer-business-info p {
+  margin-bottom: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.footer .footer-business-info strong {
+  color: var(--brand-accent);
+  font-weight: 600;
+}
+
+/* Contact Information */
+.footer .footer-contact h5 {
+  color: var(--brand-accent);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.footer .contact-item {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border-left: 3px solid var(--brand-accent);
+  line-height: 1.6;
+}
+
+.footer .contact-item strong {
+  color: var(--brand-accent);
+  display: block;
+  margin-bottom: 5px;
+}
+
+.footer .contact-item i {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+/* Company Info Section - Redesigned */
+.footer .company-info-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 30px 25px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 242, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+/* Logo and Brand with White Background */
+.footer .logo-brand-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer .logo-brand-container .footer-company-name {
+  color: var(--brand-secondary);
+  font-family: var(--heading-font);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 0;
+  line-height: 1.3;
+}
+
+.footer .logo-brand-container .footer-company-name .text-brand-accent {
+  color: var(--brand-primary) !important;
+}
+
+.footer .footer-company-name {
+  color: var(--contrast-color);
+  font-family: var(--heading-font);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 0;
+  line-height: 1.3;
+}
+
+/* Business Information - Compact */
+.footer .footer-business-info h6,
+.footer .footer-contact-compact h6,
+.footer .social-links-compact h6 {
+  color: var(--brand-accent);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer .footer-business-info {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid var(--brand-accent);
+}
+
+.footer .footer-business-info p {
+  margin-bottom: 5px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.footer .footer-business-info strong {
+  color: var(--brand-accent);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Contact Information - Compact */
+.footer .footer-contact-compact .contact-row {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.footer .footer-contact-compact .contact-row strong {
+  color: var(--brand-accent);
+  font-weight: 600;
+  display: inline-block;
+  min-width: 60px;
+}
+
+.footer .footer-contact-compact i {
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+/* Social Links - Compact */
+.footer .social-links-compact .social-links {
+  gap: 10px;
+}
+
+.footer .social-links-compact .social-links a {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  border-radius: 50%;
+  border: none;
+  background: var(--brand-primary);
+  color: var(--contrast-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(150, 75, 223, 0.3);
+}
+
+.footer .social-links-compact .social-links a:hover {
+  background: var(--brand-accent);
+  color: var(--brand-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 242, 0, 0.4);
+}
+
+/* Social Links Section */
+.footer .social-links-section h5 {
+  color: var(--brand-accent);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.footer .social-links-section .social-links {
+  gap: 12px;
+}
+
+/* Government Certification in Copyright */
+.footer .copyright .government-cert {
+  background: rgba(255, 242, 0, 0.15);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 242, 0, 0.4);
+  justify-content: center;
+}
+
+.footer .copyright .cert-logo {
+  max-height: 32px;
+  width: auto;
+}
+
+.footer .copyright .cert-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brand-accent);
+  line-height: 1.3;
+}
+
+/* Government Certification */
+.footer .government-cert {
+  background: rgba(255, 242, 0, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 242, 0, 0.3);
+  align-items: center;
+}
+
+.footer .cert-logo {
+  max-height: 40px;
+  width: auto;
+}
+
+.footer .cert-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-accent);
+  line-height: 1.4;
 }
 
 .footer .footer-about .logo {
@@ -589,23 +899,39 @@ h6 {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--default-color), transparent 50%);
+  border: none;
   font-size: 16px;
-  color: color-mix(in srgb, var(--default-color), transparent 20%);
+  color: var(--contrast-color);
   margin-right: 10px;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  background: var(--brand-primary);
+  box-shadow: 0 2px 10px rgba(150, 75, 223, 0.3);
 }
 
 .footer .social-links a:hover {
-  color: var(--accent-color);
-  border-color: var(--accent-color);
+  background: var(--brand-accent);
+  color: var(--brand-secondary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 242, 0, 0.4);
 }
 
 .footer h4 {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 700;
   position: relative;
-  padding-bottom: 12px;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  color: var(--brand-accent);
+}
+
+.footer h4:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 30px;
+  height: 2px;
+  background: var(--brand-accent);
 }
 
 .footer .footer-links {
@@ -625,7 +951,7 @@ h6 {
 }
 
 .footer .footer-links ul li {
-  padding: 10px 0;
+  padding: 8px 0;
   display: flex;
   align-items: center;
 }
@@ -635,13 +961,16 @@ h6 {
 }
 
 .footer .footer-links ul a {
-  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  color: rgba(255, 255, 255, 0.8);
   display: inline-block;
-  line-height: 1;
+  line-height: 1.5;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
 .footer .footer-links ul a:hover {
-  color: var(--accent-color);
+  color: var(--brand-accent);
+  padding-left: 5px;
 }
 
 .footer .footer-contact p {
@@ -649,12 +978,24 @@ h6 {
 }
 
 .footer .copyright {
-  padding: 25px 0;
-  border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 30px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 .footer .copyright p {
   margin-bottom: 0;
+  color: var(--contrast-color);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.footer .footer-disclaimer {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin: 0;
 }
 
 .footer .credits {
