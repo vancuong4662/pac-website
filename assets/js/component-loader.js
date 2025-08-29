@@ -321,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'header', target: '#header-section' },
     { name: 'hero', target: '#hero-section' },
     { name: 'about', target: '#about-section' },
+    { name: 'why-choose', target: '#why-choose-section' },
     { name: 'featured-programs', target: '#featured-programs-section' },
     { name: 'featured-services', target: '#featured-services-section' },
     { name: 'find-teacher', target: '#find-teacher-section' },

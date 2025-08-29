@@ -7000,3 +7000,127 @@ section,
   background: linear-gradient(135deg, rgba(255, 242, 0, 0.2) 0%, rgba(150, 75, 223, 0.2) 100%);
   transform: translateY(-2px);
 }
+
+/*--------------------------------------------------------------
+# Why Choose Section
+--------------------------------------------------------------*/
+.why-choose {
+  padding: 120px 0;
+}
+
+.why-choose .section-heading {
+  font-size: 2.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--heading-color);
+}
+
+.why-choose .feature-card {
+  background: var(--surface-color);
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  text-align: center;
+  height: 100%;
+  transition: all 0.4s ease;
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 93%);
+  position: relative;
+  overflow: hidden;
+}
+
+.why-choose .feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.why-choose .feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.why-choose .feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 60px color-mix(in srgb, var(--brand-primary), transparent 85%);
+  border-color: color-mix(in srgb, var(--brand-primary), transparent 80%);
+}
+
+.why-choose .feature-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  transition: all 0.4s ease;
+}
+
+.why-choose .feature-icon i {
+  font-size: 2.2rem;
+  color: var(--contrast-color);
+}
+
+.why-choose .feature-card:hover .feature-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-primary) 100%);
+}
+
+.why-choose .feature-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.why-choose .feature-description {
+  color: color-mix(in srgb, var(--default-color), transparent 25%);
+  line-height: 1.7;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@media (max-width: 992px) {
+  .why-choose {
+    padding: 80px 0;
+  }
+  
+  .why-choose .section-heading {
+    font-size: 2.2rem;
+  }
+  
+  .why-choose .feature-card {
+    padding: 2.5rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .why-choose {
+    padding: 60px 0;
+  }
+  
+  .why-choose .section-heading {
+    font-size: 1.8rem;
+  }
+  
+  .why-choose .feature-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .why-choose .feature-icon {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .why-choose .feature-icon i {
+    font-size: 2rem;
+  }
+}
