@@ -180,4 +180,31 @@
     });
   });
 
+  /**
+   * Hero Slideshow
+   */
+  function initHeroSlideshow() {
+    const slides = document.querySelectorAll('.hero-slideshow .slide');
+    let currentSlide = 0;
+    
+    if (slides.length === 0) return;
+
+    function showNextSlide() {
+      // Remove active class from current slide
+      slides[currentSlide].classList.remove('active');
+      
+      // Move to next slide
+      currentSlide = (currentSlide + 1) % slides.length;
+      
+      // Add active class to new slide
+      slides[currentSlide].classList.add('active');
+    }
+
+    // Start slideshow - change every 2 seconds
+    setInterval(showNextSlide, 2000);
+  }
+
+  // Initialize slideshow when DOM is loaded
+  window.addEventListener('load', initHeroSlideshow);
+
 })();
