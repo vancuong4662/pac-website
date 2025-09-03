@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'solution', target: '#solution-section' },
     { name: 'courses', target: '#courses-section' },
     { name: 'find-teacher', target: '#find-teacher-section' },
-    { name: 'call-to-action', target: '#call-to-action-section' },
+    { name: 'feedback', target: '#feedback-section' },
     { name: 'footer', target: '#footer-section' }
   ];
 

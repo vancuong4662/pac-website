@@ -207,4 +207,99 @@
   // Initialize slideshow when DOM is loaded
   window.addEventListener('load', initHeroSlideshow);
 
+  /**
+   * Feedback Slideshow
+   */
+  function initFeedbackSlideshow() {
+    const slides = document.querySelectorAll('.feedback .testimonial-slide');
+    const indicators = document.querySelectorAll('.feedback .indicator');
+    let currentSlide = 0;
+    let slideInterval = null;
+    let isInitialized = false;
+    
+    if (slides.length === 0 || isInitialized) return;
+    
+    // Mark as initialized to prevent multiple initializations
+    isInitialized = true;
+
+    function showSlide(index) {
+      // Clear any existing interval first
+      if (slideInterval) {
+        clearInterval(slideInterval);
+        slideInterval = null;
+      }
+      
+      // Remove active class from all slides and indicators
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(indicator => indicator.classList.remove('active'));
+      
+      // Add active class to selected slide and indicator
+      if (slides[index] && indicators[index]) {
+        slides[index].classList.add('active');
+        indicators[index].classList.add('active');
+      }
+      
+      currentSlide = index;
+      
+      // Restart the interval after showing slide
+      startSlideshow();
+    }
+
+    function nextSlide() {
+      const nextIndex = (currentSlide + 1) % slides.length;
+      currentSlide = nextIndex;
+      
+      // Remove active class from all slides and indicators
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(indicator => indicator.classList.remove('active'));
+      
+      // Add active class to current slide and indicator
+      if (slides[currentSlide] && indicators[currentSlide]) {
+        slides[currentSlide].classList.add('active');
+        indicators[currentSlide].classList.add('active');
+      }
+    }
+
+    function startSlideshow() {
+      // Clear existing interval if any
+      if (slideInterval) {
+        clearInterval(slideInterval);
+      }
+      // Set new interval
+      slideInterval = setInterval(nextSlide, 3000); // Exactly 3 seconds
+    }
+
+    function stopSlideshow() {
+      if (slideInterval) {
+        clearInterval(slideInterval);
+        slideInterval = null;
+      }
+    }
+
+    // Add click handlers to indicators
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        if (index !== currentSlide) {
+          showSlide(index);
+        }
+      });
+    });
+
+    // Pause on hover
+    const feedbackSection = document.querySelector('.feedback');
+    if (feedbackSection) {
+      feedbackSection.addEventListener('mouseenter', stopSlideshow);
+      feedbackSection.addEventListener('mouseleave', startSlideshow);
+    }
+
+    // Start the slideshow
+    startSlideshow();
+  }
+
+  // Initialize feedback slideshow when DOM is loaded
+  window.addEventListener('load', function() {
+    // Wait a bit to ensure all components are loaded
+    setTimeout(initFeedbackSlideshow, 500);
+  });
+
 })();
