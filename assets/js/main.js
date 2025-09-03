@@ -323,6 +323,13 @@
 
   async function loadTeamData() {
     try {
+      // Check if team grid exists, if not, retry later
+      const grid = document.getElementById('team-members-grid');
+      if (!grid) {
+        setTimeout(loadTeamData, 300);
+        return;
+      }
+
       // Check localStorage first
       const cachedData = localStorage.getItem('teamMembersData');
       const cacheTimestamp = localStorage.getItem('teamMembersTimestamp');
@@ -355,6 +362,9 @@
       showErrorMessage();
     }
   }
+
+  // Make loadTeamData globally accessible
+  window.loadTeamData = loadTeamData;
 
   function renderTeamMembers() {
     const grid = document.getElementById('team-members-grid');
@@ -483,12 +493,54 @@
     bootstrapModal.show();
   }
 
-  // Initialize team functionality when DOM is loaded
-  window.addEventListener('load', function() {
-    setTimeout(() => {
+  // Initialize team functionality with multiple strategies
+  function initTeamWithFallback() {
+    if (document.getElementById('team-members-grid')) {
       loadTeamData();
       initTeamModal();
-    }, 500);
+      return true;
+    }
+    return false;
+  }
+
+  // Strategy 1: DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (!initTeamWithFallback()) {
+          // Retry after a delay if team section not ready
+          setTimeout(initTeamWithFallback, 500);
+        }
+      }, 100);
+    });
+  } else {
+    // Document already loaded
+    setTimeout(() => {
+      if (!initTeamWithFallback()) {
+        // Retry after a delay if team section not ready
+        setTimeout(initTeamWithFallback, 500);
+      }
+    }, 100);
+  }
+
+  // Strategy 2: Window load event
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      if (!initTeamWithFallback()) {
+        // Retry after a delay if team section not ready
+        setTimeout(initTeamWithFallback, 500);
+      }
+    }, 200);
   });
+
+  // Strategy 3: Delayed fallback for cached pages
+  setTimeout(() => {
+    initTeamWithFallback();
+  }, 1000);
+
+  // Strategy 4: Final safety net
+  setTimeout(() => {
+    initTeamWithFallback();
+  }, 2500);
 
 })();

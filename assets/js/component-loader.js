@@ -192,6 +192,9 @@ class ComponentLoader {
       case 'find-teacher':
         this.initializeFindTeacher(targetElement);
         break;
+      case 'team':
+        this.initializeTeam(targetElement);
+        break;
       case 'partners':
         this.initializePartners(targetElement);
         break;
@@ -430,6 +433,58 @@ class ComponentLoader {
         // Silent fail in production
       }
     }
+  }
+  
+  /**
+   * Initialize team component
+   */
+  initializeTeam(targetElement) {
+    // Team-specific initialization
+    // Wait a bit for DOM to settle, then trigger team data loading
+    setTimeout(() => {
+      if (typeof window.loadTeamData === 'function') {
+        window.loadTeamData();
+      } else {
+        // Retry a few times as loadTeamData might not be available yet
+        this.initializeTeamWithRetry(0);
+      }
+    }, 100);
+  }
+  
+  /**
+   * Retry team initialization with exponential backoff
+   */
+  initializeTeamWithRetry(attempts) {
+    const maxAttempts = 5;
+    attempts = attempts || 0;
+    
+    const tryInit = () => {
+      attempts++;
+      
+      // Check if the team grid exists first
+      const teamGrid = document.querySelector('#team-members-grid');
+      if (!teamGrid) {
+        if (attempts < maxAttempts) {
+          setTimeout(tryInit, 300);
+        }
+        return;
+      }
+      
+      // Check if function exists
+      if (typeof window.loadTeamData === 'function') {
+        window.loadTeamData();
+        return;
+      }
+      
+      // Retry if failed and we have attempts left
+      if (attempts < maxAttempts) {
+        const delay = Math.min(500 * attempts, 2000); // Max 2 second delay
+        setTimeout(tryInit, delay);
+      }
+    };
+    
+    // Start first attempt
+    tryInit();
   }
 }
 
