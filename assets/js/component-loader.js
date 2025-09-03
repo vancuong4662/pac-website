@@ -53,25 +53,40 @@ class ComponentLoader {
     try {
       let componentHtml = '';
 
-      // Check cache first
-      if (useCache && this.componentCache.has(componentName)) {
-        componentHtml = this.componentCache.get(componentName);
+      // Check cache first (but add cache busting for development)
+      const cacheKey = componentName + '_v1.1'; // Version for cache busting
+      if (useCache && this.componentCache.has(cacheKey)) {
+        componentHtml = this.componentCache.get(cacheKey);
       } else {
-        // Fetch component from server
-        const response = await fetch(`components/${componentName}.html`);
+        // Fetch component from server với cache busting
+        const cacheBuster = new Date().getTime();
+        const response = await fetch(`components/${componentName}.html?v=${cacheBuster}`);
         if (!response.ok) {
           throw new Error(`Failed to load component: ${componentName}`);
         }
         componentHtml = await response.text();
         
-        // Cache the component
+        // Cache the component với versioned key
         if (useCache) {
-          this.componentCache.set(componentName, componentHtml);
+          this.componentCache.set(cacheKey, componentHtml);
         }
       }
 
       // Insert component into target
       target.innerHTML = componentHtml;
+      
+      // Force execute any scripts in the component
+      const scripts = target.querySelectorAll('script');
+      scripts.forEach(script => {
+        const newScript = document.createElement('script');
+        if (script.src) {
+          newScript.src = script.src;
+        } else {
+          newScript.textContent = script.textContent;
+        }
+        // Replace the old script with new one to force execution
+        script.parentNode.replaceChild(newScript, script);
+      });
       
       // Update loading states
       target.classList.remove('component-loading');
@@ -80,8 +95,10 @@ class ComponentLoader {
       // Mark as loaded
       this.loadedComponents.add(componentName);
       
-      // Trigger component-specific initialization
-      this.initializeComponent(componentName, target);
+      // Trigger component-specific initialization với delay để đảm bảo DOM ready
+      setTimeout(() => {
+        this.initializeComponent(componentName, target);
+      }, 100);
       
       return true;
 
@@ -174,6 +191,9 @@ class ComponentLoader {
         break;
       case 'find-teacher':
         this.initializeFindTeacher(targetElement);
+        break;
+      case 'partners':
+        this.initializePartners(targetElement);
         break;
       // Add more component-specific initializations as needed
     }
@@ -275,6 +295,33 @@ class ComponentLoader {
    */
   initializeHero(element) {
     // Hero-specific initialization
+    // Wait a bit for DOM to settle, then trigger hero slideshow
+    setTimeout(() => {
+      if (typeof initHeroSlideshow === 'function') {
+        initHeroSlideshow();
+      } else {
+        // Try to find and call hero slideshow from main.js
+        const slides = element.querySelectorAll('.hero-slideshow .slide');
+        if (slides.length > 0) {
+          this.manualHeroInit(slides);
+        }
+      }
+    }, 100);
+  }
+  
+  /**
+   * Manual hero slideshow initialization
+   */
+  manualHeroInit(slides) {
+    let currentSlide = 0;
+    
+    function showNextSlide() {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+    
+    setInterval(showNextSlide, 2000);
   }
 
   initializeFeaturedPrograms(element) {
@@ -309,6 +356,81 @@ class ComponentLoader {
       cachedComponents: Array.from(this.componentCache.keys())
     };
   }
+
+  /**
+   * Initialize Partners slideshow component
+   */
+  initializePartners(targetElement) {
+    // Wait a bit for script to execute
+    setTimeout(() => {
+      this.attemptPartnersInit();
+    }, 200);
+  }
+  
+  /**
+   * Attempt to initialize partners slideshow with better error handling
+   */
+  attemptPartnersInit() {
+    const maxAttempts = 10;
+    let attempts = 0;
+    
+    const tryInit = () => {
+      attempts++;
+      
+      // Check if the elements exist first
+      const partnersSection = document.querySelector('#partners');
+      if (!partnersSection) {
+        if (attempts < maxAttempts) {
+          setTimeout(tryInit, 300);
+        }
+        return;
+      }
+      
+      // Check if function exists
+      if (typeof window.initPartnersSlideshow === 'function') {
+        const success = window.initPartnersSlideshow();
+        if (success) {
+          return;
+        }
+      }
+      
+      // Retry if failed and we have attempts left
+      if (attempts < maxAttempts) {
+        const delay = Math.min(500 * attempts, 2000); // Max 2 second delay
+        setTimeout(tryInit, delay);
+      } else {
+        // As a last resort, try to manually initialize
+        this.manualPartnersInit();
+      }
+    };
+    
+    // Start first attempt
+    tryInit();
+  }
+  
+  /**
+   * Manual initialization as last resort
+   */
+  manualPartnersInit() {
+    const partnersSection = document.querySelector('#partners');
+    if (!partnersSection) return;
+    
+    // Try to trigger the inline script again
+    const script = partnersSection.querySelector('script');
+    if (script) {
+      try {
+        eval(script.textContent);
+        // Try calling the function after a delay
+        setTimeout(() => {
+          if (typeof window.initPartnersSlideshow === 'function') {
+            window.initPartnersSlideshow();
+          }
+        }, 100);
+      } catch (error) {
+        // Silent fail in production
+      }
+    }
+  }
 }
 
 // Initialize global component loader
@@ -326,6 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'courses', target: '#courses-section' },
     { name: 'team', target: '#team-section' },
     { name: 'feedback', target: '#feedback-section' },
+    { name: 'partners', target: '#partners-section' },
     { name: 'footer', target: '#footer-section' }
   ];
 

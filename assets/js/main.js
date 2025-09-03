@@ -205,7 +205,19 @@
   }
 
   // Initialize slideshow when DOM is loaded
-  window.addEventListener('load', initHeroSlideshow);
+  window.addEventListener('load', function() {
+    // Wait for components to load first
+    setTimeout(function() {
+      initHeroSlideshow();
+      
+      // If still no slides, retry a few more times
+      if (document.querySelectorAll('.hero-slideshow .slide').length === 0) {
+        setTimeout(initHeroSlideshow, 500);
+        setTimeout(initHeroSlideshow, 1000);
+        setTimeout(initHeroSlideshow, 1500);
+      }
+    }, 200);
+  });
 
   /**
    * Feedback Slideshow
@@ -299,7 +311,9 @@
   // Initialize feedback slideshow when DOM is loaded
   window.addEventListener('load', function() {
     // Wait a bit to ensure all components are loaded
-    setTimeout(initFeedbackSlideshow, 500);
+    setTimeout(function() {
+      initFeedbackSlideshow();
+    }, 600);
   });
 
   /**

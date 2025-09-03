@@ -1,0 +1,522 @@
+<!-- Partners Section -->
+<section id="partners" class="partners section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>ĐỐI TÁC & KHÁCH HÀNG</h2>
+    <p>Chúng tôi tự hào hợp tác cùng các tổ chức uy tín hàng đầu</p>
+  </div>
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="partners-carousel">
+      <!-- Main logo display area -->
+      <div class="main-logo-container">
+        <div class="main-logo">
+          <img id="main-partner-logo" src="assets/img/partner/Morrisby-logo.png" alt="Partner Logo" />
+        </div>
+      </div>
+
+      <!-- Surrounding logos -->
+      <div class="surrounding-logos">
+        <!-- Top logos -->
+        <div class="logo-position top-left">
+          <img class="partner-logo" src="assets/img/partner/NQA_ISO9001_CMYK.jpg" alt="NQA ISO 9001" />
+        </div>
+        <div class="logo-position top-right">
+          <img class="partner-logo" src="assets/img/partner/the-british-psy.png" alt="The British Psychological Society" />
+        </div>
+        
+        <!-- Side logos -->
+        <div class="logo-position left">
+          <img class="partner-logo" src="assets/img/partner/iacac.png" alt="IACAC" />
+        </div>
+        <div class="logo-position right">
+          <img class="partner-logo" src="assets/img/partner/IECA-Logo_CMYK-horizontal-new-1.png" alt="IECA" />
+        </div>
+        
+        <!-- Bottom logos -->
+        <div class="logo-position bottom-left">
+          <img class="partner-logo" src="assets/img/partner/CDI.png" alt="CDI" />
+        </div>
+        <div class="logo-position bottom-right">
+          <img class="partner-logo" src="assets/img/partner/Matrix-QM-RGB-2.png" alt="Matrix" />
+        </div>
+
+        <!-- Hidden logo for rotation -->
+        <div class="logo-position hidden">
+          <img class="partner-logo" src="assets/img/partner/hcpc.jpg" alt="HCPC" />
+        </div>
+      </div>
+
+      <!-- Navigation dots -->
+      <div class="carousel-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+        <span class="dot" data-index="4"></span>
+        <span class="dot" data-index="5"></span>
+        <span class="dot" data-index="6"></span>
+        <span class="dot" data-index="7"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.partners {
+  background: linear-gradient(135deg, #f8f9ff 0%, #e6f0ff 100%);
+  padding: 80px 0;
+}
+
+.partners .section-title h2 {
+  color: var(--heading-color);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.partners .section-title p {
+  color: var(--default-color);
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.partners-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-logo-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--accent-color);
+}
+
+.main-logo {
+  width: 200px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.surrounding-logos {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-position {
+  position: absolute;
+  width: 120px;
+  height: 80px;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.7;
+}
+
+.logo-position:hover {
+  opacity: 1;
+  transform: scale(1.05) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.logo-position.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.logo-position img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+/* Position the surrounding logos */
+.top-left {
+  top: 50px;
+  left: 100px;
+}
+
+.top-right {
+  top: 50px;
+  right: 100px;
+}
+
+.left {
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+}
+
+.right {
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+.bottom-left {
+  bottom: 50px;
+  left: 100px;
+}
+
+.bottom-right {
+  bottom: 50px;
+  right: 100px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(var(--accent-color-rgb), 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: var(--accent-color);
+  transform: scale(1.2);
+}
+
+.dot:hover {
+  background: var(--accent-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .partners-carousel {
+    height: 400px;
+    max-width: 600px;
+  }
+  
+  .main-logo-container {
+    padding: 20px;
+  }
+  
+  .main-logo {
+    width: 150px;
+    height: 90px;
+  }
+  
+  .logo-position {
+    width: 90px;
+    height: 60px;
+    padding: 10px;
+  }
+  
+  .top-left, .top-right {
+    top: 40px;
+  }
+  
+  .bottom-left, .bottom-right {
+    bottom: 40px;
+  }
+  
+  .left {
+    left: 10px;
+  }
+  
+  .right {
+    right: 10px;
+  }
+  
+  .top-left, .bottom-left {
+    left: 60px;
+  }
+  
+  .top-right, .bottom-right {
+    right: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .partners {
+    padding: 60px 0;
+  }
+  
+  .partners-carousel {
+    height: 350px;
+    max-width: 90%;
+  }
+  
+  .main-logo {
+    width: 120px;
+    height: 70px;
+  }
+  
+  .logo-position {
+    width: 70px;
+    height: 45px;
+    padding: 8px;
+  }
+  
+  .partners .section-title h2 {
+    font-size: 2rem;
+  }
+}
+</style>
+
+<script>
+// Completely isolated partners slideshow - no conflicts
+(function() {
+  'use strict';
+  
+  // Namespace cho partners slideshow để tránh xung đột
+  const PartnersSlideshow = {
+    partners: [
+      { 
+        main: 'assets/img/partner/Morrisby-logo.png',
+        alt: 'Morrisby'
+      },
+      { 
+        main: 'assets/img/partner/NQA_ISO9001_CMYK.jpg',
+        alt: 'NQA ISO 9001'
+      },
+      { 
+        main: 'assets/img/partner/the-british-psy.png',
+        alt: 'The British Psychological Society'
+      },
+      { 
+        main: 'assets/img/partner/iacac.png',
+        alt: 'IACAC'
+      },
+      { 
+        main: 'assets/img/partner/IECA-Logo_CMYK-horizontal-new-1.png',
+        alt: 'IECA'
+      },
+      { 
+        main: 'assets/img/partner/CDI.png',
+        alt: 'CDI'
+      },
+      { 
+        main: 'assets/img/partner/Matrix-QM-RGB-2.png',
+        alt: 'Matrix'
+      },
+      { 
+        main: 'assets/img/partner/hcpc.jpg',
+        alt: 'HCPC'
+      }
+    ],
+    
+    currentIndex: 0,
+    autoSlideInterval: null,
+    isInitialized: false,
+    elements: {},
+    
+    init: function() {
+      if (this.isInitialized) return true;
+      
+      // Find elements
+      this.elements.section = document.querySelector('#partners');
+      if (!this.elements.section) return false;
+      
+      this.elements.mainLogo = this.elements.section.querySelector('#main-partner-logo');
+      this.elements.dots = this.elements.section.querySelectorAll('.dot');
+      this.elements.surroundingLogos = this.elements.section.querySelectorAll('.logo-position:not(.hidden)');
+      this.elements.carousel = this.elements.section.querySelector('.partners-carousel');
+      
+      if (!this.elements.mainLogo || this.elements.dots.length === 0 || this.elements.surroundingLogos.length === 0) {
+        return false;
+      }
+      
+      this.setupEventListeners();
+      this.updateCarousel(false);
+      this.startAutoSlide();
+      
+      this.isInitialized = true;
+      return true;
+    },
+    
+    updateCarousel: function(animate = true) {
+      const self = this;
+      
+      // Update main logo
+      if (animate) {
+        this.elements.mainLogo.style.opacity = '0';
+        setTimeout(function() {
+          self.elements.mainLogo.src = self.partners[self.currentIndex].main;
+          self.elements.mainLogo.alt = self.partners[self.currentIndex].alt;
+          self.elements.mainLogo.style.opacity = '1';
+        }, 300);
+      } else {
+        this.elements.mainLogo.src = this.partners[this.currentIndex].main;
+        this.elements.mainLogo.alt = this.partners[this.currentIndex].alt;
+      }
+      
+      // Update dots
+      this.elements.dots.forEach(function(dot, index) {
+        if (index === self.currentIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+      
+      // Update surrounding logos
+      this.updateSurroundingLogos(animate);
+    },
+    
+    updateSurroundingLogos: function(animate = true) {
+      const self = this;
+      
+      this.elements.surroundingLogos.forEach(function(logoContainer, index) {
+        const img = logoContainer.querySelector('img');
+        if (!img) return;
+        
+        if (animate) {
+          logoContainer.style.transform = 'scale(0.9)';
+          logoContainer.style.opacity = '0.4';
+          
+          setTimeout(function() {
+            const partnerIndex = (self.currentIndex + index + 1) % self.partners.length;
+            img.src = self.partners[partnerIndex].main;
+            img.alt = self.partners[partnerIndex].alt;
+            
+            logoContainer.style.transform = 'scale(1)';
+            logoContainer.style.opacity = '0.7';
+          }, 150 + index * 30);
+        } else {
+          const partnerIndex = (self.currentIndex + index + 1) % self.partners.length;
+          img.src = self.partners[partnerIndex].main;
+          img.alt = self.partners[partnerIndex].alt;
+        }
+      });
+    },
+    
+    nextSlide: function() {
+      this.currentIndex = (this.currentIndex + 1) % this.partners.length;
+      this.updateCarousel(true);
+    },
+    
+    goToSlide: function(index) {
+      if (index >= 0 && index < this.partners.length && index !== this.currentIndex) {
+        this.currentIndex = index;
+        this.updateCarousel(true);
+      }
+    },
+    
+    startAutoSlide: function() {
+      const self = this;
+      this.stopAutoSlide();
+      this.autoSlideInterval = setInterval(function() {
+        self.nextSlide();
+      }, 2000);
+    },
+    
+    stopAutoSlide: function() {
+      if (this.autoSlideInterval) {
+        clearInterval(this.autoSlideInterval);
+        this.autoSlideInterval = null;
+      }
+    },
+    
+    setupEventListeners: function() {
+      const self = this;
+      
+      // Dot navigation
+      this.elements.dots.forEach(function(dot, index) {
+        dot.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          self.stopAutoSlide();
+          self.goToSlide(index);
+          
+          setTimeout(function() {
+            self.startAutoSlide();
+          }, 3000);
+        });
+      });
+      
+      // Hover pause
+      if (this.elements.carousel) {
+        this.elements.carousel.addEventListener('mouseenter', function() {
+          self.stopAutoSlide();
+        });
+        
+        this.elements.carousel.addEventListener('mouseleave', function() {
+          self.startAutoSlide();
+        });
+      }
+    }
+  };
+  
+  // Global access function
+  window.initPartnersSlideshow = function() {
+    return PartnersSlideshow.init();
+  };
+  
+  // Auto-initialization attempts
+  function tryInit() {
+    if (PartnersSlideshow.init()) {
+      return; // Success
+    }
+    // Retry with exponential backoff
+    setTimeout(tryInit, 300);
+  }
+  
+  // Multiple initialization strategies
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(tryInit, 100);
+    });
+  } else {
+    setTimeout(tryInit, 50);
+  }
+  
+  // Fallback attempts
+  window.addEventListener('load', function() {
+    setTimeout(tryInit, 100);
+  });
+  
+  setTimeout(function() {
+    if (!PartnersSlideshow.isInitialized) {
+      tryInit();
+    }
+  }, 1000);
+  
+  setTimeout(function() {
+    if (!PartnersSlideshow.isInitialized) {
+      tryInit();
+    }
+  }, 2500);
+  
+})();
+</script>
