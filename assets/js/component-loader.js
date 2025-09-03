@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'about', target: '#about-section' },
     { name: 'why-choose', target: '#why-choose-section' },
     { name: 'solution', target: '#solution-section' },
-    { name: 'featured-services', target: '#featured-services-section' },
+    { name: 'courses', target: '#courses-section' },
     { name: 'find-teacher', target: '#find-teacher-section' },
     { name: 'call-to-action', target: '#call-to-action-section' },
     { name: 'footer', target: '#footer-section' }
