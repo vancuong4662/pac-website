@@ -440,9 +440,18 @@
   /**
    * Team Member Modal
    */
+  let memberModalInstance = null; // Store single modal instance
+  
   function initTeamModal() {
     const modal = document.getElementById('memberModal');
     if (!modal) return;
+    
+    // Create single modal instance
+    memberModalInstance = new bootstrap.Modal(modal, {
+      keyboard: true,
+      backdrop: true,
+      focus: true
+    });
 
     // Use event delegation to handle dynamically created buttons
     document.addEventListener('click', (e) => {
@@ -451,9 +460,30 @@
         showMemberModal(memberId);
       }
     });
+    
+    // Clean up backdrop when modal is hidden
+    modal.addEventListener('hidden.bs.modal', function () {
+      // Force cleanup any remaining backdrops
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => {
+        if (backdrop.parentNode) {
+          backdrop.parentNode.removeChild(backdrop);
+        }
+      });
+      // Ensure body class is cleaned
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    });
   }
 
   function showMemberModal(memberId) {
+    // Don't proceed if modal instance not ready
+    if (!memberModalInstance) {
+      setTimeout(() => showMemberModal(memberId), 100);
+      return;
+    }
+
     const member = teamMembers.find(m => {
       const normalizedName = m.name.toLowerCase()
         .normalize('NFD')
@@ -487,10 +517,8 @@
     // Update description
     document.getElementById('memberDescription').innerHTML = member.description || 'Thông tin chi tiết sẽ được cập nhật sớm...';
 
-    // Show modal
-    const modal = document.getElementById('memberModal');
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    // Show modal using existing instance
+    memberModalInstance.show();
   }
 
   // Initialize team functionality with multiple strategies
