@@ -40,8 +40,7 @@ pac-new/
 
 | Document | Description |
 |----------|-------------|
-| [📦 Components](docs/COMPONENTS.md) | Component overview và usage |
-| [🏗️ Architecture](docs/component-architecture.md) | Component system chi tiết |
+| [📦 Components](docs/component-system.md) | Component system |
 | [⚡ Tech Stack](docs/tech-stack.md) | Technologies và tools |
 | [🎨 Brand Colors](docs/brand-colors.md) | PAC Group brand colors guide |
 | [🔧 Development](docs/development-guide.md) | Development workflow |
