@@ -1,0 +1,75 @@
+<!-- Team Section -->
+<section id="team" class="find-a-doctor section">
+
+  <!-- Section Title -->
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Đội Ngũ Chuyên Gia</h2>
+    <p>Chuyên gia trong lĩnh vực tư vấn giáo dục và định hướng nghề nghiệp</p>
+  </div><!-- End Section Title -->
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+    <div class="row specialists-grid" id="team-members-grid" data-aos="fade-up" data-aos-delay="200">
+      <!-- Members will be dynamically loaded here -->
+      <div class="col-12 text-center">
+        <div class="loading-spinner">
+          <i class="bi bi-arrow-clockwise spin"></i>
+          <p>Đang tải thông tin chuyên gia...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- View All Button -->
+    <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="700">
+      <a href="#members" class="btn-view-all">
+        Xem toàn bộ thành viên
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Team Member Modal -->
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="memberModalLabel">Thông tin chuyên gia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="member-details">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="member-photo">
+                <img id="memberPhoto" src="" alt="" class="img-fluid rounded">
+              </div>
+            </div>
+            <div class="col-md-8">
+              <h4 id="memberName"></h4>
+              <p class="member-role" id="memberRole"></p>
+              <span class="member-badge" id="memberBadge"></span>
+              
+              <div class="member-info mt-3">
+                <h6><strong>Bằng cấp và Chứng chỉ:</strong></h6>
+                <ul id="memberTitles" class="member-titles">
+                  <!-- Titles will be loaded here -->
+                </ul>
+                
+                <h6><strong>Thông tin:</strong></h6>
+                <p id="memberDescription" class="member-description">
+                  <!-- Description will be loaded here -->
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>

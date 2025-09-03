@@ -302,4 +302,179 @@
     setTimeout(initFeedbackSlideshow, 500);
   });
 
+  /**
+   * Team Data Management
+   */
+  let teamMembers = [];
+
+  async function loadTeamData() {
+    try {
+      // Check localStorage first
+      const cachedData = localStorage.getItem('teamMembersData');
+      const cacheTimestamp = localStorage.getItem('teamMembersTimestamp');
+      const currentTime = new Date().getTime();
+      const cacheAge = currentTime - (cacheTimestamp || 0);
+      const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+
+      if (cachedData && cacheAge < cacheExpiry) {
+        teamMembers = JSON.parse(cachedData);
+        renderTeamMembers();
+        return;
+      }
+
+      // Fetch from server
+      const response = await fetch('static/team.json');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      
+      const data = await response.json();
+      teamMembers = data.members;
+      
+      // Cache data
+      localStorage.setItem('teamMembersData', JSON.stringify(teamMembers));
+      localStorage.setItem('teamMembersTimestamp', currentTime.toString());
+      
+      renderTeamMembers();
+    } catch (error) {
+      console.error('Error loading team data:', error);
+      showErrorMessage();
+    }
+  }
+
+  function renderTeamMembers() {
+    const grid = document.getElementById('team-members-grid');
+    if (!grid || !teamMembers.length) return;
+
+    grid.innerHTML = '';
+
+    teamMembers.forEach((member, index) => {
+      const memberCard = createMemberCard(member, index);
+      grid.appendChild(memberCard);
+    });
+
+    // Initialize AOS animations for new elements
+    if (typeof AOS !== 'undefined') {
+      AOS.refresh();
+    }
+  }
+
+  function createMemberCard(member, index) {
+    const col = document.createElement('div');
+    col.className = 'col-lg-4 col-md-6 mb-4';
+    
+    const memberId = member.name.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/\s+/g, '-');
+
+    col.innerHTML = `
+      <div class="specialist-card" data-aos="slide-up" data-aos-delay="${100 + (index * 100)}">
+        <div class="card-content">
+          <div class="specialist-info">
+            <div class="profile-section">
+              <div class="profile-image">
+                <img src="${member.image}" alt="${member.name}" class="img-fluid">
+                <div class="online-status active"></div>
+              </div>
+              <div class="specialist-data">
+                <h3>${member.name}</h3>
+                <p class="specialty">${member.role}</p>
+                <div class="credentials">
+                  <span class="badge">${member.badge}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button class="action-btn primary" data-member="${memberId}">Xem thông tin</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return col;
+  }
+
+  function showErrorMessage() {
+    const grid = document.getElementById('team-members-grid');
+    if (!grid) return;
+
+    grid.innerHTML = `
+      <div class="col-12 text-center">
+        <div class="error-message">
+          <i class="bi bi-exclamation-triangle text-warning"></i>
+          <p>Không thể tải thông tin chuyên gia. Vui lòng thử lại sau.</p>
+          <button class="btn btn-primary" onclick="loadTeamData()">Thử lại</button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Team Member Modal
+   */
+  function initTeamModal() {
+    const modal = document.getElementById('memberModal');
+    if (!modal) return;
+
+    // Use event delegation to handle dynamically created buttons
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('[data-member]')) {
+        const memberId = e.target.getAttribute('data-member');
+        showMemberModal(memberId);
+      }
+    });
+  }
+
+  function showMemberModal(memberId) {
+    const member = teamMembers.find(m => {
+      const normalizedName = m.name.toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .replace(/\s+/g, '-');
+      return normalizedName === memberId;
+    });
+
+    if (!member) return;
+
+    // Update modal content
+    document.getElementById('memberName').textContent = member.name;
+    document.getElementById('memberRole').textContent = member.role;
+    document.getElementById('memberBadge').textContent = member.badge;
+    document.getElementById('memberPhoto').src = member.image;
+    document.getElementById('memberPhoto').alt = member.name;
+
+    // Update titles list
+    const titlesContainer = document.getElementById('memberTitles');
+    titlesContainer.innerHTML = '';
+    if (member.title && member.title.length > 0) {
+      member.title.forEach(title => {
+        const li = document.createElement('li');
+        li.textContent = title;
+        titlesContainer.appendChild(li);
+      });
+    }
+
+    // Update description
+    document.getElementById('memberDescription').innerHTML = member.description || 'Thông tin chi tiết sẽ được cập nhật sớm...';
+
+    // Show modal
+    const modal = document.getElementById('memberModal');
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+  }
+
+  // Initialize team functionality when DOM is loaded
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      loadTeamData();
+      initTeamModal();
+    }, 500);
+  });
+
 })();

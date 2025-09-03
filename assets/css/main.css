@@ -6939,3 +6939,263 @@ section,
     font-size: 2rem;
   }
 }
+
+/*--------------------------------------------------------------
+# Team Section (Inheriting Find Doctor styles)
+--------------------------------------------------------------*/
+
+.team-section .container {
+  max-width: 1200px;
+}
+
+.team-section .specialists-grid {
+  margin-top: 40px;
+}
+
+.team-section .specialists-grid .col-lg-4 {
+  padding: 0 15px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .team-section .specialists-grid .col-lg-4 {
+    margin-bottom: 20px;
+  }
+  
+  .team-section .specialists-grid .mb-4:last-child {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* Inherit all specialist card styles */
+.team-section .specialist-card {
+  background: var(--surface-color);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 92%);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.team-section .specialist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--default-color), transparent 85%);
+  border-color: color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.team-section .specialist-card.featured {
+  border-color: var(--accent-color);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--accent-color), transparent 80%);
+}
+
+.team-section .specialist-card.featured .card-content {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-color), transparent 95%) 0%, var(--surface-color) 100%);
+}
+
+.team-section .specialist-card .card-content {
+  padding: 1.75rem;
+}
+
+.team-section .specialist-card .specialist-info {
+  margin-bottom: 1.5rem;
+}
+
+.team-section .specialist-card .specialist-info .profile-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image img {
+  width: 70px;
+  height: 70px;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image .online-status {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid var(--surface-color);
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image .online-status.active {
+  background: #22c55e;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image .online-status.busy {
+  background: #f59e0b;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .profile-image .online-status.offline {
+  background: color-mix(in srgb, var(--default-color), transparent 50%);
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data {
+  flex: 1;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--heading-color);
+  margin-bottom: 0.25rem;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data .specialty {
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data .credentials {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data .credentials .badge {
+  background: color-mix(in srgb, var(--accent-color), transparent 85%);
+  color: var(--accent-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.team-section .specialist-card .specialist-info .profile-section .specialist-data .credentials .experience {
+  color: color-mix(in srgb, var(--default-color), transparent 40%);
+  font-size: 0.875rem;
+}
+
+.team-section .specialist-card .quick-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.team-section .specialist-card .quick-actions .action-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.team-section .specialist-card .quick-actions .action-btn.outline {
+  background: transparent;
+  color: var(--default-color);
+  border: 1.5px solid color-mix(in srgb, var(--default-color), transparent 75%);
+}
+
+.team-section .specialist-card .quick-actions .action-btn.outline:hover {
+  background: color-mix(in srgb, var(--default-color), transparent 95%);
+  border-color: color-mix(in srgb, var(--default-color), transparent 60%);
+  color: var(--default-color);
+  text-decoration: none;
+}
+
+.team-section .specialist-card .quick-actions .action-btn.primary {
+  background: var(--accent-color);
+  color: var(--contrast-color);
+  border: 1.5px solid var(--accent-color);
+}
+
+.team-section .specialist-card .quick-actions .action-btn.primary:hover {
+  background: color-mix(in srgb, var(--accent-color), black 10%);
+  border-color: color-mix(in srgb, var(--accent-color), black 10%);
+  color: var(--contrast-color);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Loading and Error States */
+.loading-spinner {
+  padding: 60px 20px;
+  color: color-mix(in srgb, var(--default-color), transparent 50%);
+}
+
+.loading-spinner i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+.loading-spinner p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  padding: 60px 20px;
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+}
+
+.error-message i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-message p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modal Enhancements */
+.member-badge {
+  background: color-mix(in srgb, var(--accent-color), transparent 85%);
+  color: var(--accent-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.member-role {
+  color: color-mix(in srgb, var(--default-color), transparent 30%);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.member-titles {
+  background: color-mix(in srgb, var(--default-color), transparent 95%);
+  border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+  padding: 1.25rem 1.5rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  list-style-type: disc;
+}
+
+.member-titles li {
+  margin-bottom: 0.75rem;
+  margin-left: 1rem;
+  color: color-mix(in srgb, var(--default-color), transparent 15%);
+  line-height: 1.5;
+}
+
+.member-titles li:last-child {
+  margin-bottom: 0;
+}
+
+.member-description {
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+  line-height: 1.6;
+  text-align: justify;
+}

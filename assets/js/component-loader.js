@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'why-choose', target: '#why-choose-section' },
     { name: 'solution', target: '#solution-section' },
     { name: 'courses', target: '#courses-section' },
-    { name: 'find-teacher', target: '#find-teacher-section' },
+    { name: 'team', target: '#team-section' },
     { name: 'feedback', target: '#feedback-section' },
     { name: 'footer', target: '#footer-section' }
   ];
