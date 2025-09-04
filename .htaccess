@@ -69,6 +69,7 @@ RewriteRule ^contact/?$ templates/contact.html [L]
 RewriteRule ^dangnhap/?$ templates/login.html [L]
 RewriteRule ^dangky/?$ templates/register.html [L]
 RewriteRule ^profile/?$ templates/profile.html [L]
+RewriteRule ^payment-history/?$ templates/payment-history.html [L]
 
 # Admin pages (with authentication check)
 RewriteRule ^admin/?$ templates/admin/login.html [L]

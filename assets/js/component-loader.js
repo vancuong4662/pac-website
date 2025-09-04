@@ -500,8 +500,54 @@ window.componentLoader = new ComponentLoader();
 document.addEventListener('DOMContentLoaded', function() {
   // Check if page has custom component loading (will be defined by specific pages)
   if (window.pageComponentsConfig) {
-    window.componentLoader.loadComponents(window.pageComponentsConfig);
-    return;
+    
+    // Handle array format (legacy format for profile page)
+    if (Array.isArray(window.pageComponentsConfig)) {
+      window.componentLoader.loadComponents(window.pageComponentsConfig).then(() => {
+        // Set active navigation based on current page
+        setTimeout(() => {
+          setActiveNavigation();
+        }, 200);
+      });
+      return;
+    }
+    
+    // Handle object format (new format for payment-history and other pages)
+    if (typeof window.pageComponentsConfig === 'object') {
+      // Convert pageComponentsConfig object to components array
+      const pageComponents = [];
+      
+      // Add header and footer if they exist
+      if (document.querySelector('#header-section')) {
+        pageComponents.push({ name: 'header', target: '#header-section' });
+      }
+      
+      if (document.querySelector('#footer-section')) {
+        pageComponents.push({ name: 'footer', target: '#footer-section' });
+      }
+      
+      // Add sidebar if configured
+      if (window.pageComponentsConfig.sidebar) {
+        const sidebarTarget = '#profile-sidebar, #payment-history-sidebar';
+        const sidebarElement = document.querySelector('#profile-sidebar') || document.querySelector('#payment-history-sidebar');
+        if (sidebarElement) {
+          pageComponents.push({ 
+            name: window.pageComponentsConfig.sidebar.replace('.html', ''), 
+            target: sidebarElement.id ? `#${sidebarElement.id}` : '#profile-sidebar'
+          });
+        }
+      }
+      
+      if (pageComponents.length > 0) {
+        window.componentLoader.loadComponents(pageComponents).then(() => {
+          // Set active navigation based on current page
+          setTimeout(() => {
+            setActiveNavigation();
+          }, 200);
+        });
+      }
+      return;
+    }
   }
   
   // Default components for index page (only if we detect index-specific elements)
@@ -523,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.componentLoader.loadComponents(indexComponents);
   } else {
-    // For other pages, only load header and footer if they exist
+    // For other pages without pageComponentsConfig, only load header and footer
     const commonComponents = [];
     
     if (document.querySelector('#header-section')) {
@@ -539,3 +585,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
+
+/**
+ * Set active navigation item based on current page
+ */
+function setActiveNavigation() {
+  const currentPath = window.location.pathname;
+  const currentPage = currentPath.split('/').pop() || 'index.html';
+  
+  // Find all navigation links
+  const navLinks = document.querySelectorAll('.profile-nav .nav-link');
+  
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    
+    // Check if this link matches current page
+    const href = link.getAttribute('href');
+    if (href) {
+      const linkPage = href.split('/').pop() || href;
+      
+      // Match patterns for different pages
+      if (
+        (currentPage.includes('payment-history') && href.includes('payment-history')) ||
+        (currentPage.includes('profile') && !currentPage.includes('payment-history') && href.includes('profile') && !href.includes('payment-history'))
+      ) {
+        link.classList.add('active');
+      }
+    }
+  });
+}

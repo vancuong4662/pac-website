@@ -63,7 +63,7 @@
         <div class="row">
           <!-- Profile Sidebar -->
           <div class="col-lg-3 col-md-4 mb-4">
-            <div id="profile-sidebar-section">
+            <div id="profile-sidebar">
               <!-- Profile sidebar component will be loaded here -->
             </div>
           </div>
@@ -249,12 +249,10 @@
   <!-- Profile specific JS -->
   <script src="assets/js/profile.js?v=1.0"></script>
   <script>
-    // Define custom components for profile page BEFORE DOMContentLoaded
-    window.pageComponentsConfig = [
-      { name: 'header', target: '#header-section' },
-      { name: 'profile-sidebar', target: '#profile-sidebar-section' },
-      { name: 'footer', target: '#footer-section' }
-    ];
+    // Configure page-specific components
+    window.pageComponentsConfig = {
+      sidebar: 'profile-sidebar.html'
+    };
   </script>
 
   <!-- Main JS File -->

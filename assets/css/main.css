@@ -7435,3 +7435,204 @@ section,
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
+
+/*--------------------------------------------------------------
+# Payment History Page Styles - PAC Group
+--------------------------------------------------------------*/
+.payment-history-page {
+  background-color: var(--bg-light);
+}
+
+/* Share header styles with profile page */
+.payment-history-page .page-header {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+  position: relative;
+  overflow: hidden;
+  margin-top: 78px !important;
+  padding-top: 50px !important;
+  padding-bottom: 60px;
+}
+
+.payment-history-page .page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: url('../img/s6-decor.png') no-repeat center right;
+  background-size: contain;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.payment-history-page .page-header .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Payment History Content */
+.payment-history-content {
+  background-color: var(--bg-light);
+  min-height: 70vh;
+}
+
+/* Summary Cards */
+.payment-history-page .summary-icon {
+  background: rgba(255, 255, 255, 0.1);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Payment History Table */
+.payment-history-page .table {
+  background: white;
+}
+
+.payment-history-page .table thead th {
+  background-color: var(--bg-light) !important;
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-color);
+}
+
+.payment-history-page .table tbody tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.payment-history-page .table tbody tr:hover {
+  background-color: rgba(255, 242, 0, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.payment-history-page .payment-row td {
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Badge styles */
+.payment-history-page .badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+}
+
+/* Action buttons */
+.payment-history-page .btn-group .btn {
+  border-radius: 6px;
+  margin-right: 2px;
+  transition: all 0.2s ease;
+}
+
+.payment-history-page .btn-group .btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Empty state */
+.payment-history-page .empty-state-icon {
+  background: rgba(108, 117, 125, 0.1);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+  .payment-history-page .page-header {
+    margin-top: 78px !important;
+    padding-top: 40px !important;
+    padding-bottom: 3rem;
+  }
+  
+  .payment-history-page .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .payment-history-page .btn-group {
+    flex-direction: column;
+  }
+  
+  .payment-history-page .btn-group .btn {
+    margin-bottom: 0.25rem;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-history-page .table th,
+  .payment-history-page .table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .payment-history-page .table thead {
+    font-size: 0.75rem;
+  }
+  
+  .payment-history-page .summary-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .payment-history-page .summary-icon i {
+    font-size: 1.8rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .payment-history-page .page-header {
+    margin-top: 78px !important;
+    padding-top: 30px !important;
+    padding-bottom: 2rem;
+  }
+  
+  .payment-history-page .table-responsive {
+    font-size: 0.8125rem;
+  }
+  
+  /* Stack table content on mobile */
+  .payment-history-page .table thead {
+    display: none;
+  }
+  
+  .payment-history-page .table,
+  .payment-history-page .table tbody,
+  .payment-history-page .table tr,
+  .payment-history-page .table td {
+    display: block;
+    width: 100%;
+  }
+  
+  .payment-history-page .table tr {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  
+  .payment-history-page .table td {
+    border: none;
+    padding: 0.5rem 0;
+    text-align: left !important;
+  }
+  
+  .payment-history-page .table td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}

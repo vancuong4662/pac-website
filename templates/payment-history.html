@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Lịch sử thanh toán</title>
+  <meta name="description" content="PAC Group - Xem lại lịch sử các giao dịch thanh toán và mua khóa học của bạn.">
+  <meta name="keywords" content="lịch sử thanh toán, PAC Group, giao dịch, khóa học, hóa đơn">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts - Montserrat for PAC Group -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+</head>
+
+<body class="payment-history-page">
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Header Section Container -->
+  <div id="header-section">
+    <!-- Header component will be loaded here -->
+  </div>
+
+  <main class="main">
+    <!-- Payment History Page Header -->
+    <section class="page-header bg-primary text-white py-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <h1 class="display-6 fw-bold mb-2 text-white">Lịch sử thanh toán</h1>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark mb-0">
+                <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">Lịch sử thanh toán</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment History Content -->
+    <section class="payment-history-content py-5">
+      <div class="container">
+        <div class="row">
+          <!-- Sidebar -->
+          <div class="col-lg-3 col-md-4 mb-4">
+            <div id="profile-sidebar">
+              <!-- Sidebar component will be loaded here -->
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="col-lg-9 col-md-8">
+            <div class="payment-history-main-content">
+              
+              <!-- Summary Cards -->
+              <div class="row mb-4">
+                <div class="col-md-6 col-lg-4 mb-3">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                      <div class="summary-icon mb-3">
+                        <i class="fas fa-credit-card text-primary" style="font-size: 2.5rem;"></i>
+                      </div>
+                      <h5 class="card-title text-muted mb-2">Tổng đã thanh toán</h5>
+                      <h3 class="text-primary fw-bold mb-0" id="total-paid">0 VND</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-3">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                      <div class="summary-icon mb-3">
+                        <i class="fas fa-graduation-cap text-success" style="font-size: 2.5rem;"></i>
+                      </div>
+                      <h5 class="card-title text-muted mb-2">Khóa học đã mua</h5>
+                      <h3 class="text-success fw-bold mb-0" id="total-courses">0</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-3">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center">
+                      <div class="summary-icon mb-3">
+                        <i class="fas fa-handshake text-info" style="font-size: 2.5rem;"></i>
+                      </div>
+                      <h5 class="card-title text-muted mb-2">Dịch vụ tư vấn</h5>
+                      <h3 class="text-info fw-bold mb-0" id="total-consultations">0</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment History Table -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                  <div class="row align-items-center">
+                    <div class="col">
+                      <h5 class="card-title mb-0">
+                        <i class="fas fa-history text-primary me-2"></i>
+                        Lịch sử giao dịch
+                      </h5>
+                    </div>
+                    <div class="col-auto">
+                      <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-filter me-1"></i>
+                          Lọc theo loại
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="#" data-filter="all">Tất cả</a></li>
+                          <li><a class="dropdown-item" href="#" data-filter="course">Khóa học</a></li>
+                          <li><a class="dropdown-item" href="#" data-filter="consultation">Tư vấn</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="payment-history-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-calendar me-2"></i>Ngày giao dịch
+                          </th>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-tag me-2"></i>Mã giao dịch
+                          </th>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-shopping-bag me-2"></i>Sản phẩm/Dịch vụ
+                          </th>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-list me-2"></i>Loại
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-end">
+                            <i class="fas fa-money-bill me-2"></i>Số tiền
+                          </th>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-info-circle me-2"></i>Trạng thái
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-center">
+                            <i class="fas fa-cog me-2"></i>Thao tác
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="payment-history-tbody">
+                        <!-- Payment history rows will be populated by JavaScript -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty State (initially hidden) -->
+              <div class="card border-0 shadow-sm d-none" id="empty-state">
+                <div class="card-body text-center py-5">
+                  <div class="empty-state-icon mb-4">
+                    <i class="fas fa-receipt text-muted" style="font-size: 4rem;"></i>
+                  </div>
+                  <h4 class="text-muted mb-3">Chưa có giao dịch nào</h4>
+                  <p class="text-muted mb-4">Bạn chưa thực hiện giao dịch nào. Hãy khám phá các khóa học và dịch vụ của chúng tôi!</p>
+                  <a href="/khoa-hoc" class="btn btn-primary">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Khám phá khóa học
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section Container -->
+  <div id="footer-section">
+    <!-- Footer component will be loaded here -->
+  </div>
+
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Component Loader -->
+  <script src="assets/js/component-loader.js"></script>
+  
+  <!-- Payment History JS -->
+  <script src="assets/js/payment-history.js"></script>
+
+  <script>
+    // Configure page-specific components
+    window.pageComponentsConfig = {
+      sidebar: 'profile-sidebar.html' // Sử dụng chung sidebar với profile
+    };
+  </script>
+
+</body>
+</html>
