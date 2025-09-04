@@ -1,0 +1,325 @@
+<!-- Profile Sidebar Component -->
+<div class="profile-sidebar">
+  <!-- User Info Section -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body text-center p-4">
+      <div class="profile-avatar-large mb-3">
+        <div class="avatar-circle-large bg-gradient-primary text-white d-flex align-items-center justify-content-center mx-auto">
+          <i class="fas fa-user fa-3x"></i>
+        </div>
+      </div>
+      <h5 class="fw-bold mb-1" id="sidebar-username">Nguyen Van A</h5>
+      <p class="text-muted small mb-3" id="sidebar-email">user@example.com</p>
+      <span class="badge bg-success-soft text-success px-3 py-2">
+        <i class="fas fa-check-circle me-1"></i>Đang hoạt động
+      </span>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="profile-nav">
+        <ul class="nav nav-pills nav-flush flex-column">
+          <!-- Profile Information -->
+          <li class="nav-item">
+            <a class="nav-link active d-flex align-items-center py-3 px-4" 
+               href="profile" 
+               id="nav-profile-info">
+              <div class="nav-icon me-3">
+                <i class="fas fa-user text-primary"></i>
+              </div>
+              <div class="nav-content flex-grow-1">
+                <div class="nav-title fw-semibold">Hồ sơ thông tin</div>
+                <div class="nav-subtitle small text-muted">Quản lý thông tin cá nhân</div>
+              </div>
+              <i class="fas fa-chevron-right text-muted small"></i>
+            </a>
+          </li>
+
+          <!-- Change Password -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-3 px-4" 
+               href="profile/change-password" 
+               id="nav-change-password">
+              <div class="nav-icon me-3">
+                <i class="fas fa-lock text-warning"></i>
+              </div>
+              <div class="nav-content flex-grow-1">
+                <div class="nav-title fw-semibold">Đổi mật khẩu</div>
+                <div class="nav-subtitle small text-muted">Bảo mật tài khoản</div>
+              </div>
+              <i class="fas fa-chevron-right text-muted small"></i>
+            </a>
+          </li>
+
+          <!-- Payment History -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-3 px-4" 
+               href="profile/payment-history" 
+               id="nav-payment-history">
+              <div class="nav-icon me-3">
+                <i class="fas fa-credit-card text-success"></i>
+              </div>
+              <div class="nav-content flex-grow-1">
+                <div class="nav-title fw-semibold">Lịch sử thanh toán</div>
+                <div class="nav-subtitle small text-muted">Xem các giao dịch</div>
+              </div>
+              <div class="nav-badge me-2">
+                <span class="badge bg-info text-white rounded-pill">3</span>
+              </div>
+              <i class="fas fa-chevron-right text-muted small"></i>
+            </a>
+          </li>
+
+          <!-- Test Results -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center py-3 px-4" 
+               href="profile/test-results" 
+               id="nav-test-results">
+              <div class="nav-icon me-3">
+                <i class="fas fa-chart-bar text-info"></i>
+              </div>
+              <div class="nav-content flex-grow-1">
+                <div class="nav-title fw-semibold">Kết quả trắc nghiệm</div>
+                <div class="nav-subtitle small text-muted">Xem điểm số đã đạt được</div>
+              </div>
+              <div class="nav-badge me-2">
+                <span class="badge bg-warning text-dark rounded-pill">12</span>
+              </div>
+              <i class="fas fa-chevron-right text-muted small"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <div class="mt-4">
+    <button class="btn btn-outline-danger w-100" id="logout-btn">
+      <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+    </button>
+  </div>
+</div>
+
+<!-- Profile Sidebar Styles -->
+<style>
+/* Profile Sidebar Specific Styles */
+.profile-sidebar {
+  position: sticky;
+  top: 20px;
+}
+
+.avatar-circle-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-color) 0%, #0056b3 100%);
+  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+}
+
+.bg-success-soft {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+.profile-nav .nav-link {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--default-color);
+  transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.profile-nav .nav-link:last-child {
+  border-bottom: none;
+}
+
+.profile-nav .nav-link:hover {
+  background-color: rgba(0, 102, 204, 0.05);
+  color: var(--accent-color);
+}
+
+.profile-nav .nav-link.active {
+  background-color: rgba(0, 102, 204, 0.1);
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.profile-nav .nav-link.active .nav-icon i {
+  color: var(--accent-color) !important;
+}
+
+.nav-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  background-color: rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover .nav-icon {
+  background-color: rgba(0, 102, 204, 0.1);
+}
+
+.nav-link.active .nav-icon {
+  background-color: rgba(0, 102, 204, 0.15);
+}
+
+.nav-title {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.nav-subtitle {
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: 0.7;
+}
+
+.nav-badge .badge {
+  font-size: 10px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 991.98px) {
+  .profile-sidebar {
+    position: static;
+    margin-bottom: 2rem;
+  }
+  
+  .avatar-circle-large {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .avatar-circle-large i {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-nav .nav-link {
+    padding: 1rem !important;
+  }
+  
+  .nav-icon {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .nav-content {
+    margin-left: 0.5rem;
+  }
+}
+
+/* Animation for active state */
+.profile-nav .nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-color);
+  border-radius: 0 3px 3px 0;
+}
+
+.profile-nav .nav-item {
+  position: relative;
+}
+</style>
+
+<!-- Profile Sidebar JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize profile sidebar functionality
+  initProfileSidebar();
+});
+
+function initProfileSidebar() {
+  // Handle navigation link clicks
+  const navLinks = document.querySelectorAll('.profile-nav .nav-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove active class from all links
+      navLinks.forEach(l => l.classList.remove('active'));
+      
+      // Add active class to clicked link
+      this.classList.add('active');
+      
+      // Get the href and navigate (you can implement routing here)
+      const href = this.getAttribute('href');
+      console.log('Navigate to:', href);
+      
+      // For now, just update the URL without page reload
+      // In a real application, you would implement proper routing
+      window.history.pushState(null, '', href);
+    });
+  });
+  
+  // Logout button
+  document.getElementById('logout-btn')?.addEventListener('click', function() {
+    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      // Implement logout functionality
+      // This would typically clear session/localStorage and redirect to login
+      localStorage.removeItem('user_token');
+      sessionStorage.clear();
+      window.location.href = 'dangnhap';
+    }
+  });
+  
+  // Load user info into sidebar (demo data)
+  loadUserInfoToSidebar();
+}
+
+function loadUserInfoToSidebar() {
+  // This would typically fetch user data from API
+  // For demo, using static data
+  const demoUserData = {
+    fullname: 'Nguyen Van A',
+    email: 'nguyenvana@example.com',
+    status: 'active'
+  };
+  
+  // Update sidebar user info
+  const sidebarUsername = document.getElementById('sidebar-username');
+  const sidebarEmail = document.getElementById('sidebar-email');
+  
+  if (sidebarUsername) sidebarUsername.textContent = demoUserData.fullname;
+  if (sidebarEmail) sidebarEmail.textContent = demoUserData.email;
+}
+
+// Function to update active nav based on current page
+function updateActiveNavigation(currentPath) {
+  const navLinks = document.querySelectorAll('.profile-nav .nav-link');
+  
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    
+    const href = link.getAttribute('href');
+    if (href === currentPath || (currentPath === 'profile' && href === 'profile')) {
+      link.classList.add('active');
+    }
+  });
+}
+
+// Initialize on component load
+window.addEventListener('load', function() {
+  // Get current path and update navigation
+  const currentPath = window.location.pathname.replace('/pac-new/', '').replace('/', '');
+  updateActiveNavigation(currentPath);
+});
+</script>

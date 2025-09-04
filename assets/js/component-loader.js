@@ -46,7 +46,7 @@ class ComponentLoader {
   async loadComponent(componentName, targetSelector, useCache = true) {
     const target = document.querySelector(targetSelector);
     if (!target) {
-      console.error(`Target element not found: ${targetSelector}`);
+      console.warn(`Target element not found: ${targetSelector}. Skipping component: ${componentName}`);
       return false;
     }
 
@@ -126,13 +126,18 @@ class ComponentLoader {
     this.isLoading = true;
     this.showPreloader();
 
-    const loadPromises = components.map(({ name, target }) => 
+    // Filter out components whose targets don't exist
+    const validComponents = components.filter(({ name, target }) => {
+      const exists = document.querySelector(target) !== null;
+      return exists;
+    });
+
+    const loadPromises = validComponents.map(({ name, target }) => 
       this.loadComponent(name, target)
     );
 
     try {
       const results = await Promise.all(loadPromises);
-      const successCount = results.filter(result => result).length;
       
       // Initialize page-wide features after all components loaded
       this.initializePageFeatures();
@@ -493,20 +498,44 @@ window.componentLoader = new ComponentLoader();
 
 // Auto-load components when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-  // Define components to load on page load
-  const pageComponents = [
-    { name: 'header', target: '#header-section' },
-    { name: 'hero', target: '#hero-section' },
-    { name: 'about', target: '#about-section' },
-    { name: 'why-choose', target: '#why-choose-section' },
-    { name: 'solution', target: '#solution-section' },
-    { name: 'courses', target: '#courses-section' },
-    { name: 'team', target: '#team-section' },
-    { name: 'feedback', target: '#feedback-section' },
-    { name: 'partners', target: '#partners-section' },
-    { name: 'footer', target: '#footer-section' }
-  ];
-
-  // Load all components
-  window.componentLoader.loadComponents(pageComponents);
+  // Check if page has custom component loading (will be defined by specific pages)
+  if (window.pageComponentsConfig) {
+    window.componentLoader.loadComponents(window.pageComponentsConfig);
+    return;
+  }
+  
+  // Default components for index page (only if we detect index-specific elements)
+  const isIndexPage = document.querySelector('.index-page') !== null;
+  
+  if (isIndexPage) {
+    const indexComponents = [
+      { name: 'header', target: '#header-section' },
+      { name: 'hero', target: '#hero-section' },
+      { name: 'about', target: '#about-section' },
+      { name: 'why-choose', target: '#why-choose-section' },
+      { name: 'solution', target: '#solution-section' },
+      { name: 'courses', target: '#courses-section' },
+      { name: 'team', target: '#team-section' },
+      { name: 'feedback', target: '#feedback-section' },
+      { name: 'partners', target: '#partners-section' },
+      { name: 'footer', target: '#footer-section' }
+    ];
+    
+    window.componentLoader.loadComponents(indexComponents);
+  } else {
+    // For other pages, only load header and footer if they exist
+    const commonComponents = [];
+    
+    if (document.querySelector('#header-section')) {
+      commonComponents.push({ name: 'header', target: '#header-section' });
+    }
+    
+    if (document.querySelector('#footer-section')) {
+      commonComponents.push({ name: 'footer', target: '#footer-section' });
+    }
+    
+    if (commonComponents.length > 0) {
+      window.componentLoader.loadComponents(commonComponents);
+    }
+  }
 });

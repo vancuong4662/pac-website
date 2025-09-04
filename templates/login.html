@@ -1,476 +1,56 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Đăng Nhập</title>
-  <meta name="description" content="Đăng nhập vào hệ thống PAC Group - Tư vấn giáo dục và định hướng nghề nghiệp chuyên nghiệp.">
-  <meta name="keywords" content="đăng nhập, PAC Group, tư vấn giáo dục">
+  <title>Đăng Nhập - PAC Group</title>
+  <meta content="Đăng nhập để truy cập hệ thống tư vấn giáo dục PAC Group" name="description">
+  <meta content="đăng nhập, PAC Group, giáo dục, tư vấn" name="keywords">
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Fonts - Montserrat for PAC Group -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
 
-  <!-- Main CSS File -->
-  <link href="assets/css/main.css" rel="stylesheet">
-  
   <!-- Toastbar CSS -->
   <link href="assets/css/toastbar.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
   
-  <style>
-    /* Custom Toastbar Font for PAC Group Theme */
-    .toastbar-main .toast-title {
-      font-family: var(--heading-font);
-    }
-    
-    .toastbar-main .toast-message {
-      font-family: var(--default-font);
-    }
-    
-    @media (max-width: 480px) {
-      #toastbar-zone {
-        top: 0.5rem;
-        right: 0.5rem;
-        left: 0.5rem;
-        align-items: stretch;
-      }
-      
-      .toastbar-main {
-        min-width: auto;
-        max-width: none;
-      }
-    }
-  </style>
-
-  <style>
-    /* Login Page Specific Styles */
-    .login-page {
-      min-height: 100vh;
-      background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .login-container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      max-width: 900px;
-      width: 100%;
-      min-height: 500px;
-      display: flex;
-    }
-
-    .login-image {
-      flex: 1;
-      background: linear-gradient(45deg, rgba(150, 75, 223, 0.8), rgba(93, 46, 139, 0.8)), url('assets/img/login-background.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-    }
-
-    .login-image::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(150, 75, 223, 0.1);
-      backdrop-filter: blur(1px);
-    }
-
-    .login-illustration {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      color: white;
-    }
-
-    .login-illustration i {
-      font-size: 120px;
-      margin-bottom: 30px;
-      color: var(--brand-accent);
-      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .login-illustration h3 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: white;
-    }
-
-    .login-illustration p {
-      font-size: 16px;
-      opacity: 0.9;
-      line-height: 1.6;
-    }
-
-    .login-form-section {
-      flex: 1;
-      padding: 60px 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    .login-header h2 {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--brand-primary);
-      margin-bottom: 10px;
-    }
-
-    .login-header p {
-      color: var(--neutral-gray);
-      font-size: 16px;
-    }
-
-    .form-group {
-      margin-bottom: 25px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--heading-color);
-      font-size: 14px;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 15px 20px;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      background-color: #f9fafb;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--brand-primary);
-      background-color: white;
-      box-shadow: 0 0 0 3px rgba(150, 75, 223, 0.1);
-    }
-
-    .form-control::placeholder {
-      color: #9ca3af;
-    }
-
-    .form-check {
-      display: flex;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .form-check-input {
-      margin-right: 10px;
-      accent-color: var(--brand-primary);
-    }
-
-    .form-check-label {
-      color: var(--neutral-gray);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-login {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .btn-login:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
-    }
-
-    .login-footer {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .login-footer a {
-      color: var(--brand-primary);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-
-    .login-footer a:hover {
-      color: var(--brand-secondary);
-    }
-
-    .back-to-home {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 100;
-    }
-
-    .back-to-home a {
-      display: flex;
-      align-items: center;
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 25px;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-
-    .back-to-home a:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: var(--brand-accent);
-    }
-
-    .back-to-home i {
-      margin-right: 8px;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .login-page {
-        flex-direction: column;
-        padding: 10px;
-        align-items: stretch;
-      }
-
-      .back-to-home {
-        position: static;
-        width: 100%;
-        margin-bottom: 20px;
-        text-align: center;
-        order: 1;
-      }
-
-      .back-to-home a {
-        display: inline-flex;
-        background: var(--brand-primary);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 30px;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(150, 75, 223, 0.3);
-        transform: none;
-      }
-
-      .back-to-home a:hover {
-        background: var(--brand-secondary);
-        color: var(--brand-accent);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(150, 75, 223, 0.4);
-      }
-
-      .login-container {
-        flex-direction: column;
-        margin: 0 auto;
-        max-width: 500px;
-        width: 100%;
-        order: 2;
-        align-self: center;
-      }
-
-      .login-image {
-        min-height: 200px;
-        padding: 30px 20px;
-      }
-
-      .login-illustration i {
-        font-size: 80px;
-        margin-bottom: 20px;
-      }
-
-      .login-illustration h3 {
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-
-      .login-illustration p {
-        font-size: 14px;
-      }
-
-      .login-form-section {
-        padding: 40px 30px;
-      }
-
-      .login-header h2 {
-        font-size: 28px;
-      }
-    }
-
-    /* Tablet specific adjustments */
-    @media (max-width: 1024px) and (min-width: 769px) {
-      .login-page {
-        flex-direction: column;
-        padding: 20px;
-      }
-
-      .back-to-home {
-        position: static;
-        width: 100%;
-        margin-bottom: 30px;
-        text-align: center;
-        order: 1;
-      }
-
-      .back-to-home a {
-        display: inline-flex;
-        background: var(--brand-primary);
-        color: white;
-        padding: 12px 28px;
-        border-radius: 30px;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(150, 75, 223, 0.3);
-      }
-
-      .back-to-home a:hover {
-        background: var(--brand-secondary);
-        color: var(--brand-accent);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(150, 75, 223, 0.4);
-      }
-
-      .login-container {
-        order: 2;
-        margin: 0 auto;
-        max-width: 700px;
-        align-self: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .login-page {
-        padding: 10px;
-      }
-
-      .back-to-home a {
-        padding: 10px 20px;
-        font-size: 14px;
-      }
-
-      .login-container {
-        max-width: 100%;
-        margin: 0;
-      }
-
-      .login-form-section {
-        padding: 30px 20px;
-      }
-
-      .login-header h2 {
-        font-size: 24px;
-      }
-
-      .form-control {
-        padding: 12px 15px;
-        font-size: 14px;
-      }
-
-      .btn-login {
-        padding: 12px;
-        font-size: 14px;
-      }
-    }
-
-    /* Login Form Styles */
-    .login-form {
-      width: 100%;
-    }
-
-    /* Loading Animation */
-    .btn-login:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-
-    .btn-login.loading::after {
-      content: '';
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 2px solid transparent;
-      border-top: 2px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-left: 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+  <!-- Access Pages CSS File -->
+  <link href="assets/css/access.css" rel="stylesheet">
 </head>
 
-<body class="login-page">
-
-  <!-- Back to Home -->
-  <div class="back-to-home">
-    <a href="home">
-      <i class="bi bi-arrow-left"></i>
-      Về Trang Chủ
-    </a>
-  </div>
-
+<body class="auth-page">
   <!-- Login Container -->
-  <div class="login-container">
+  <div class="auth-container">
     
     <!-- Left Side - Illustration -->
-    <div class="login-image">
-      <div class="login-illustration">
+    <div class="auth-image">
+      <div class="auth-illustration">
         <i class="fas fa-graduation-cap"></i>
-        <h3>Unlock Your Career</h3>
-        <p>Kết nối cùng chúng tôi<br>Chọn đúng nghề, học đúng ngành</p>
+        <h3>Unlock your Career</h3>
+        <p>Kết nối cùng chúng tôi <br> Chọn đúng nghề, học đúng ngành</p>
       </div>
     </div>
 
     <!-- Right Side - Login Form -->
-    <div class="login-form-section">
-      <div class="login-header">
+    <div class="auth-form-section">
+      <div class="auth-header">
         <h2>Đăng Nhập</h2>
         <p>Vui lòng nhập thông tin đăng nhập của bạn</p>
       </div>
 
-      <div id="loginForm" class="login-form">
+      <div id="authForm" class="auth-form">
         <div class="form-group">
           <label for="username">Tên đăng nhập *</label>
           <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tên đăng nhập của bạn" required>
@@ -488,197 +68,33 @@
           </label>
         </div>
 
-        <button type="button" class="btn-login" id="loginButton">Đăng Nhập</button>
+        <button type="button" class="btn-auth" id="authButton">Đăng Nhập</button>
 
-        <div class="login-footer">
+        <div class="auth-footer">
           <p><a href="#" id="forgotPassword">Quên mật khẩu?</a></p>
-          <p>Chưa có tài khoản? <a href="#" id="registerLink">Đăng ký ngay</a></p>
+          <p>Chưa có tài khoản? <a href="dangky">Đăng ký ngay</a></p>
         </div>
       </div>
     </div>
 
+    <!-- Back to Home Button -->
+    <div class="auth-actions">
+      <a href="/" class="back-home-btn">
+        <i class="fas fa-arrow-left"></i> Quay về trang chủ
+      </a>
+    </div>
   </div>
 
-  <!-- Vendor JS Files -->
+  <!-- Scripts -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Toastbar JS -->
+  <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/js/toastbar.js"></script>
-
-  <!-- Login Page JavaScript -->
+  <script src="assets/js/access.js"></script>
+  
+  <!-- Initialize Login Page -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const loginForm = document.getElementById('loginForm');
-      const loginButton = document.getElementById('loginButton');
-      const usernameInput = document.getElementById('username');
-      const passwordInput = document.getElementById('password');
-      const rememberInput = document.getElementById('remember');
-
-      loginButton.addEventListener('click', function() {
-        handleLogin();
-      });
-
-      // Handle Enter key press in input fields
-      [usernameInput, passwordInput].forEach(input => {
-        input.addEventListener('keypress', function(e) {
-          if (e.key === 'Enter') {
-            handleLogin();
-          }
-        });
-      });
-
-      function handleLogin() {
-        // Get form data
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-        const remember = rememberInput.checked;
-
-        // Validate form
-        if (!username || !password) {
-          showToast('Lỗi đăng nhập', 'Vui lòng nhập đầy đủ thông tin đăng nhập.', 'error', 4000);
-          return;
-        }
-
-        // Show loading state
-        setLoadingState(true);
-
-        // Prepare data for API
-        const loginData = {
-          username: username,
-          password: password,
-          remember: remember
-        };
-
-        // Make XHR request
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/pac-new/api/auth/login.php', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4) {
-            setLoadingState(false);
-
-            if (xhr.status === 200) {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                
-                if (response.success) {
-                  showToast('Thành công!', response.message || 'Đăng nhập thành công!', 'success', 2000);
-                  
-                  // Store token if provided
-                  if (response.token) {
-                    localStorage.setItem('auth_token', response.token);
-                  }
-                  
-                  // Store user info if provided
-                  if (response.user) {
-                    localStorage.setItem('user_info', JSON.stringify(response.user));
-                  }
-
-                  // Redirect after success
-                  setTimeout(() => {
-                    const redirectUrl = response.redirect_url || '/pac-new/home';
-                    window.location.href = redirectUrl;
-                  }, 1500);
-                } else {
-                  showToast('Đăng nhập thất bại', response.message || 'Đăng nhập thất bại.', 'error', 5000);
-                }
-              } catch (e) {
-                console.error('JSON Parse Error:', e);
-                showToast('Lỗi server', 'Có lỗi xảy ra khi xử lý phản hồi từ server.', 'error', 5000);
-              }
-            } else if (xhr.status === 401) {
-              showToast('Lỗi xác thực', 'Tên đăng nhập hoặc mật khẩu không chính xác.', 'error', 5000);
-            } else if (xhr.status === 422) {
-              try {
-                const response = JSON.parse(xhr.responseText);
-                showToast('Dữ liệu không hợp lệ', response.message || 'Dữ liệu không hợp lệ.', 'warning', 5000);
-              } catch (e) {
-                showToast('Dữ liệu không hợp lệ', 'Dữ liệu không hợp lệ.', 'warning', 5000);
-              }
-            } else if (xhr.status === 429) {
-              showToast('Quá nhiều lần thử', 'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau.', 'warning', 6000);
-            } else if (xhr.status === 0) {
-              showToast('Lỗi kết nối', 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.', 'error', 5000);
-            } else {
-              showToast('Lỗi không xác định', 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.', 'error', 5000);
-            }
-          }
-        };
-
-        xhr.onerror = function() {
-          setLoadingState(false);
-          showToast('Lỗi kết nối', 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.', 'error', 5000);
-        };
-
-        xhr.ontimeout = function() {
-          setLoadingState(false);
-          showToast('Timeout', 'Kết nối timeout. Vui lòng thử lại.', 'warning', 5000);
-        };
-
-        xhr.timeout = 30000; // 30 seconds timeout
-
-        // Send the request
-        xhr.send(JSON.stringify(loginData));
-      }
-
-      function setLoadingState(isLoading) {
-        if (isLoading) {
-          loginButton.classList.add('loading');
-          loginButton.disabled = true;
-          loginButton.textContent = 'Đang xử lý...';
-          usernameInput.disabled = true;
-          passwordInput.disabled = true;
-        } else {
-          loginButton.classList.remove('loading');
-          loginButton.disabled = false;
-          loginButton.textContent = 'ĐĂNG NHẬP';
-          usernameInput.disabled = false;
-          passwordInput.disabled = false;
-        }
-      }
-
-      // Handle forgot password
-      document.getElementById('forgotPassword').addEventListener('click', function(e) {
-        e.preventDefault();
-        // You can implement forgot password functionality here
-        showToast('Thông báo', 'Chức năng quên mật khẩu sẽ được triển khai sớm.', 'info', 4000);
-      });
-
-      // Handle register link
-      document.getElementById('registerLink').addEventListener('click', function(e) {
-        e.preventDefault();
-        // You can redirect to register page here
-        showToast('Thông báo', 'Chức năng đăng ký sẽ được triển khai sớm.', 'info', 4000);
-      });
-
-      // Focus on first input
-      usernameInput.focus();
-      
-      // Show welcome toast (demo purposes - remove in production)
-      setTimeout(() => {
-        showToast('Chào mừng!', 'Bạn có thể test với: admin/admin123 hoặc demo/demo123', 'info', 6000);
-      }, 500);
-    });
-
-    // Add floating animation to illustration icon
-    function animateIcon() {
-      const icon = document.querySelector('.login-illustration i');
-      if (icon) {
-        icon.style.transform = 'translateY(-10px)';
-        icon.style.transition = 'transform 2s ease-in-out';
-        setTimeout(() => {
-          icon.style.transform = 'translateY(0px)';
-        }, 2000);
-      }
-    }
-
-    // Start animation
-    setTimeout(animateIcon, 1000);
-    setInterval(animateIcon, 6000);
+    // Initialize auth page with login mode
+    AuthHelpers.init('login');
   </script>
-
 </body>
-
 </html>
