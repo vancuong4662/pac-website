@@ -607,7 +607,8 @@ function setActiveNavigation() {
       // Match patterns for different pages
       if (
         (currentPage.includes('payment-history') && href.includes('payment-history')) ||
-        (currentPage.includes('profile') && !currentPage.includes('payment-history') && href.includes('profile') && !href.includes('payment-history'))
+        (currentPage.includes('test-results') && href.includes('test-results')) ||
+        (currentPage.includes('profile') && !currentPage.includes('payment-history') && !currentPage.includes('test-results') && href.includes('profile') && !href.includes('payment-history') && !href.includes('test-results'))
       ) {
         link.classList.add('active');
       }
