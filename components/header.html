@@ -1,30 +1,43 @@
 <!-- Top Info Bar -->
 <div id="topbar" class="topbar d-flex align-items-center">
   <div class="container d-flex justify-content-between align-items-center">
-    <div class="contact-info d-flex align-items-center">
+    <!-- Mobile menu toggle (chỉ hiện trên mobile/tablet) -->
+    <button class="mobile-menu-toggle d-xl-none" type="button">
+      <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- Contact info (chỉ hiện trên desktop) -->
+    <div class="contact-info d-xl-flex d-none align-items-center">
       <i class="bi bi-envelope-fill me-1"></i>
       <span class="me-4">info@pacgroup.org</span>
       <i class="bi bi-telephone-fill me-1"></i>
       <span>096 501 3663</span>
     </div>
+    
+    <!-- Right side items (desktop: social + auth + cart, mobile: chỉ auth + cart) -->
     <div class="d-flex align-items-center">
-      <div class="social-links d-flex me-3">
+      <!-- Social links (chỉ hiện trên desktop) -->
+      <div class="social-links d-xl-flex d-none me-3">
         <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
         <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
         <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
         <a href="#" class="social-icon"><i class="bi bi-globe"></i></a>
       </div>
-      <div class="auth-buttons d-flex">
+      
+      <!-- Auth buttons -->
+      <div class="auth-buttons d-flex align-items-center">
         <a href="/dangnhap" class="auth-btn me-2">
           <i class="bi bi-person-fill me-1"></i>ĐĂNG NHẬP
         </a>
         <span class="separator">|</span>
-        <a href="/dangky" class="auth-btn ms-2">ĐĂNG KÝ</a>
-        <a href="#" class="cart-btn ms-3">
-          <i class="bi bi-cart-fill"></i>
-          <span class="cart-count">0</span>
-        </a>
+        <a href="/dangky" class="auth-btn ms-2 me-3">ĐĂNG KÝ</a>
       </div>
+      
+      <!-- Cart button -->
+      <a href="#" class="cart-btn">
+        <i class="bi bi-cart-fill"></i>
+        <span class="cart-count">0</span>
+      </a>
     </div>
   </div>
 </div>
@@ -72,3 +85,42 @@
 
   </div>
 </header>
+
+<!-- Mobile Navigation Menu (chỉ hiện trên mobile/tablet) -->
+<nav id="mobile-nav" class="mobile-nav d-xl-none">
+  <div class="mobile-nav-content">
+    <div class="mobile-nav-header">
+      <img src="assets/img/logo.png" alt="Logo" class="mobile-logo">
+      <button class="mobile-nav-close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <ul class="mobile-nav-menu">
+      <li class="mobile-dropdown">
+        <a href="/ve-unlock-your-career" class="mobile-dropdown-toggle">
+          <span>VỀ UNLOCK YOUR CAREER</span>
+          <i class="bi bi-chevron-down"></i>
+        </a>
+        <ul class="mobile-submenu">
+          <li><a href="/su-menh-tam-nhin">SỨ MỆNH VÀ TẦM NHÌN</a></li>
+          <li><a href="/mo-hinh-danh-gia">MÔ HÌNH ĐÁNH GIÁ</a></li>
+          <li><a href="/doi-ngu-co-van">ĐỘI NGŨ CỐ VẤN</a></li>
+        </ul>
+      </li>
+      <li class="mobile-dropdown">
+        <a href="/giai-phap" class="mobile-dropdown-toggle">
+          <span>GIẢI PHÁP</span>
+          <i class="bi bi-chevron-down"></i>
+        </a>
+        <ul class="mobile-submenu">
+          <li><a href="/huong-nghiep">Hướng nghiệp</a></li>
+          <li><a href="/khoa-hoc">Khóa học</a></li>
+        </ul>
+      </li>
+      <li><a href="/nguon-du-lieu">NGUỒN DỮ LIỆU</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Mobile Nav Overlay -->
+<div id="mobile-nav-overlay" class="mobile-nav-overlay d-xl-none"></div>
