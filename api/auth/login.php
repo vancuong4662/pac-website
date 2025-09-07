@@ -2,17 +2,21 @@
 /**
  * User Login API Endpoint
  * PAC Group - Unlock Your Career
- * Handle user login with database authentication
+ * Handle user login with database authentication and session management
  */
 
-// Bao gồm file kết nối database
+// Start session
+session_start();
+
+// Include database connection file
 require_once '../../config/db.php';
 
 // Thiết lập header để trả về JSON và cho phép CORS
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: http://localhost');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+header('Access-Control-Allow-Credentials: true');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -97,8 +101,70 @@ try {
         exit();
     }
 
-    // Generate a simple token (in production, use JWT or similar)
-    $token = base64_encode($user['id'] . ':' . time() . ':' . md5($user['username'] . 'pac_secret_key_2025'));
+    // Generate secure session token
+    $sessionToken = bin2hex(random_bytes(32));
+    
+    // Set expiration time
+    $expiresAt = $remember ? 
+        date('Y-m-d H:i:s', strtotime('+30 days')) : // Remember me: 30 days
+        date('Y-m-d H:i:s', strtotime('+24 hours')); // Normal: 24 hours
+    
+    // Get user info for session
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '';
+    
+    // Clean up old sessions for this user (keep only last 5 sessions)
+    $cleanupQuery = "DELETE FROM sessions WHERE user_id = ? AND id NOT IN (
+        SELECT id FROM (
+            SELECT id FROM sessions WHERE user_id = ? ORDER BY created_at DESC LIMIT 5
+        ) AS temp
+    )";
+    $cleanupStmt = $conn->prepare($cleanupQuery);
+    $cleanupStmt->bind_param("ii", $user['id'], $user['id']);
+    $cleanupStmt->execute();
+    
+    // Insert new session
+    $sessionQuery = "INSERT INTO sessions (user_id, session_token, expires_at, user_agent, ip_address, is_remember) VALUES (?, ?, ?, ?, ?, ?)";
+    $sessionStmt = $conn->prepare($sessionQuery);
+    $sessionStmt->bind_param("issssi", $user['id'], $sessionToken, $expiresAt, $userAgent, $ipAddress, $remember);
+    
+    if (!$sessionStmt->execute()) {
+        throw new Exception('Không thể tạo phiên đăng nhập');
+    }
+    
+    // Set session variables
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['fullname'] = $user['fullname'];
+    $_SESSION['role'] = $user['role'];
+    $_SESSION['session_token'] = $sessionToken;
+    $_SESSION['logged_in'] = true;
+    
+    // Set cookie with session token
+    $cookieExpires = $remember ? time() + (30 * 24 * 60 * 60) : 0; // 30 days or session
+    setcookie('pac_session_token', $sessionToken, [
+        'expires' => $cookieExpires,
+        'path' => '/',
+        'domain' => '',
+        'secure' => false, // Set to true in production with HTTPS
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    
+    // Also set user info cookie for frontend
+    setcookie('pac_user_info', json_encode([
+        'id' => $user['id'],
+        'username' => $user['username'],
+        'fullname' => $user['fullname'],
+        'role' => $user['role']
+    ]), [
+        'expires' => $cookieExpires,
+        'path' => '/',
+        'domain' => '',
+        'secure' => false, // Set to true in production with HTTPS
+        'httponly' => false, // Allow JavaScript access for this cookie
+        'samesite' => 'Lax'
+    ]);
 
     // Prepare user data for response
     $userData = [
@@ -114,10 +180,11 @@ try {
     echo json_encode([
         'success' => true,
         'message' => 'Đăng nhập thành công!',
-        'token' => $token,
+        'session_token' => $sessionToken,
         'user' => $userData,
-        'redirect_url' => '/pac-new/',
-        'remember' => $remember
+        'redirect_url' => 'home',
+        'remember' => $remember,
+        'expires_at' => $expiresAt
     ]);
 
 } catch (Exception $e) {

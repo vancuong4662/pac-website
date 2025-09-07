@@ -7,13 +7,7 @@
 // Auth Page Configuration
 const AuthConfig = {
   API_BASE_URL: 'api/auth', // Đường dẫn tương đối từ root level
-  TIMEOUT: 30000,
-  DEMO_ACCOUNTS: {
-    admin: 'admin123',
-    user: 'user123', 
-    demo: 'demo123',
-    pacgroup: 'pac2025'
-  }
+  TIMEOUT: 30000
 };
 
 // Auth Page Helper Functions
@@ -25,10 +19,6 @@ const AuthHelpers = {
       AuthHelpers.setupEventListeners(pageType);
       AuthHelpers.setupAnimations();
       AuthHelpers.focusFirstInput();
-      
-      if (pageType === 'login') {
-        AuthHelpers.showWelcomeToast();
-      }
     });
   },
 
@@ -193,8 +183,10 @@ const AuthHelpers = {
 
   // Generic API request function
   makeAuthRequest: function(endpoint, data, type) {
+    const fullUrl = `${AuthConfig.API_BASE_URL}/${endpoint}`;
+    
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${AuthConfig.API_BASE_URL}/${endpoint}`, true);
+    xhr.open('POST', fullUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
@@ -232,8 +224,9 @@ const AuthHelpers = {
           showToast('Thành công!', response.message || successMessage, 'success', 2000);
           
           // Store auth data if provided
-          if (response.token) {
-            localStorage.setItem('auth_token', response.token);
+          if (response.token || response.session_token) {
+            const token = response.token || response.session_token;
+            localStorage.setItem('auth_token', token);
           }
           
           if (response.user || response.data) {
@@ -244,10 +237,9 @@ const AuthHelpers = {
           // Redirect after success
           setTimeout(() => {
             if (type === 'register') {
-              // Redirect to login page after successful registration
               window.location.href = 'dangnhap';
             } else {
-              const redirectUrl = response.redirect_url || '/pac-new/';
+              const redirectUrl = response.redirect_url || 'home';
               window.location.href = redirectUrl;
             }
           }, 1500);
@@ -263,8 +255,7 @@ const AuthHelpers = {
           showToast(errorMessage, displayMessage, 'error', 5000);
         }
       } catch (e) {
-        console.error('JSON Parse Error:', e);
-        showToast('Lỗi server', 'Có lỗi xảy ra khi xử lý phản hồi từ server.', 'error', 5000);
+        showToast('Lỗi server', 'Server trả về dữ liệu không hợp lệ.', 'error', 5000);
       }
     } else if (xhr.status === 400) {
       try {
@@ -344,14 +335,6 @@ const AuthHelpers = {
     }
   },
 
-  // Show welcome toast for login page
-  showWelcomeToast: function() {
-    setTimeout(() => {
-      const accounts = Object.keys(AuthConfig.DEMO_ACCOUNTS).join('/');
-      showToast('Chào mừng!', `Bạn có thể test với: ${accounts}`, 'info', 6000);
-    }, 500);
-  },
-
   // Setup animations
   setupAnimations: function() {
     // Icon floating animation
@@ -400,3 +383,12 @@ const AuthHelpers = {
 
 // Export for global use
 window.AuthHelpers = AuthHelpers;
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Detect page type
+  const pageType = document.body.classList.contains('register-page') ? 'register' : 'login';
+  
+  // Initialize helpers
+  AuthHelpers.init(pageType);
+});
