@@ -13,7 +13,7 @@
   font-family: var(--default-font);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   #toastbar-zone {
     top: 0.5rem;
     right: 0.5rem;
@@ -269,8 +269,8 @@
   margin-right: 8px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design - Mobile Only */
+@media (max-width: 600px) {
   .auth-page {
     flex-direction: column;
     padding: 10px;
@@ -340,47 +340,7 @@
   }
 }
 
-/* Tablet specific adjustments */
-@media (max-width: 1024px) and (min-width: 769px) {
-  .auth-page {
-    flex-direction: column;
-    padding: 20px;
-  }
-
-  .auth-actions {
-    position: static;
-    width: 100%;
-    margin-bottom: 30px;
-    text-align: center;
-    order: 1;
-  }
-
-  .back-home-btn {
-    display: inline-flex;
-    background: var(--brand-primary);
-    color: white;
-    padding: 12px 28px;
-    border-radius: 30px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(150, 75, 223, 0.3);
-  }
-
-  .back-home-btn:hover {
-    background: var(--brand-secondary);
-    color: var(--brand-accent);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(150, 75, 223, 0.4);
-  }
-
-  .auth-container {
-    order: 2;
-    margin: 0 auto;
-    max-width: 700px;
-    align-self: center;
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .auth-page {
     padding: 10px;
   }
