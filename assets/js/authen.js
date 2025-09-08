@@ -23,7 +23,6 @@ class AuthChecker {
             }
         });
         window.dispatchEvent(event);
-        console.log('[AuthChecker] Auth state changed event emitted:', { isAuthenticated, user });
     }
 
     /**
@@ -105,16 +104,13 @@ class AuthChecker {
     getUserInfo() {
         try {
             const userInfoCookie = this.getCookie('pac_user_info');
-            console.log('[AuthChecker] Raw pac_user_info cookie:', userInfoCookie);
             if (userInfoCookie) {
                 const parsed = JSON.parse(decodeURIComponent(userInfoCookie));
-                console.log('[AuthChecker] Parsed user info:', parsed);
                 return parsed;
             }
         } catch (error) {
             console.error('[AuthChecker] Error parsing user info cookie:', error);
         }
-        console.log('[AuthChecker] No valid user info found in cookies');
         return null;
     }
 
@@ -124,7 +120,6 @@ class AuthChecker {
      */
     getSessionToken() {
         const token = this.getCookie('pac_session_token');
-        console.log('[AuthChecker] Session token from cookie:', token ? `${token.substring(0, 10)}...` : 'null');
         return token;
     }
 
@@ -133,17 +128,12 @@ class AuthChecker {
      * @returns {boolean} True if user appears to be authenticated
      */
     isAuthenticatedLocally() {
-        console.log('[AuthChecker] Checking local authentication...');
-        
         // Since session token is httpOnly, we can only check user info
         // This is just a quick check - real verification happens on server
         const userInfo = this.getUserInfo();
         
-        console.log('[AuthChecker] User info:', userInfo ? userInfo : 'Missing');
-        
         // If we have user info, assume we might be authenticated (need server verification)
         const hasUserInfo = !!(userInfo && userInfo.id);
-        console.log('[AuthChecker] Local auth result (user info only):', hasUserInfo);
         
         return hasUserInfo;
     }
@@ -154,8 +144,6 @@ class AuthChecker {
      * @returns {Promise<Object>} Verification result
      */
     async verifySession(token = null) {
-        console.log('[AuthChecker] Verifying session with server (using httpOnly cookie)...');
-
         try {
             // Don't send token in body since it's httpOnly - server will read from cookie
             const response = await fetch(`${this.baseURL}/verify-session.php`, {
@@ -168,7 +156,6 @@ class AuthChecker {
             });
 
             const result = await response.json();
-            console.log('[AuthChecker] Server verification response:', result);
             
             if (response.ok && result.success && result.authenticated) {
                 return {
@@ -216,24 +203,18 @@ class AuthChecker {
      * @returns {Promise<Object>} Authentication status result
      */
     async checkAuthStatus() {
-        console.log('[AuthChecker] Starting checkAuthStatus()');
-        
         // Quick local check first (only check user info since token is httpOnly)
         const hasUserInfo = this.isAuthenticatedLocally();
-        console.log('[AuthChecker] Local user info check:', hasUserInfo);
         
         if (!hasUserInfo) {
-            console.log('[AuthChecker] No user info found locally');
             return {
                 authenticated: false,
                 message: 'No local user data found'
             };
         }
 
-        console.log('[AuthChecker] User info found locally, verifying with server...');
         // Always verify with server since we can't read session token
         const verification = await this.verifySession();
-        console.log('[AuthChecker] Server verification result:', verification);
         
         return {
             authenticated: verification.valid,
@@ -281,35 +262,26 @@ class AuthChecker {
      * @param {string} pageName - Current page name for logging
      */
     async handleAuthPageAccess(pageName = 'auth') {
-        console.log(`[AuthChecker] Starting handleAuthPageAccess for ${pageName}`);
-        
         try {
-            console.log('[AuthChecker] Checking authentication status...');
             const authStatus = await this.checkAuthStatus();
             
-            console.log('[AuthChecker] Auth status result:', authStatus);
-            
             if (authStatus.authenticated) {
-                console.log('[AuthChecker] User is authenticated, preparing redirect...');
                 const userInfo = authStatus.user;
                 const welcomeMessage = userInfo ? 
                     `Chào mừng trở lại, ${userInfo.fullname || userInfo.username}!` : 
                     'Bạn đã đăng nhập. Đang chuyển hướng...';
                 
-                console.log('[AuthChecker] Showing welcome message and redirecting immediately...');
                 this.showToast(welcomeMessage, 'info');
                 
                 // Emit auth state change event for authenticated user
                 this.emitAuthStateChange(true, authStatus.user);
                 
                 // Redirect immediately to home
-                console.log('[AuthChecker] Executing immediate redirect to home...');
                 this.redirectToDashboard('home');
                 
                 return true; // User is authenticated, will be redirected
             }
             
-            console.log('[AuthChecker] User is not authenticated, allowing access to auth page');
             // Emit auth state change event for non-authenticated user
             this.emitAuthStateChange(false, null);
             

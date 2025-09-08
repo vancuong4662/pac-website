@@ -531,10 +531,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const sidebarTarget = '#profile-sidebar, #payment-history-sidebar';
         const sidebarElement = document.querySelector('#profile-sidebar') || document.querySelector('#payment-history-sidebar');
         if (sidebarElement) {
-          pageComponents.push({ 
+          const sidebarComponent = { 
             name: window.pageComponentsConfig.sidebar.replace('.html', ''), 
             target: sidebarElement.id ? `#${sidebarElement.id}` : '#profile-sidebar'
-          });
+          };
+          pageComponents.push(sidebarComponent);
         }
       }
       

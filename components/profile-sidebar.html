@@ -1,125 +1,94 @@
 <!-- Profile Sidebar Component -->
-<div class="profile-sidebar">
-  <!-- User Info Section -->
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body text-center p-4">
-      <div class="profile-avatar-large mb-3">
-        <div class="avatar-circle-large bg-gradient-primary text-white d-flex align-items-center justify-content-center mx-auto">
-          <i class="fas fa-user fa-3x"></i>
-        </div>
+<div class="profile-sidebar-container">
+  <!-- Profile Card -->
+  <div class="profile-card bg-white rounded-4 shadow-sm mb-4 p-4">
+    <div class="text-center">
+      <!-- Avatar Circle -->
+      <div class="avatar-circle-large bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
+        <span class="fw-bold fs-3">NC</span>
       </div>
-      <h5 class="fw-bold mb-1" id="sidebar-username">Nguyen Van A</h5>
-      <p class="text-muted small mb-3" id="sidebar-email">user@example.com</p>
-      <span class="badge bg-success-soft text-success px-3 py-2">
+      
+      <!-- User Info -->
+      <h5 class="mb-1" id="sidebar-username">Đang tải...</h5>
+      <p class="text-muted small mb-2" id="sidebar-email">Đang tải...</p>
+      
+      <!-- Status Badge -->
+      <span class="badge bg-success-soft text-success px-3 py-2" id="sidebar-status">
         <i class="fas fa-check-circle me-1"></i>Đang hoạt động
       </span>
     </div>
   </div>
 
   <!-- Navigation Menu -->
-  <div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-      <div class="profile-nav">
-        <ul class="nav nav-pills nav-flush flex-column">
-          <!-- Profile Information -->
-          <li class="nav-item">
-            <a class="nav-link active d-flex align-items-center py-3 px-4" 
-               href="profile" 
-               id="nav-profile-info">
-              <div class="nav-icon me-3">
-                <i class="fas fa-user text-primary"></i>
-              </div>
-              <div class="nav-content flex-grow-1">
-                <div class="nav-title fw-semibold">Hồ sơ thông tin</div>
-                <div class="nav-subtitle small text-muted">Quản lý thông tin cá nhân</div>
-              </div>
-              <i class="fas fa-chevron-right text-muted small"></i>
-            </a>
-          </li>
-
-          <!-- Change Password -->
-          <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-3 px-4" 
-               href="change-password" 
-               id="nav-change-password">
-              <div class="nav-icon me-3">
-                <i class="fas fa-lock text-warning"></i>
-              </div>
-              <div class="nav-content flex-grow-1">
-                <div class="nav-title fw-semibold">Đổi mật khẩu</div>
-                <div class="nav-subtitle small text-muted">Bảo mật tài khoản</div>
-              </div>
-              <i class="fas fa-chevron-right text-muted small"></i>
-            </a>
-          </li>
-
-          <!-- Payment History -->
-          <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-3 px-4" 
-               href="payment-history" 
-               id="nav-payment-history">
-              <div class="nav-icon me-3">
-                <i class="fas fa-credit-card text-success"></i>
-              </div>
-              <div class="nav-content flex-grow-1">
-                <div class="nav-title fw-semibold">Lịch sử thanh toán</div>
-                <div class="nav-subtitle small text-muted">Xem các giao dịch</div>
-              </div>
-              <i class="fas fa-chevron-right text-muted small"></i>
-            </a>
-          </li>
-
-          <!-- Test Results -->
-          <li class="nav-item">
-            <a class="nav-link d-flex align-items-center py-3 px-4" 
-               href="test-results" 
-               id="nav-test-results">
-              <div class="nav-icon me-3">
-                <i class="fas fa-chart-bar text-info"></i>
-              </div>
-              <div class="nav-content flex-grow-1">
-                <div class="nav-title fw-semibold">Kết quả trắc nghiệm</div>
-                <div class="nav-subtitle small text-muted">Xem điểm số đã đạt được</div>
-              </div>
-              <i class="fas fa-chevron-right text-muted small"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Logout Button -->
-  <div class="mt-4">
-    <button class="btn btn-outline-danger w-100" id="logout-btn">
-      <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-    </button>
+  <div class="profile-nav-container">
+    <ul class="nav nav-pills flex-column profile-nav">
+      <li class="nav-item">
+        <a class="nav-link active" href="profile">
+          <i class="fas fa-user me-2"></i>
+          Thông tin cá nhân
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="payment-history">
+          <i class="fas fa-credit-card me-2"></i>
+          Lịch sử thanh toán
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="test-results">
+          <i class="fas fa-chart-line me-2"></i>
+          Kết quả bài test
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#settings">
+          <i class="fas fa-cog me-2"></i>
+          Cài đặt
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="#" onclick="handleLogout()">
+          <i class="fas fa-sign-out-alt me-2"></i>
+          Đăng xuất
+        </a>
+      </li>
+    </ul>
   </div>
 </div>
 
-<!-- Profile Sidebar Styles -->
 <style>
-/* Profile Sidebar Specific Styles */
-.profile-sidebar {
-  position: sticky;
-  top: 20px;
+.profile-sidebar-container {
+  width: 100%;
+  height: 100%;
+}
+
+.profile-card {
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
 }
 
 .avatar-circle-large {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-color) 0%, #0056b3 100%);
-  box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--accent-color), #4dabf7);
+  border: 3px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.bg-success-soft {
-  background-color: rgba(25, 135, 84, 0.1) !important;
+.profile-nav {
+  gap: 0;
 }
 
 .profile-nav .nav-link {
-  border: none;
-  border-radius: 0;
+  padding: 0.75rem 1rem;
+  margin-bottom: 2px;
+  border-radius: 8px;
   background: transparent;
   color: var(--default-color);
   transition: all 0.3s ease;
@@ -141,70 +110,25 @@
   font-weight: 600;
 }
 
-.profile-nav .nav-link.active .nav-icon i {
-  color: var(--accent-color) !important;
+/* Soft background colors for status badges */
+.bg-success-soft {
+  background-color: rgba(40, 167, 69, 0.1) !important;
 }
 
-.nav-icon {
-  width: 35px;
-  height: 35px;
-  border-radius: 8px;
-  background-color: rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+.bg-warning-soft {
+  background-color: rgba(255, 193, 7, 0.1) !important;
 }
 
-.nav-link:hover .nav-icon {
-  background-color: rgba(0, 102, 204, 0.1);
+.bg-danger-soft {
+  background-color: rgba(220, 53, 69, 0.1) !important;
 }
 
-.nav-link.active .nav-icon {
-  background-color: rgba(0, 102, 204, 0.15);
+.bg-info-soft {
+  background-color: rgba(13, 202, 240, 0.1) !important;
 }
 
-.nav-title {
-  font-size: 14px;
-  line-height: 1.3;
-}
-
-.nav-subtitle {
-  font-size: 12px;
-  line-height: 1.2;
-  opacity: 0.7;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 991.98px) {
-  .profile-sidebar {
-    position: static;
-    margin-bottom: 2rem;
-  }
-  
-  .avatar-circle-large {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .avatar-circle-large i {
-    font-size: 1.5rem !important;
-  }
-}
-
-@media (max-width: 576px) {
-  .profile-nav .nav-link {
-    padding: 1rem !important;
-  }
-  
-  .nav-icon {
-    width: 30px;
-    height: 30px;
-  }
-  
-  .nav-content {
-    margin-left: 0.5rem;
-  }
+.bg-secondary-soft {
+  background-color: rgba(108, 117, 125, 0.1) !important;
 }
 
 /* Animation for active state */
@@ -226,14 +150,47 @@
 
 <!-- Profile Sidebar JavaScript -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize profile sidebar functionality
-  initProfileSidebar();
-});
+// Function to wait for sidebar elements and load user info
+function waitForSidebarElements() {
+  const checkElements = () => {
+    const sidebarUsername = document.getElementById('sidebar-username');
+    const sidebarEmail = document.getElementById('sidebar-email');
+    
+    if (sidebarUsername && sidebarEmail) {
+      loadUserInfoFromLocalStorage();
+      return true;
+    } else {
+      return false;
+    }
+  };
+  
+  // Try immediately
+  if (checkElements()) return;
+  
+  // If not found, set up observer
+  const observer = new MutationObserver((mutations) => {
+    if (checkElements()) {
+      observer.disconnect();
+    }
+  });
+  
+  // Start observing
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  // Fallback timeout
+  setTimeout(() => {
+    observer.disconnect();
+    checkElements();
+  }, 3000);
+}
 
-function initProfileSidebar() {
-  // Handle navigation link clicks
+// Set active navigation link based on current page
+function setActiveNavLink() {
   const navLinks = document.querySelectorAll('.profile-nav .nav-link');
+  const currentPath = window.location.pathname;
   
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
@@ -245,66 +202,201 @@ function initProfileSidebar() {
       // Add active class to clicked link
       this.classList.add('active');
       
-      // Get the href and navigate (you can implement routing here)
+      // Get the href and navigate
       const href = this.getAttribute('href');
-      console.log('Navigate to:', href);
       
-      // For now, just update the URL without page reload
-      // In a real application, you would implement proper routing
-      window.history.pushState(null, '', href);
+      // Navigate to the page
+      if (href && href !== '#') {
+        window.location.href = href;
+      }
     });
   });
   
-  // Logout button
-  document.getElementById('logout-btn')?.addEventListener('click', function() {
-    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-      // Implement logout functionality
-      // This would typically clear session/localStorage and redirect to login
-      localStorage.removeItem('user_token');
-      sessionStorage.clear();
-      window.location.href = 'dangnhap';
-    }
-  });
-  
-  // Load user info into sidebar (demo data)
-  loadUserInfoToSidebar();
-}
-
-function loadUserInfoToSidebar() {
-  // This would typically fetch user data from API
-  // For demo, using static data
-  const demoUserData = {
-    fullname: 'Nguyen Van A',
-    email: 'nguyenvana@example.com',
-    status: 'active'
-  };
-  
-  // Update sidebar user info
-  const sidebarUsername = document.getElementById('sidebar-username');
-  const sidebarEmail = document.getElementById('sidebar-email');
-  
-  if (sidebarUsername) sidebarUsername.textContent = demoUserData.fullname;
-  if (sidebarEmail) sidebarEmail.textContent = demoUserData.email;
-}
-
-// Function to update active nav based on current page
-function updateActiveNavigation(currentPath) {
-  const navLinks = document.querySelectorAll('.profile-nav .nav-link');
-  
+  // Set active link based on current page
   navLinks.forEach(link => {
-    link.classList.remove('active');
-    
     const href = link.getAttribute('href');
-    if (href === currentPath || (currentPath === 'profile' && href === 'profile')) {
+    if (href && currentPath.includes(href.replace(/\./g, ''))) {
       link.classList.add('active');
     }
   });
 }
 
-// Initialize on component load
-window.addEventListener('load', function() {
-  // Get current path and update navigation
-  const currentPath = window.location.pathname.replace('/pac-new/', '').replace('/', '');
-  updateActiveNavigation(currentPath);
+function loadUserInfoFromLocalStorage() {
+  // First check if sidebar elements exist
+  const sidebarUsername = document.getElementById('sidebar-username');
+  const sidebarEmail = document.getElementById('sidebar-email');
+  
+  if (!sidebarUsername || !sidebarEmail) {
+    setTimeout(() => {
+      loadUserInfoFromLocalStorage();
+    }, 200);
+    return false;
+  }
+  
+  try {
+    // Try to get user_info from localStorage
+    const userInfoStr = localStorage.getItem('user_info');
+    
+    if (userInfoStr) {
+      const userInfo = JSON.parse(userInfoStr);
+      
+      if (userInfo && userInfo.fullname && userInfo.email) {
+        updateSidebarUserInfo(userInfo);
+        return true;
+      }
+    }
+    
+    // Try alternative localStorage keys
+    const altKeys = ['pac_user_profile', 'pac_user_data'];
+    for (const key of altKeys) {
+      const altUserInfoStr = localStorage.getItem(key);
+      if (altUserInfoStr) {
+        try {
+          const altUserInfo = JSON.parse(altUserInfoStr);
+          if (altUserInfo && altUserInfo.fullname && altUserInfo.email) {
+            updateSidebarUserInfo(altUserInfo);
+            return true;
+          }
+        } catch (e) {
+          // Silent error handling
+        }
+      }
+    }
+    
+    // If still no data, try to get from cookie as last resort
+    const userInfoCookie = getCookie('pac_user_info');
+    if (userInfoCookie) {
+      try {
+        const cookieUserInfo = JSON.parse(decodeURIComponent(userInfoCookie));
+        if (cookieUserInfo && cookieUserInfo.fullname && cookieUserInfo.email) {
+          updateSidebarUserInfo(cookieUserInfo);
+          return true;
+        }
+      } catch (e) {
+        // Silent error handling
+      }
+    }
+    
+    // No user data found anywhere
+    showGuestState();
+    return false;
+    
+  } catch (error) {
+    showGuestState();
+    return false;
+  }
+}
+
+function updateSidebarUserInfo(userData) {
+  const sidebarUsername = document.getElementById('sidebar-username');
+  const sidebarEmail = document.getElementById('sidebar-email');
+  const sidebarStatus = document.getElementById('sidebar-status');
+  const avatarCircle = document.querySelector('.avatar-circle-large');
+  
+  // Double check elements exist
+  if (!sidebarUsername || !sidebarEmail) {
+    return false;
+  }
+  
+  // Update name
+  if (sidebarUsername && userData.fullname) {
+    sidebarUsername.textContent = userData.fullname;
+  }
+  
+  // Update email
+  if (sidebarEmail && userData.email) {
+    sidebarEmail.textContent = userData.email;
+  }
+  
+  // Update status badge
+  if (sidebarStatus) {
+    const status = userData.status || 'active';
+    const statusMap = {
+      'active': { class: 'bg-success-soft text-success', icon: 'check-circle', text: 'Đang hoạt động' },
+      'inactive': { class: 'bg-warning-soft text-warning', icon: 'pause-circle', text: 'Tạm khóa' },
+      'banned': { class: 'bg-danger-soft text-danger', icon: 'ban', text: 'Bị cấm' },
+      'pending': { class: 'bg-info-soft text-info', icon: 'clock', text: 'Chờ xác thực' }
+    };
+    
+    const statusConfig = statusMap[status] || statusMap['active'];
+    sidebarStatus.className = `badge ${statusConfig.class} px-3 py-2`;
+    sidebarStatus.innerHTML = `<i class="fas fa-${statusConfig.icon} me-1"></i>${statusConfig.text}`;
+  }
+  
+  // Update avatar with initials
+  if (avatarCircle && userData.fullname) {
+    const initials = getInitials(userData.fullname);
+    avatarCircle.innerHTML = `<span class="fw-bold fs-3">${initials}</span>`;
+  }
+  
+  return true;
+}
+
+function showGuestState() {
+  const sidebarUsername = document.getElementById('sidebar-username');
+  const sidebarEmail = document.getElementById('sidebar-email');
+  const sidebarStatus = document.getElementById('sidebar-status');
+  const avatarCircle = document.querySelector('.avatar-circle-large');
+  
+  if (sidebarUsername) {
+    sidebarUsername.textContent = 'Khách';
+  }
+  
+  if (sidebarEmail) {
+    sidebarEmail.textContent = 'guest@example.com';
+  }
+  
+  if (sidebarStatus) {
+    sidebarStatus.className = 'badge bg-secondary-soft text-secondary px-3 py-2';
+    sidebarStatus.innerHTML = '<i class="fas fa-user-times me-1"></i>Chưa đăng nhập';
+  }
+  
+  if (avatarCircle) {
+    avatarCircle.innerHTML = '<i class="fas fa-user text-muted fs-1"></i>';
+  }
+}
+
+function getInitials(fullname) {
+  if (!fullname) return 'U';
+  
+  const names = fullname.trim().split(' ');
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase();
+  }
+  
+  const firstInitial = names[0].charAt(0).toUpperCase();
+  const lastInitial = names[names.length - 1].charAt(0).toUpperCase();
+  return firstInitial + lastInitial;
+}
+
+// Helper function to get cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+  return null;
+}
+
+// Initialize sidebar functionality
+document.addEventListener('DOMContentLoaded', function() {
+  setActiveNavLink();
 });
+
+// Listen for localStorage changes (when user logs in/out in another tab)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'user_info' || e.key === 'pac_user_profile') {
+    loadUserInfoFromLocalStorage();
+  }
+});
+
+// Expose function globally so profile.js can call it
+window.loadUserInfoFromLocalStorage = loadUserInfoFromLocalStorage;
+
+// Start immediately
+setTimeout(() => {
+  waitForSidebarElements();
+}, 100);
+
 </script>

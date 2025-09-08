@@ -25,6 +25,16 @@ class ProfileManager {
     this.bindEvents();
     this.loadUserProfile();
     this.setupValidation();
+    
+    // Ensure sidebar gets updated after profile data is loaded
+    setTimeout(() => {
+      const sidebarUsername = document.getElementById('sidebar-username');
+      if (sidebarUsername && sidebarUsername.textContent === 'Đang tải...' && this.originalData && this.originalData.fullname) {
+        if (typeof authChecker !== 'undefined') {
+          authChecker.emitAuthStateChange(true, this.originalData);
+        }
+      }
+    }, 2000);
   }
 
   bindEvents() {
@@ -40,10 +50,19 @@ class ProfileManager {
       cancelBtn.addEventListener('click', () => this.resetForm());
     }
 
+    // Refresh profile button
+    const refreshBtn = document.getElementById('refresh-profile-btn');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => this.refreshProfile());
+    }
+
     // Form input change detection
     const formInputs = document.querySelectorAll('.profile-form input, .profile-form textarea');
     formInputs.forEach(input => {
-      input.addEventListener('input', () => this.onFormChange());
+      // Skip readonly fields
+      if (!input.readOnly) {
+        input.addEventListener('input', () => this.onFormChange());
+      }
     });
 
     // Form focus effects
@@ -57,16 +76,93 @@ class ProfileManager {
     try {
       this.setLoadingState(true);
       
-      // In a real application, this would fetch from API
-      // For demo purposes, using localStorage or default data
-      const userData = this.getUserDataFromStorage() || this.getDefaultUserData();
-      
-      this.populateForm(userData);
-      this.originalData = { ...userData };
+      // Fetch user profile from API
+      const response = await fetch('api/auth/get-profile.php', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include' // Include cookies for authentication
+      });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        throw new Error('Server returned invalid response format');
+      }
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const userData = result.user;
+        
+        this.populateForm(userData);
+        this.originalData = { ...userData };
+        
+        // Show email verification status
+        this.updateEmailVerificationStatus(userData.email_verified);
+        
+        // Emit auth state change event for sidebar update
+        if (typeof authChecker !== 'undefined') {
+          authChecker.emitAuthStateChange(true, userData);
+        }
+        
+        // Also emit a specific profile manager ready event
+        const profileReadyEvent = new CustomEvent('profileManagerReady', {
+          detail: { userData: userData }
+        });
+        window.dispatchEvent(profileReadyEvent);
+        
+        // Force trigger sidebar update with direct localStorage
+        setTimeout(() => {
+          // Ensure user_info is in localStorage
+          if (userData) {
+            localStorage.setItem('user_info', JSON.stringify(userData));
+          }
+          
+          // Try to call sidebar function directly if it exists
+          if (typeof loadUserInfoFromLocalStorage === 'function') {
+            loadUserInfoFromLocalStorage();
+          } else if (window.loadUserInfoFromLocalStorage) {
+            window.loadUserInfoFromLocalStorage();
+          }
+        }, 500);
+      } else {
+        // Handle API error
+        
+        if (response.status === 401) {
+          this.showNotification('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'warning');
+          // Redirect to login after a delay
+          setTimeout(() => {
+            if (typeof authChecker !== 'undefined') {
+              authChecker.redirectToLogin('Phiên đăng nhập hết hạn');
+            } else {
+              window.location.href = 'dangnhap';
+            }
+          }, 2000);
+          return;
+        } else {
+          throw new Error(result.message || 'Không thể tải thông tin profile');
+        }
+      }
       
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('[Profile] Error loading profile:', error);
+      console.error('[Profile] Error stack:', error.stack);
+      
       this.showNotification('Không thể tải thông tin profile. Vui lòng thử lại.', 'error');
+      
+      // Fallback to demo data in case of network error
+      console.log('[Profile] Loading fallback data...');
+      const fallbackData = this.getUserDataFromStorage() || this.getDefaultUserData();
+      this.populateForm(fallbackData);
+      this.originalData = { ...fallbackData };
+      
+      // Even with fallback data, try to emit auth state if we have user info
+      if (fallbackData && fallbackData.fullname && typeof authChecker !== 'undefined') {
+        authChecker.emitAuthStateChange(true, fallbackData);
+      }
     } finally {
       this.setLoadingState(false);
     }
@@ -92,22 +188,28 @@ class ProfileManager {
   }
 
   populateForm(userData) {
+    
     // Populate form fields
     const fields = ['fullname', 'username', 'email', 'phone', 'birth_date', 'address'];
     
     fields.forEach(field => {
       const element = document.getElementById(field);
-      if (element && userData[field]) {
-        element.value = userData[field];
+      if (element) {
+        if (userData[field] !== undefined && userData[field] !== null) {
+          element.value = userData[field];
+        }
       }
     });
 
-    // Set status (readonly field)
+    // Set status (readonly field) - use status_text if available
     const statusField = document.getElementById('status');
     if (statusField) {
-      const statusText = this.getStatusText(userData.status);
+      const statusText = userData.status_text || this.getStatusText(userData.status);
       statusField.value = statusText;
     }
+    
+    // Update profile header with user info
+    this.updateProfileHeader(userData);
   }
 
   getStatusText(status) {
@@ -135,27 +237,78 @@ class ProfileManager {
       // Collect form data
       const formData = this.collectFormData();
       
-      // Simulate API call
-      await this.saveToAPI(formData);
-      
-      // Save to localStorage for demo
-      this.saveToStorage(formData);
-      
-      // Update original data
-      this.originalData = { ...formData };
-      
-      this.showNotification('Thông tin profile đã được cập nhật thành công!', 'success');
+      // Send to API
+      const response = await fetch('api/auth/update-profile.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+        body: JSON.stringify(formData)
+      });
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        throw new Error('Server returned invalid response format');
+      }
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Update original data
+        this.originalData = { ...formData };
+        
+        // Update profile header
+        if (result.user) {
+          this.updateProfileHeader(result.user);
+          
+          // Emit auth state change event for sidebar update
+          if (typeof authChecker !== 'undefined') {
+            authChecker.emitAuthStateChange(true, result.user);
+          }
+        }
+        
+        // Save to localStorage for backup
+        this.saveToStorage(formData);
+        
+        this.showNotification('Thông tin profile đã được cập nhật thành công!', 'success');
+        
+        // Reset form state
+        this.onFormChange();
+        
+      } else {
+        // Handle API errors
+        console.error('[Profile] Save API Error:', result);
+        
+        if (response.status === 401) {
+          this.showNotification('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'warning');
+          setTimeout(() => {
+            if (typeof authChecker !== 'undefined') {
+              authChecker.redirectToLogin('Phiên đăng nhập hết hạn');
+            } else {
+              window.location.href = 'dangnhap';
+            }
+          }, 2000);
+        } else if (response.status === 409) {
+          this.showNotification('Email này đã được sử dụng bởi tài khoản khác.', 'error');
+        } else {
+          this.showNotification(result.message || 'Có lỗi xảy ra khi lưu thông tin.', 'error');
+        }
+      }
       
     } catch (error) {
-      console.error('Error saving profile:', error);
-      this.showNotification('Có lỗi xảy ra khi lưu thông tin. Vui lòng thử lại.', 'error');
+      console.error('[Profile] Error saving profile:', error);
+      console.error('[Profile] Save error stack:', error.stack);
+      this.showNotification('Có lỗi mạng xảy ra. Vui lòng thử lại.', 'error');
     } finally {
       this.setLoadingState(false);
     }
   }
 
   collectFormData() {
-    const fields = ['fullname', 'username', 'email', 'phone', 'birth_date', 'address'];
+    const fields = ['fullname', 'email', 'phone', 'birth_date', 'address'];
     const data = {};
     
     fields.forEach(field => {
@@ -166,6 +319,30 @@ class ProfileManager {
     });
 
     return data;
+  }
+
+  /**
+   * Refresh profile data from server
+   */
+  async refreshProfile() {
+    const refreshBtn = document.getElementById('refresh-profile-btn');
+    if (refreshBtn) {
+      const originalHTML = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      refreshBtn.disabled = true;
+    }
+
+    try {
+      await this.loadUserProfile();
+      this.showNotification('Đã làm mới thông tin profile!', 'success');
+    } catch (error) {
+      this.showNotification('Không thể làm mới thông tin. Vui lòng thử lại.', 'error');
+    } finally {
+      if (refreshBtn) {
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        refreshBtn.disabled = false;
+      }
+    }
   }
 
   validateForm() {
@@ -355,31 +532,134 @@ class ProfileManager {
   }
 
   showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = `
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      min-width: 300px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    `;
+    // Use Toastbar if available, otherwise fallback to custom notification
+    if (typeof Toastbar !== 'undefined') {
+      // Map types to Toastbar
+      const toastTypes = {
+        'success': 'success',
+        'error': 'error', 
+        'warning': 'warning',
+        'info': 'info'
+      };
+      
+      const title = type === 'success' ? 'Thành công!' : 
+                   type === 'error' ? 'Lỗi!' :
+                   type === 'warning' ? 'Cảnh báo!' : 'Thông báo';
+      
+      Toastbar.show(title, message, toastTypes[type] || 'info');
+    } else {
+      // Fallback to custom notification
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      notification.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      `;
+      
+      notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+
+      // Add to page
+      document.body.appendChild(notification);
+
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 5000);
+    }
+  }
+
+  /**
+   * Update profile header with user information
+   * @param {Object} userData - User data object
+   */
+  updateProfileHeader(userData) {
+    // Update avatar initials
+    const avatarCircle = document.querySelector('.profile-avatar .avatar-circle');
+    if (avatarCircle && userData.fullname) {
+      const initials = this.getInitials(userData.fullname);
+      avatarCircle.innerHTML = `<span class="fw-bold fs-4">${initials}</span>`;
+    } else {
+      console.log('[Profile] Avatar circle not found or no fullname');
+    }
     
-    notification.innerHTML = `
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    // Update profile title if exists
+    const profileTitle = document.querySelector('.profile-main-content h3');
+    if (profileTitle && userData.fullname) {
+      profileTitle.textContent = `Hồ sơ của ${userData.fullname}`;
+    }
+  }
 
-    // Add to page
-    document.body.appendChild(notification);
+  /**
+   * Get initials from full name
+   * @param {string} fullname - Full name
+   * @returns {string} Initials
+   */
+  getInitials(fullname) {
+    if (!fullname) return 'U';
+    
+    const names = fullname.trim().split(' ');
+    if (names.length === 1) {
+      return names[0].charAt(0).toUpperCase();
+    }
+    
+    const firstInitial = names[0].charAt(0).toUpperCase();
+    const lastInitial = names[names.length - 1].charAt(0).toUpperCase();
+    return firstInitial + lastInitial;
+  }
 
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
+  /**
+   * Update email verification status display
+   * @param {boolean} isVerified - Email verification status
+   */
+  updateEmailVerificationStatus(isVerified) {
+    const emailGroup = document.querySelector('#email').closest('.form-group');
+    if (!emailGroup) return;
+    
+    // Remove existing status elements
+    const existingStatus = emailGroup.querySelector('.email-status');
+    if (existingStatus) {
+      existingStatus.remove();
+    }
+    
+    // Create status element
+    const statusElement = document.createElement('small');
+    statusElement.className = 'email-status mt-1 d-block';
+    
+    if (isVerified) {
+      statusElement.className += ' text-success';
+      statusElement.innerHTML = '<i class="fas fa-shield-alt me-1"></i>Email đã được xác thực';
+      
+      // Update input group text
+      const inputGroupText = emailGroup.querySelector('.input-group-text');
+      if (inputGroupText) {
+        inputGroupText.className = 'input-group-text bg-success text-white';
+        inputGroupText.innerHTML = '<i class="fas fa-check-circle"></i>';
       }
-    }, 5000);
+    } else {
+      statusElement.className += ' text-warning';
+      statusElement.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Email chưa được xác thực';
+      
+      // Update input group text
+      const inputGroupText = emailGroup.querySelector('.input-group-text');
+      if (inputGroupText) {
+        inputGroupText.className = 'input-group-text bg-warning text-dark';
+        inputGroupText.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+      }
+    }
+    
+    // Insert after input group
+    const inputGroup = emailGroup.querySelector('.input-group');
+    if (inputGroup) {
+      inputGroup.insertAdjacentElement('afterend', statusElement);
+    }
   }
 }
 

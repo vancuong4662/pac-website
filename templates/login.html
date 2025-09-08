@@ -100,12 +100,10 @@
       try {
         const userInfoCookie = getCookie('pac_user_info');
         if (userInfoCookie) {
-          console.log('[Login Early Check] Found pac_user_info, redirecting to home...');
           // User appears to be logged in, redirect immediately
           window.location.href = 'home';
           return true;
         }
-        console.log('[Login Early Check] No pac_user_info found, will proceed with login page');
       } catch (error) {
         console.error('[Login Early Check] Error:', error);
       }
@@ -195,18 +193,10 @@
 
     // Enhanced authentication check after DOM loads (if user wasn't redirected by early check)
     document.addEventListener('DOMContentLoaded', async function() {
-        console.log('[Login Page] DOMContentLoaded event fired');
-        console.log('[Login Page] authChecker available:', typeof authChecker);
-        
         try {
             // Show loading state on form elements
             const authForm = document.getElementById('authForm');
             const authButton = document.getElementById('authButton');
-            
-            console.log('[Login Page] Found form elements:', {
-                authForm: !!authForm,
-                authButton: !!authButton
-            });
             
             if (authForm) {
                 authForm.style.opacity = '0.7';
@@ -216,13 +206,10 @@
                 authButton.textContent = 'Đang kiểm tra...';
             }
             
-            console.log('[Login Page] About to call handleAuthPageAccess for server verification...');
             // Do server verification (early check only used cookies)
             const isAlreadyAuthenticated = await authChecker.handleAuthPageAccess('login');
-            console.log('[Login Page] handleAuthPageAccess result:', isAlreadyAuthenticated);
             
             if (!isAlreadyAuthenticated) {
-                console.log('[Login Page] User not authenticated, showing login form...');
                 // User is not authenticated, show the login form
                 if (authForm) {
                     authForm.style.opacity = '1';
@@ -237,15 +224,12 @@
                 
                 // Initialize auth page
                 if (typeof AuthHelpers !== 'undefined') {
-                    console.log('[Login Page] Initializing AuthHelpers...');
                     AuthHelpers.init('login');
                 } else {
                     console.error('[Login Page] AuthHelpers not found. Please check access.js');
                 }
-            } else {
-                console.log('[Login Page] User already authenticated, redirect should happen...');
-                // Keep loading overlay visible during redirect
             }
+            // If user is authenticated, redirect should happen
             
         } catch (error) {
             console.error('[Login Page] Error during login page initialization:', error);
@@ -267,7 +251,6 @@
             
             // Initialize auth page as fallback
             if (typeof AuthHelpers !== 'undefined') {
-                console.log('[Login Page] Fallback: Initializing AuthHelpers...');
                 AuthHelpers.init('login');
             }
         }

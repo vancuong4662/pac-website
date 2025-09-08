@@ -199,7 +199,6 @@
         try {
           const authStatus = authChecker.getCurrentAuthStatus();
           if (authStatus.isAuthenticated && authStatus.user) {
-            console.log('[Header Auth] User is authenticated via authChecker:', authStatus.user);
             this.showAuthenticatedState(authStatus.user);
             return;
           }
@@ -212,10 +211,8 @@
       const userInfo = this.getUserInfoFromCookie();
       
       if (userInfo && userInfo.id) {
-        console.log('[Header Auth] User is authenticated via cookie:', userInfo);
         this.showAuthenticatedState(userInfo);
       } else {
-        console.log('[Header Auth] User is not authenticated');
         this.showNotAuthenticatedState();
       }
     }
@@ -277,8 +274,6 @@
     
     async handleLogout() {
       try {
-        console.log('[Header Auth] Initiating logout...');
-        
         // Check if authChecker is available (from main authentication system)
         if (typeof authChecker !== 'undefined') {
           await authChecker.logout(true);

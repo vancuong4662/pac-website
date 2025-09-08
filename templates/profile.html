@@ -27,6 +27,9 @@
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+  
+  <!-- Toastbar CSS for notifications -->
+  <link href="assets/css/toastbar.css" rel="stylesheet">
 </head>
 
 <body class="profile-page">
@@ -80,9 +83,16 @@
                         <i class="fas fa-user fa-2x"></i>
                       </div>
                     </div>
-                    <div>
+                    <div class="flex-grow-1">
                       <h3 class="mb-1 fw-bold text-dark">Thông tin cá nhân</h3>
                       <p class="text-muted mb-0">Quản lý và cập nhật thông tin của bạn</p>
+                    </div>
+                    <div class="profile-actions">
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="refresh-profile-btn" title="Làm mới">
+                          <i class="fas fa-sync-alt"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -113,10 +123,17 @@
                           </label>
                           <div class="input-group">
                             <input type="text" 
-                                   class="form-control form-control-lg border-2" 
+                                   class="form-control form-control-lg border-2 bg-light" 
                                    id="username" 
-                                   placeholder="Tên đăng nhập">
+                                   placeholder="Tên đăng nhập"
+                                   readonly>
+                            <span class="input-group-text bg-secondary text-white">
+                              <i class="fas fa-lock"></i>
+                            </span>
                           </div>
+                          <small class="text-muted mt-1 d-block">
+                            <i class="fas fa-info-circle me-1"></i>Tên đăng nhập không thể thay đổi
+                          </small>
                         </div>
                       </div>
 
@@ -135,9 +152,7 @@
                               <i class="fas fa-check-circle"></i>
                             </span>
                           </div>
-                          <small class="text-success mt-1 d-block">
-                            <i class="fas fa-shield-alt me-1"></i>Email đã được xác thực
-                          </small>
+                          <!-- Email verification status will be dynamically updated by JS -->
                         </div>
                       </div>
 
@@ -246,6 +261,9 @@
   <!-- Component Loader -->
   <script src="assets/js/component-loader.js?v=1.1"></script>
 
+  <!-- Toastbar for notifications -->
+  <script src="assets/js/toastbar.js"></script>
+
   <!-- Authentication -->
   <script src="assets/js/authen.js"></script>
 
@@ -259,18 +277,10 @@
 
     // Check authentication before initializing profile page
     document.addEventListener('DOMContentLoaded', async function() {
-        console.log('[Profile Page] Checking authentication...');
         
         try {
             // Use authChecker to verify user is authenticated
             const user = await authChecker.handleProtectedPageAccess('profile');
-            
-            if (user) {
-                console.log('[Profile Page] User authenticated:', user);
-                // User is authenticated, continue with page initialization
-                // The main.js and profile.js will handle the rest
-            }
-            // If user is not authenticated, authChecker will handle redirection
             
         } catch (error) {
             console.error('[Profile Page] Error during authentication check:', error);
