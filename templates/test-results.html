@@ -161,6 +161,9 @@
   <!-- Component Loader -->
   <script src="assets/js/component-loader.js"></script>
   
+  <!-- Authentication -->
+  <script src="assets/js/authen.js"></script>
+  
   <!-- Test Results JS -->
   <script src="assets/js/test-results.js"></script>
 
@@ -169,6 +172,27 @@
     window.pageComponentsConfig = {
       sidebar: 'profile-sidebar.html' // Sử dụng chung sidebar với profile
     };
+
+    // Check authentication before initializing test results page
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('[Test Results Page] Checking authentication...');
+        
+        try {
+            // Use authChecker to verify user is authenticated
+            const user = await authChecker.handleProtectedPageAccess('test-results');
+            
+            if (user) {
+                console.log('[Test Results Page] User authenticated:', user);
+                // User is authenticated, continue with page initialization
+                // The main.js and test-results.js will handle the rest
+            }
+            // If user is not authenticated, authChecker will handle redirection
+            
+        } catch (error) {
+            console.error('[Test Results Page] Error during authentication check:', error);
+            authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+        }
+    });
   </script>
 
 </body>

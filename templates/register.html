@@ -27,9 +27,96 @@
 
   <!-- Template Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
-
+  
   <!-- Access Pages CSS File -->
   <link href="assets/css/access.css" rel="stylesheet">
+
+  <!-- Early Authentication Check - Before page renders -->
+  <style>
+    /* Fullscreen loading overlay */
+    #authLoadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    .auth-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .auth-loading-text {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+    
+    .auth-loading-subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+  </style>
+  
+  <script>
+    // Inject fullscreen loading overlay immediately
+    document.write(`
+      <div id="authLoadingOverlay">
+        <div class="auth-spinner"></div>
+        <div class="auth-loading-text">Đang kiểm tra đăng nhập</div>
+        <div class="auth-loading-subtitle">Vui lòng chờ trong giây lát...</div>
+      </div>
+    `);
+    
+    // Quick authentication check using cookies only
+    function quickAuthCheck() {
+      // Get pac_user_info cookie
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+          return parts.pop().split(';').shift();
+        }
+        return null;
+      }
+      
+      try {
+        const userInfoCookie = getCookie('pac_user_info');
+        if (userInfoCookie) {
+          console.log('[Register Early Check] Found pac_user_info, redirecting to home...');
+          // User appears to be logged in, redirect immediately
+          window.location.href = 'home';
+          return true;
+        }
+        console.log('[Register Early Check] No pac_user_info found, will proceed with register page');
+      } catch (error) {
+        console.error('[Register Early Check] Error:', error);
+      }
+      return false;
+    }
+    
+    // Run quick check immediately
+    quickAuthCheck();
+  </script>
 </head>
 
 <body class="auth-page">
@@ -111,12 +198,116 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/js/toastbar.js"></script>
+  <script src="assets/js/authen.js"></script>
   <script src="assets/js/access.js"></script>
 
   <!-- Initialize Register Page -->
   <script>
-    // Initialize auth page with register mode
-    AuthHelpers.init('register');
+    // Function to hide loading overlay (if still showing)
+    function hideLoadingOverlay() {
+      const overlay = document.getElementById('authLoadingOverlay');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+          overlay.remove();
+        }, 300);
+      }
+    }
+
+    // Enhanced authentication check after DOM loads (if user wasn't redirected by early check)
+    function initializeRegisterPage() {
+      document.addEventListener('DOMContentLoaded', async function() {
+          console.log('[Register Page] DOMContentLoaded event fired');
+          console.log('[Register Page] authChecker available:', typeof authChecker);
+          
+          try {
+              // Show loading state on form elements
+              const authForm = document.getElementById('authForm');
+              const authButton = document.getElementById('authButton');
+              
+              console.log('[Register Page] Found form elements:', {
+                  authForm: !!authForm,
+                  authButton: !!authButton
+              });
+              
+              if (authForm) {
+                  authForm.style.opacity = '0.7';
+              }
+              if (authButton) {
+                  authButton.disabled = true;
+                  authButton.textContent = 'Đang kiểm tra...';
+              }
+              
+              console.log('[Register Page] About to call handleAuthPageAccess for server verification...');
+              // Do server verification (early check only used cookies)
+              const isAlreadyAuthenticated = await authChecker.handleAuthPageAccess('register');
+              console.log('[Register Page] handleAuthPageAccess result:', isAlreadyAuthenticated);
+              
+              if (!isAlreadyAuthenticated) {
+                  console.log('[Register Page] User not authenticated, showing register form...');
+                  // User is not authenticated, show the register form
+                  if (authForm) {
+                      authForm.style.opacity = '1';
+                  }
+                  if (authButton) {
+                      authButton.disabled = false;
+                      authButton.textContent = 'Đăng Ký';
+                  }
+                  
+                  // Hide loading overlay
+                  hideLoadingOverlay();
+                  
+                  // Initialize auth page
+                  if (typeof AuthHelpers !== 'undefined') {
+                      console.log('[Register Page] Initializing AuthHelpers...');
+                      AuthHelpers.init('register');
+                  } else {
+                      console.error('[Register Page] AuthHelpers not found. Please check access.js');
+                  }
+              } else {
+                  console.log('[Register Page] User already authenticated, redirect should happen...');
+                  // Keep loading overlay visible during redirect
+              }
+              
+          } catch (error) {
+              console.error('[Register Page] Error during register page initialization:', error);
+              
+              // Restore form state on error
+              const authForm = document.getElementById('authForm');
+              const authButton = document.getElementById('authButton');
+              
+              if (authForm) {
+                  authForm.style.opacity = '1';
+              }
+              if (authButton) {
+                  authButton.disabled = false;
+                  authButton.textContent = 'Đăng Ký';
+              }
+              
+              // Hide loading overlay
+              hideLoadingOverlay();
+              
+              // Initialize auth page as fallback
+              if (typeof AuthHelpers !== 'undefined') {
+                  console.log('[Register Page] Fallback: Initializing AuthHelpers...');
+                  AuthHelpers.init('register');
+              }
+          }
+      });
+    }
+
+    // Initialize register page
+    initializeRegisterPage();
+
+    // Check if we need to hide loading overlay after timeout
+    setTimeout(() => {
+      // If loading overlay is still visible after 2 seconds, hide it
+      const overlay = document.getElementById('authLoadingOverlay');
+      if (overlay && !window.location.href.includes('home')) {
+        hideLoadingOverlay();
+      }
+    }, 2000);
   </script>
 </body>
 

@@ -15,11 +15,10 @@ const AuthHelpers = {
   
   // Initialize auth page functionality
   init: function(pageType) {
-    document.addEventListener('DOMContentLoaded', function() {
-      AuthHelpers.setupEventListeners(pageType);
-      AuthHelpers.setupAnimations();
-      AuthHelpers.focusFirstInput();
-    });
+    // Remove the DOMContentLoaded wrapper since we're calling this manually
+    AuthHelpers.setupEventListeners(pageType);
+    AuthHelpers.setupAnimations();
+    AuthHelpers.focusFirstInput();
   },
 
   // Setup event listeners based on page type
@@ -384,7 +383,8 @@ const AuthHelpers = {
 // Export for global use
 window.AuthHelpers = AuthHelpers;
 
-// Initialize when DOM is ready
+// Initialize when DOM is ready - DISABLED to avoid conflicts with manual initialization
+/* 
 document.addEventListener('DOMContentLoaded', function() {
   // Detect page type
   const pageType = document.body.classList.contains('register-page') ? 'register' : 'login';
@@ -392,3 +392,4 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize helpers
   AuthHelpers.init(pageType);
 });
+*/

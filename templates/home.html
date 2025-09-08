@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Trang Chủ - PAC Group</title>
+  <meta content="Trang chủ hệ thống PAC Group" name="description">
+  <meta content="PAC Group, giáo dục, tư vấn" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Toastbar CSS -->
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Header -->
+  <header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+      <a href="#" class="logo d-flex align-items-center">
+        <img src="assets/img/logo.png" alt="PAC Group Logo">
+      </a>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto active" href="#hero">Trang Chủ</a></li>
+          <li><a class="nav-link scrollto" href="#about">Giới Thiệu</a></li>
+          <li><a class="nav-link scrollto" href="#services">Dịch Vụ</a></li>
+          <li><a class="nav-link scrollto" href="#contact">Liên Hệ</a></li>
+          <li class="dropdown">
+            <a href="#" class="nav-link dropdown-toggle" id="userDropdown">
+              <i class="fas fa-user-circle"></i> <span id="userDisplayName">Người dùng</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" id="profileLink">Hồ sơ cá nhân</a></li>
+              <li><a href="#" id="settingsLink">Cài đặt</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a href="#" id="logoutBtn">Đăng xuất</a></li>
+            </ul>
+          </li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 d-flex flex-column justify-content-center">
+          <h1 data-aos="fade-up">Chào mừng đến với PAC Group</h1>
+          <h2 data-aos="fade-up" data-aos-delay="400">Unlock Your Career - Kết nối cùng chúng tôi</h2>
+          <div data-aos="fade-up" data-aos-delay="600">
+            <div class="text-center text-lg-start">
+              <a href="#about" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+                <span>Khám phá ngay</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
+          <img src="assets/img/banner/1.jpg" class="img-fluid" alt="PAC Group">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main id="main">
+    <!-- Welcome Section -->
+    <section id="welcome" class="welcome">
+      <div class="container" data-aos="fade-up">
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <h3>Xin chào, <span id="welcomeUserName">Người dùng</span>!</h3>
+            <p>Bạn đã đăng nhập thành công vào hệ thống PAC Group</p>
+            
+            <div class="user-info-card mt-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Thông tin tài khoản</h5>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>Họ tên:</strong> <span id="userFullName">-</span></p>
+                      <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Tên đăng nhập:</strong> <span id="userUsername">-</span></p>
+                      <p><strong>Vai trò:</strong> <span id="userRole">-</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section id="actions" class="actions">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>Thao tác nhanh</h2>
+          <p>Các tính năng và dịch vụ của PAC Group</p>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="action-box">
+              <div class="icon"><i class="fas fa-user-edit"></i></div>
+              <h4><a href="#" id="editProfileBtn">Chỉnh sửa hồ sơ</a></h4>
+              <p>Cập nhật thông tin cá nhân của bạn</p>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="action-box">
+              <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+              <h4><a href="#">Khóa học</a></h4>
+              <p>Xem các khóa học và chương trình đào tạo</p>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+            <div class="action-box">
+              <div class="icon"><i class="fas fa-chart-line"></i></div>
+              <h4><a href="#">Báo cáo</a></h4>
+              <p>Xem báo cáo và thống kê học tập</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>PAC Group</span></strong>. All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top button -->
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  <script src="assets/js/authen.js"></script>
+  <script src="assets/js/main.js"></script>
+  
+  <!-- Initialize Protected Page -->
+  <script>
+    // Check authentication status and load user data
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            // Show loading state
+            document.body.style.opacity = '0.7';
+            
+            // Check if user is authenticated
+            const user = await authChecker.handleProtectedPageAccess('home');
+            
+            if (user) {
+                // User is authenticated, load user data
+                loadUserData(user);
+                
+                // Restore page visibility
+                document.body.style.opacity = '1';
+                
+                // Initialize AOS
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({
+                        duration: 1000,
+                        easing: 'ease-in-out',
+                        once: true,
+                        mirror: false
+                    });
+                }
+                
+                // Setup event listeners
+                setupEventListeners();
+            }
+            // If user is not authenticated, authChecker will handle redirection
+            
+        } catch (error) {
+            console.error('Error during home page initialization:', error);
+            authChecker.showToast('Lỗi tải trang. Vui lòng thử lại', 'error');
+            
+            // Restore page visibility
+            document.body.style.opacity = '1';
+        }
+    });
+
+    /**
+     * Load user data into the page
+     * @param {Object} user - User data object
+     */
+    function loadUserData(user) {
+        // Update user display elements
+        const userDisplayName = document.getElementById('userDisplayName');
+        const welcomeUserName = document.getElementById('welcomeUserName');
+        const userFullName = document.getElementById('userFullName');
+        const userEmail = document.getElementById('userEmail');
+        const userUsername = document.getElementById('userUsername');
+        const userRole = document.getElementById('userRole');
+
+        if (userDisplayName) {
+            userDisplayName.textContent = user.fullname || user.username;
+        }
+        if (welcomeUserName) {
+            welcomeUserName.textContent = user.fullname || user.username;
+        }
+        if (userFullName) {
+            userFullName.textContent = user.fullname || '-';
+        }
+        if (userEmail) {
+            userEmail.textContent = user.email || '-';
+        }
+        if (userUsername) {
+            userUsername.textContent = user.username || '-';
+        }
+        if (userRole) {
+            userRole.textContent = user.role || 'user';
+        }
+    }
+
+    /**
+     * Setup event listeners for page interactions
+     */
+    function setupEventListeners() {
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Confirm logout
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    authChecker.logout(true);
+                }
+            });
+        }
+
+        // Edit profile button
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        if (editProfileBtn) {
+            editProfileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                authChecker.showToast('Tính năng đang phát triển', 'info');
+            });
+        }
+
+        // Profile link
+        const profileLink = document.getElementById('profileLink');
+        if (profileLink) {
+            profileLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                authChecker.showToast('Tính năng đang phát triển', 'info');
+            });
+        }
+
+        // Settings link
+        const settingsLink = document.getElementById('settingsLink');
+        if (settingsLink) {
+            settingsLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                authChecker.showToast('Tính năng đang phát triển', 'info');
+            });
+        }
+    }
+  </script>
+
+  <style>
+    .welcome {
+      padding: 80px 0 60px 0;
+    }
+
+    .user-info-card .card {
+      border: none;
+      box-shadow: 0 4px 16px rgba(1, 41, 112, 0.1);
+      border-radius: 10px;
+    }
+
+    .actions {
+      padding: 60px 0;
+      background: #f8f9fa;
+    }
+
+    .action-box {
+      padding: 30px;
+      background: #fff;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(1, 41, 112, 0.1);
+      transition: all 0.3s ease-in-out;
+      margin-bottom: 30px;
+    }
+
+    .action-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(1, 41, 112, 0.15);
+    }
+
+    .action-box .icon {
+      font-size: 48px;
+      color: #012970;
+      margin-bottom: 20px;
+    }
+
+    .action-box h4 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .action-box h4 a {
+      color: #012970;
+      text-decoration: none;
+    }
+
+    .action-box h4 a:hover {
+      color: #0ea5e9;
+    }
+
+    .action-box p {
+      color: #6c757d;
+      margin-bottom: 0;
+    }
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(1, 41, 112, 0.1);
+      min-width: 200px;
+      z-index: 1000;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu li {
+      list-style: none;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 15px;
+      color: #333;
+      text-decoration: none;
+      border-bottom: 1px solid #f8f9fa;
+    }
+
+    .dropdown-menu a:hover {
+      background: #f8f9fa;
+      color: #012970;
+    }
+
+    .dropdown-divider {
+      margin: 0;
+      border-color: #dee2e6;
+    }
+  </style>
+</body>
+</html>

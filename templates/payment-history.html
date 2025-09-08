@@ -217,6 +217,9 @@
   <!-- Component Loader -->
   <script src="assets/js/component-loader.js"></script>
   
+  <!-- Authentication -->
+  <script src="assets/js/authen.js"></script>
+  
   <!-- Payment History JS -->
   <script src="assets/js/payment-history.js"></script>
 
@@ -225,6 +228,27 @@
     window.pageComponentsConfig = {
       sidebar: 'profile-sidebar.html' // Sử dụng chung sidebar với profile
     };
+
+    // Check authentication before initializing payment history page
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('[Payment History Page] Checking authentication...');
+        
+        try {
+            // Use authChecker to verify user is authenticated
+            const user = await authChecker.handleProtectedPageAccess('payment-history');
+            
+            if (user) {
+                console.log('[Payment History Page] User authenticated:', user);
+                // User is authenticated, continue with page initialization
+                // The main.js and payment-history.js will handle the rest
+            }
+            // If user is not authenticated, authChecker will handle redirection
+            
+        } catch (error) {
+            console.error('[Payment History Page] Error during authentication check:', error);
+            authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+        }
+    });
   </script>
 
 </body>

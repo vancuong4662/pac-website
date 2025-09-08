@@ -246,6 +246,9 @@
   <!-- Component Loader -->
   <script src="assets/js/component-loader.js?v=1.1"></script>
 
+  <!-- Authentication -->
+  <script src="assets/js/authen.js"></script>
+
   <!-- Profile specific JS -->
   <script src="assets/js/profile.js?v=1.0"></script>
   <script>
@@ -253,6 +256,27 @@
     window.pageComponentsConfig = {
       sidebar: 'profile-sidebar.html'
     };
+
+    // Check authentication before initializing profile page
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('[Profile Page] Checking authentication...');
+        
+        try {
+            // Use authChecker to verify user is authenticated
+            const user = await authChecker.handleProtectedPageAccess('profile');
+            
+            if (user) {
+                console.log('[Profile Page] User authenticated:', user);
+                // User is authenticated, continue with page initialization
+                // The main.js and profile.js will handle the rest
+            }
+            // If user is not authenticated, authChecker will handle redirection
+            
+        } catch (error) {
+            console.error('[Profile Page] Error during authentication check:', error);
+            authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+        }
+    });
   </script>
 
   <!-- Main JS File -->
