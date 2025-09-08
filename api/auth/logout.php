@@ -71,7 +71,7 @@ try {
     echo json_encode([
         'success' => true,
         'message' => 'Đăng xuất thành công!',
-        'redirect_url' => '/pac-new/'
+        'redirect_url' => 'dangnhap'
     ]);
 
 } catch (Exception $e) {

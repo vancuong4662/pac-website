@@ -11,6 +11,38 @@ class AuthChecker {
     }
 
     /**
+     * Emit authentication state change event
+     * @param {boolean} isAuthenticated - Authentication status
+     * @param {Object|null} user - User data if authenticated
+     */
+    emitAuthStateChange(isAuthenticated, user = null) {
+        const event = new CustomEvent('authStateChanged', {
+            detail: {
+                isAuthenticated,
+                user
+            }
+        });
+        window.dispatchEvent(event);
+        console.log('[AuthChecker] Auth state changed event emitted:', { isAuthenticated, user });
+    }
+
+    /**
+     * Get current authentication status without redirects (for UI updates)
+     * @returns {Object} Current auth status and user info
+     */
+    getCurrentAuthStatus() {
+        const userInfo = this.getUserInfo();
+        const sessionToken = this.getSessionToken();
+        
+        const isAuthenticated = !!(userInfo && userInfo.id && sessionToken);
+        
+        return {
+            isAuthenticated,
+            user: isAuthenticated ? userInfo : null
+        };
+    }
+
+    /**
      * Get cookie value by name
      * @param {string} name - Cookie name
      * @returns {string|null} Cookie value or null if not found
@@ -174,6 +206,9 @@ class AuthChecker {
             localStorage.removeItem('pac_auth_token');
             localStorage.removeItem('pac_user_data');
         }
+        
+        // Emit auth state change event
+        this.emitAuthStateChange(false, null);
     }
 
     /**
@@ -220,7 +255,7 @@ class AuthChecker {
      * @param {string} message - Optional message to show
      */
     redirectToLogin(message = null) {
-        let loginUrl = 'login';
+        let loginUrl = 'dangnhap';
         if (message) {
             loginUrl += `?message=${encodeURIComponent(message)}`;
         }
@@ -264,6 +299,9 @@ class AuthChecker {
                 console.log('[AuthChecker] Showing welcome message and redirecting immediately...');
                 this.showToast(welcomeMessage, 'info');
                 
+                // Emit auth state change event for authenticated user
+                this.emitAuthStateChange(true, authStatus.user);
+                
                 // Redirect immediately to home
                 console.log('[AuthChecker] Executing immediate redirect to home...');
                 this.redirectToDashboard('home');
@@ -272,9 +310,15 @@ class AuthChecker {
             }
             
             console.log('[AuthChecker] User is not authenticated, allowing access to auth page');
+            // Emit auth state change event for non-authenticated user
+            this.emitAuthStateChange(false, null);
+            
             return false; // User is not authenticated, can proceed
         } catch (error) {
             console.error(`[AuthChecker] Error checking auth status on ${pageName} page:`, error);
+            // Emit auth state change event for error state
+            this.emitAuthStateChange(false, null);
+            
             return false; // Allow access on error
         }
     }
@@ -294,11 +338,17 @@ class AuthChecker {
                     this.showToast('Vui lòng đăng nhập để truy cập trang này', 'warning');
                 }
                 
+                // Emit auth state change event
+                this.emitAuthStateChange(false, null);
+                
                 // Redirect immediately to login
                 this.redirectToLogin('Phiên đăng nhập đã hết hạn');
                 
                 return false; // User is not authenticated, will be redirected
             }
+            
+            // Emit auth state change event for authenticated user
+            this.emitAuthStateChange(true, authStatus.user);
             
             return authStatus.user; // Return user data for authenticated user
         } catch (error) {
@@ -307,6 +357,9 @@ class AuthChecker {
             if (showMessage) {
                 this.showToast('Lỗi xác thực. Vui lòng đăng nhập lại', 'error');
             }
+            
+            // Emit auth state change event for error state
+            this.emitAuthStateChange(false, null);
             
             // Redirect immediately to login on error
             this.redirectToLogin('Lỗi xác thực');
