@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Purchases API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .auth-section {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .test-section {
+            background-color: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+        button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+        button.clear {
+            background-color: #f44336;
+        }
+        button.clear:hover {
+            background-color: #d32f2f;
+        }
+        .response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            border-left: 4px solid #4caf50;
+            background-color: #e8f5e8;
+        }
+        .error {
+            border-left: 4px solid #f44336;
+            background-color: #ffeaea;
+        }
+        .purchase-item {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #fafafa;
+        }
+        .purchase-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .type-course {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .type-test {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        .type-consultation {
+            background-color: #e8f5e8;
+            color: #388e3c;
+        }
+        .status-active {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .status-inactive {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .status-expired {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .summary-card {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 24px;
+            font-weight: bold;
+            display: block;
+        }
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛒 Test Purchases API</h1>
+    
+    <!-- Authentication Section -->
+    <div class="container auth-section">
+        <h2>🔐 Authentication</h2>
+        <div>
+            <input type="email" id="loginEmail" placeholder="Email" value="john@example.com">
+            <input type="password" id="loginPassword" placeholder="Password" value="password123">
+            <button onclick="login()">Login</button>
+            <button onclick="logout()" class="clear">Logout</button>
+        </div>
+        <div id="authResponse" class="response"></div>
+    </div>
+
+    <!-- Test Section -->
+    <div class="container test-section">
+        <h2>🧪 Test Purchases API</h2>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('all')">Tất cả sản phẩm</div>
+            <div class="tab" onclick="showTab('courses')">Khóa học</div>
+            <div class="tab" onclick="showTab('tests')">Trắc nghiệm</div>
+            <div class="tab" onclick="showTab('consultations')">Tư vấn</div>
+        </div>
+        
+        <div id="all" class="tab-content active">
+            <h3>Tất cả sản phẩm đã mua</h3>
+            <button onclick="getAllPurchases()">Lấy tất cả sản phẩm đã mua</button>
+            <div id="allResponse" class="response"></div>
+        </div>
+        
+        <div id="courses" class="tab-content">
+            <h3>Khóa học đã mua</h3>
+            <button onclick="getCourses()">Lấy khóa học đã mua</button>
+            <div id="coursesResponse" class="response"></div>
+        </div>
+        
+        <div id="tests" class="tab-content">
+            <h3>Trắc nghiệm đã mua</h3>
+            <button onclick="getTests()">Lấy trắc nghiệm đã mua</button>
+            <div id="testsResponse" class="response"></div>
+        </div>
+        
+        <div id="consultations" class="tab-content">
+            <h3>Tư vấn đã đặt</h3>
+            <button onclick="getConsultations()">Lấy tư vấn đã đặt</button>
+            <div id="consultationsResponse" class="response"></div>
+        </div>
+        
+        <button onclick="clearAllResults()" class="clear">Clear All Results</button>
+    </div>
+
+    <script>
+        let sessionToken = '';
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/pac-new/api/auth/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                displayResponse('authResponse', data, response.ok);
+                
+                if (data.success) {
+                    sessionToken = data.session_token;
+                }
+            } catch (error) {
+                displayResponse('authResponse', { error: error.message }, false);
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/pac-new/api/auth/logout.php', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                displayResponse('authResponse', data, response.ok);
+                sessionToken = '';
+            } catch (error) {
+                displayResponse('authResponse', { error: error.message }, false);
+            }
+        }
+
+        async function getAllPurchases() {
+            try {
+                const response = await fetch('/pac-new/api/purchases/all.php', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    displayPurchasesWithUI('allResponse', data);
+                } else {
+                    displayResponse('allResponse', data, response.ok);
+                }
+            } catch (error) {
+                displayResponse('allResponse', { error: error.message }, false);
+            }
+        }
+
+        async function getCourses() {
+            try {
+                const response = await fetch('/pac-new/api/purchases/courses.php', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    displayItemsWithUI('coursesResponse', data.data, 'course');
+                } else {
+                    displayResponse('coursesResponse', data, response.ok);
+                }
+            } catch (error) {
+                displayResponse('coursesResponse', { error: error.message }, false);
+            }
+        }
+
+        async function getTests() {
+            try {
+                const response = await fetch('/pac-new/api/purchases/tests.php', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    displayItemsWithUI('testsResponse', data.data, 'test');
+                } else {
+                    displayResponse('testsResponse', data, response.ok);
+                }
+            } catch (error) {
+                displayResponse('testsResponse', { error: error.message }, false);
+            }
+        }
+
+        async function getConsultations() {
+            try {
+                const response = await fetch('/pac-new/api/purchases/consultations.php', {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    displayItemsWithUI('consultationsResponse', data.data, 'consultation');
+                } else {
+                    displayResponse('consultationsResponse', data, response.ok);
+                }
+            } catch (error) {
+                displayResponse('consultationsResponse', { error: error.message }, false);
+            }
+        }
+
+        function displayPurchasesWithUI(elementId, data) {
+            const element = document.getElementById(elementId);
+            
+            let html = '';
+            
+            // Summary cards
+            if (data.data.summary) {
+                html += '<div style="margin-bottom: 20px;">';
+                html += `<div class="summary-card">
+                    <span class="summary-number">${data.data.summary.total_purchases}</span>
+                    <span class="summary-label">Tổng sản phẩm</span>
+                </div>`;
+                html += `<div class="summary-card">
+                    <span class="summary-number">${data.data.summary.total_courses}</span>
+                    <span class="summary-label">Khóa học</span>
+                </div>`;
+                html += `<div class="summary-card">
+                    <span class="summary-number">${data.data.summary.total_tests}</span>
+                    <span class="summary-label">Trắc nghiệm</span>
+                </div>`;
+                html += `<div class="summary-card">
+                    <span class="summary-number">${data.data.summary.total_consultations}</span>
+                    <span class="summary-label">Tư vấn</span>
+                </div>`;
+                html += '</div>';
+            }
+            
+            // All purchases list
+            if (data.data.all_purchases && data.data.all_purchases.length > 0) {
+                html += '<h4>📋 Danh sách sản phẩm đã mua:</h4>';
+                data.data.all_purchases.forEach(item => {
+                    html += formatPurchaseItem(item);
+                });
+            } else {
+                html += '<p>Chưa có sản phẩm nào được mua.</p>';
+            }
+            
+            // Raw JSON for debugging
+            html += '<h4>📄 Raw JSON Response:</h4>';
+            html += `<div class="response">${JSON.stringify(data, null, 2)}</div>`;
+            
+            element.innerHTML = html;
+            element.className = 'response success';
+        }
+
+        function displayItemsWithUI(elementId, items, type) {
+            const element = document.getElementById(elementId);
+            
+            let html = '';
+            
+            if (items && items.length > 0) {
+                html += `<h4>📋 Danh sách ${getTypeDisplay(type)}:</h4>`;
+                items.forEach(item => {
+                    item.type = type; // Add type for formatting
+                    html += formatPurchaseItem(item);
+                });
+            } else {
+                html += `<p>Chưa có ${getTypeDisplay(type)} nào được mua.</p>`;
+            }
+            
+            // Raw JSON for debugging
+            html += '<h4>📄 Raw JSON Response:</h4>';
+            html += `<div class="response">${JSON.stringify(items, null, 2)}</div>`;
+            
+            element.innerHTML = html;
+            element.className = 'response success';
+        }
+
+        function formatPurchaseItem(item) {
+            const typeClass = `type-${item.type}`;
+            const statusClass = item.is_available ? 'status-active' : 
+                               item.is_expired ? 'status-expired' : 'status-inactive';
+            
+            let html = `<div class="purchase-item">`;
+            html += `<div class="purchase-type ${typeClass}">${item.type_display || getTypeDisplay(item.type)}</div>`;
+            html += `<h4>${item.product_name}</h4>`;
+            html += `<p><strong>Mô tả:</strong> ${item.product_description || 'N/A'}</p>`;
+            html += `<p><strong>Giá:</strong> ${new Intl.NumberFormat('vi-VN').format(item.product_price)} VNĐ</p>`;
+            html += `<p><strong>Mã đơn hàng:</strong> ${item.order_code}</p>`;
+            html += `<p><strong>Ngày mua:</strong> ${item.order_date_formatted}</p>`;
+            
+            if (item.type === 'course') {
+                html += `<p><strong>Mã khóa học:</strong> ${item.course_code || item.access_code}</p>`;
+            } else if (item.type === 'test') {
+                html += `<p><strong>Token trắc nghiệm:</strong> ${item.test_token || item.access_code}</p>`;
+                html += `<p><strong>Gói:</strong> ${item.package_display}</p>`;
+                html += `<p><strong>Lượt làm bài còn lại:</strong> ${item.attempts_left}</p>`;
+            } else if (item.type === 'consultation') {
+                html += `<p><strong>Mã tư vấn:</strong> ${item.consultation_code || item.access_code}</p>`;
+                html += `<p><strong>Gói:</strong> ${item.package_display}</p>`;
+                if (item.expert_name) {
+                    html += `<p><strong>Chuyên gia:</strong> ${item.expert_name}</p>`;
+                }
+                if (item.scheduled_at_formatted) {
+                    html += `<p><strong>Lịch hẹn:</strong> ${item.scheduled_at_formatted}</p>`;
+                }
+                html += `<p><strong>Trạng thái:</strong> <span class="${statusClass}">${item.status_display}</span></p>`;
+            }
+            
+            if (item.expires_at_formatted) {
+                html += `<p><strong>Hết hạn:</strong> ${item.expires_at_formatted}</p>`;
+            }
+            
+            html += `<p><strong>Trạng thái:</strong> <span class="${statusClass}">`;
+            html += item.is_available ? 'Có thể sử dụng' : 
+                   item.is_expired ? 'Đã hết hạn' : 'Không khả dụng';
+            html += `</span></p>`;
+            
+            if (item.access_url) {
+                html += `<p><strong>Link truy cập:</strong> <a href="${item.access_url}" target="_blank">${item.access_url}</a></p>`;
+            }
+            
+            html += `</div>`;
+            
+            return html;
+        }
+
+        function getTypeDisplay(type) {
+            const typeMap = {
+                'course': 'khóa học',
+                'test': 'trắc nghiệm', 
+                'consultation': 'tư vấn'
+            };
+            return typeMap[type] || type;
+        }
+
+        function displayResponse(elementId, data, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isSuccess ? 'response success' : 'response error';
+        }
+
+        function clearAllResults() {
+            document.querySelectorAll('.response').forEach(element => {
+                element.textContent = '';
+                element.className = 'response';
+            });
+        }
+
+        // Auto-login on page load for testing
+        window.onload = function() {
+            // Uncomment the line below to auto-login for testing
+            // login();
+        };
+    </script>
+</body>
+</html>

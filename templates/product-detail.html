@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm - PAC Website</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="/pac-new/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="/pac-new/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="/pac-new/assets/vendor/aos/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/pac-new/assets/css/main.css" rel="stylesheet">
+    <link href="/pac-new/assets/css/product-card.css" rel="stylesheet">
+    
+    <style>
+        .product-detail-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 100px 0 60px 0;
+        }
+        
+        .product-detail-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .product-image-section {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .product-badges {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .badge-item {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-type.course {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+        }
+        
+        .badge-type.online_test {
+            background: rgba(255, 255, 255, 0.9);
+            color: #f5576c;
+        }
+        
+        .badge-type.consultation {
+            background: rgba(255, 255, 255, 0.9);
+            color: #00f2fe;
+        }
+        
+        .badge-package.basic {
+            background: rgba(255, 193, 7, 0.9);
+            color: #212529;
+        }
+        
+        .badge-package.premium {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+        
+        .product-info {
+            padding: 40px;
+        }
+        
+        .product-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 24px;
+        }
+        
+        .price-currency {
+            font-size: 1.25rem;
+            color: #6c757d;
+            margin-left: 8px;
+        }
+        
+        .product-description {
+            font-size: 1.1rem;
+            color: #495057;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+        
+        .product-features {
+            margin-bottom: 32px;
+        }
+        
+        .features-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .btn-add-to-cart {
+            flex: 2;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-add-to-cart:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-add-to-cart:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .btn-back {
+            flex: 1;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: transparent;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-back:hover {
+            border-color: #007bff;
+            color: #007bff;
+        }
+        
+        .product-meta {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .meta-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+        
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .meta-item:last-child {
+            border-bottom: none;
+        }
+        
+        .meta-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .meta-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            color: #28a745;
+        }
+        
+        .status-inactive {
+            color: #dc3545;
+        }
+        
+        .loading-section {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-section {
+            text-align: center;
+            padding: 100px 20px;
+            color: #dc3545;
+        }
+        
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-detail-page {
+                padding: 80px 0 40px 0;
+            }
+            
+            .product-image-section {
+                height: 250px;
+            }
+            
+            .product-info {
+                padding: 24px;
+            }
+            
+            .product-title {
+                font-size: 1.75rem;
+            }
+            
+            .product-price {
+                font-size: 1.5rem;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-badges {
+                top: 16px;
+                left: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Header -->
+    <div id="header-placeholder"></div>
+    
+    <!-- Product Detail Page -->
+    <section class="product-detail-page">
+        <div class="container">
+            <!-- Loading Section -->
+            <div class="loading-section" id="loadingSection">
+                <div class="spinner"></div>
+                <h3>Đang tải thông tin sản phẩm...</h3>
+            </div>
+            
+            <!-- Error Section -->
+            <div class="error-section" id="errorSection" style="display: none;">
+                <i class="fas fa-exclamation-triangle error-icon"></i>
+                <h3>Không tìm thấy sản phẩm</h3>
+                <p>Sản phẩm có thể đã bị xóa hoặc không tồn tại.</p>
+                <button class="btn btn-primary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại
+                </button>
+            </div>
+            
+            <!-- Product Detail Container -->
+            <div class="product-detail-container" id="productDetail" style="display: none;" data-aos="fade-up">
+                <div class="row g-0">
+                    <!-- Product Image -->
+                    <div class="col-lg-6">
+                        <div class="product-image-section">
+                            <img id="productImage" 
+                                 src="" 
+                                 alt="" 
+                                 class="product-image"
+                                 onerror="this.src='/pac-new/assets/img/pic/default-product.jpg'">
+                            
+                            <div class="product-badges" id="productBadges">
+                                <!-- Badges will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="col-lg-6">
+                        <div class="product-info">
+                            <h1 class="product-title" id="productTitle"></h1>
+                            <div class="product-price">
+                                <span id="productPrice"></span>
+                                <span class="price-currency">VNĐ</span>
+                            </div>
+                            
+                            <div class="product-description" id="productDescription"></div>
+                            
+                            <!-- Product Features -->
+                            <div class="product-features">
+                                <h3 class="features-title">Tính năng nổi bật</h3>
+                                <div class="features-grid" id="featuresGrid">
+                                    <!-- Features will be inserted here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Product Actions -->
+                            <div class="product-actions">
+                                <button class="btn-add-to-cart" id="addToCartBtn" onclick="addToCartFromDetail()">
+                                    <i class="fas fa-cart-plus"></i>
+                                    Thêm vào giỏ hàng
+                                </button>
+                                <button class="btn-back" onclick="goBackToProducts()">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Quay lại
+                                </button>
+                            </div>
+                            
+                            <!-- Product Meta -->
+                            <div class="product-meta">
+                                <h4 class="meta-title">Thông tin chi tiết</h4>
+                                <div id="productMeta">
+                                    <!-- Meta information will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Include Footer -->
+    <div id="footer-placeholder"></div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                <!-- Toast message -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="/pac-new/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/pac-new/assets/vendor/aos/aos.js"></script>
+    <script src="/pac-new/assets/js/component-loader.js"></script>
+    <script src="/pac-new/assets/js/products.js"></script>
+    
+    <script>
+        let currentProduct = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+            
+            // Load header and footer
+            loadComponent('header-placeholder', '/pac-new/components/header.html');
+            loadComponent('footer-placeholder', '/pac-new/components/footer.html');
+            
+            // Load product detail
+            loadProductDetail();
+        });
+        
+        function getProductIdFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+        
+        async function loadProductDetail() {
+            const productId = getProductIdFromURL();
+            
+            if (!productId) {
+                showError();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/pac-new/api/products/detail.php?id=${productId}`);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    currentProduct = data.data;
+                    displayProductDetail(data.data);
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                console.error('Error loading product:', error);
+                showError();
+            }
+        }
+        
+        function displayProductDetail(product) {
+            // Hide loading and show product detail
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('productDetail').style.display = 'block';
+            
+            // Update page title
+            document.title = `${product.name} - PAC Website`;
+            
+            // Product image
+            const productImage = document.getElementById('productImage');
+            productImage.src = product.image || '/pac-new/assets/img/pic/default-product.svg';
+            productImage.alt = product.name;
+            
+            // Product badges
+            const badgesContainer = document.getElementById('productBadges');
+            let badgesHTML = '';
+            
+            // Type badge
+            const typeMap = {
+                'course': 'Khóa học',
+                'online_test': 'Trắc nghiệm',
+                'consultation': 'Tư vấn'
+            };
+            badgesHTML += `<div class="badge-item badge-type ${product.type}">${typeMap[product.type]}</div>`;
+            
+            // Package badge
+            if (product.package_type) {
+                const packageMap = {
+                    'basic': 'Gói cơ bản',
+                    'premium': 'Gói cao cấp'
+                };
+                badgesHTML += `<div class="badge-item badge-package ${product.package_type}">${packageMap[product.package_type]}</div>`;
+            }
+            
+            badgesContainer.innerHTML = badgesHTML;
+            
+            // Product info
+            document.getElementById('productTitle').textContent = product.name;
+            document.getElementById('productPrice').textContent = formatPrice(product.price);
+            document.getElementById('productDescription').textContent = product.description || 'Không có mô tả chi tiết.';
+            
+            // Product features
+            displayProductFeatures(product);
+            
+            // Product meta
+            displayProductMeta(product);
+            
+            // Add to cart button
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            if (product.status !== 'active') {
+                addToCartBtn.disabled = true;
+                addToCartBtn.innerHTML = '<i class="fas fa-ban"></i> Không có sẵn';
+            }
+        }
+        
+        function displayProductFeatures(product) {
+            const featuresGrid = document.getElementById('featuresGrid');
+            let featuresHTML = '';
+            
+            if (product.type === 'course') {
+                featuresHTML = `
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <div class="feature-title">Học offline</div>
+                        <div class="feature-description">Tham gia lớp học trực tiếp với giảng viên</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+                        <div class="feature-title">Chứng chỉ</div>
+                        <div class="feature-description">Nhận chứng chỉ sau khi hoàn thành khóa học</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-users"></i></div>
+                        <div class="feature-title">Nhóm học</div>
+                        <div class="feature-description">Tương tác và học hỏi từ các học viên khác</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-headset"></i></div>
+                        <div class="feature-title">Hỗ trợ</div>
+                        <div class="feature-description">Được hỗ trợ trong suốt quá trình học</div>
+                    </div>
+                `;
+            } else if (product.type === 'online_test') {
+                const duration = product.package_type === 'basic' ? '60 phút' : '90 phút';
+                const attempts = product.package_type === 'basic' ? '1 lần' : '3 lần';
+                
+                featuresHTML = `
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-title">Thời gian</div>
+                        <div class="feature-description">${duration} để hoàn thành bài test</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-redo"></i></div>
+                        <div class="feature-title">Số lần làm</div>
+                        <div class="feature-description">Được làm ${attempts}</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <div class="feature-title">Kết quả chi tiết</div>
+                        <div class="feature-description">Phân tích chi tiết kết quả và đề xuất</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <div class="feature-title">Đa nền tảng</div>
+                        <div class="feature-description">Làm bài trên máy tính hoặc điện thoại</div>
+                    </div>
+                `;
+            } else if (product.type === 'consultation') {
+                const duration = product.package_type === 'basic' ? '30 phút' : '60 phút';
+                
+                featuresHTML = `
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-user-md"></i></div>
+                        <div class="feature-title">Chuyên gia 1-1</div>
+                        <div class="feature-description">Tư vấn trực tiếp với chuyên gia hàng đầu</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-title">Thời gian</div>
+                        <div class="feature-description">${duration} tư vấn chuyên sâu</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="feature-title">Linh hoạt</div>
+                        <div class="feature-description">Đặt lịch theo thời gian phù hợp</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                        <div class="feature-title">Báo cáo</div>
+                        <div class="feature-description">Nhận báo cáo chi tiết sau buổi tư vấn</div>
+                    </div>
+                `;
+            }
+            
+            featuresGrid.innerHTML = featuresHTML;
+        }
+        
+        function displayProductMeta(product) {
+            const metaContainer = document.getElementById('productMeta');
+            
+            const typeMap = {
+                'course': 'Khóa học',
+                'online_test': 'Trắc nghiệm online',
+                'consultation': 'Tư vấn chuyên gia'
+            };
+            
+            let metaHTML = `
+                <div class="meta-item">
+                    <span class="meta-label">Loại sản phẩm:</span>
+                    <span class="meta-value">${typeMap[product.type]}</span>
+                </div>
+            `;
+            
+            if (product.package_type) {
+                const packageMap = {
+                    'basic': 'Gói cơ bản',
+                    'premium': 'Gói cao cấp'
+                };
+                metaHTML += `
+                    <div class="meta-item">
+                        <span class="meta-label">Gói dịch vụ:</span>
+                        <span class="meta-value">${packageMap[product.package_type]}</span>
+                    </div>
+                `;
+            }
+            
+            metaHTML += `
+                <div class="meta-item">
+                    <span class="meta-label">Trạng thái:</span>
+                    <span class="meta-value ${product.status === 'active' ? 'status-active' : 'status-inactive'}">
+                        ${product.status === 'active' ? 'Có sẵn' : 'Không có sẵn'}
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Ngày tạo:</span>
+                    <span class="meta-value">${product.created_at_formatted}</span>
+                </div>
+            `;
+            
+            metaContainer.innerHTML = metaHTML;
+        }
+        
+        function showError() {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'block';
+        }
+        
+        async function addToCartFromDetail() {
+            if (!currentProduct) return;
+            
+            try {
+                const response = await fetch('/pac-new/api/cart/add.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_id: currentProduct.id,
+                        quantity: 1
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+                    // Update cart badge if exists
+                    if (typeof updateCartBadge === 'function') {
+                        updateCartBadge();
+                    }
+                } else {
+                    showToast(data.message || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+            }
+        }
+        
+        function goBackToProducts() {
+            window.location.href = 'products';
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastElement = document.getElementById('toast');
+            const toastBody = document.getElementById('toastBody');
+            
+            toastBody.textContent = message;
+            
+            // Update toast icon based on type
+            const toastHeader = toastElement.querySelector('.toast-header i');
+            toastHeader.className = `fas ${type === 'success' ? 'fa-check-circle text-success' : 
+                                          type === 'error' ? 'fa-exclamation-circle text-danger' : 
+                                          'fa-info-circle text-primary'} me-2`;
+            
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+        
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN').format(price);
+        }
+    </script>
+</body>
+</html>

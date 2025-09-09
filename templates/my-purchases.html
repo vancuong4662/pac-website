@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Lịch sử mua hàng - Unlock Your Career</title>
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    
+    <!-- Main CSS Files -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .purchases-page {
+            padding: 120px 0 80px;
+            min-height: 100vh;
+            background: #f8f9ff;
+        }
+        
+        .purchases-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .purchases-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .nav-tabs {
+            border: none;
+            justify-content: center;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 12px 24px;
+            margin: 0 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(79, 185, 169, 0.1);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: white;
+            background: var(--accent-color);
+            border-color: transparent;
+        }
+        
+        .purchases-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .filters-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .filters-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .filter-control {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .filter-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            background: #45a085;
+        }
+        
+        .purchases-list {
+            margin-top: 20px;
+        }
+        
+        .purchase-item {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .purchase-item:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 15px rgba(79, 185, 169, 0.1);
+        }
+        
+        .purchase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .purchase-info h3 {
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .purchase-meta {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .purchase-status {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #d39e00;
+            border: 1px solid #ffc107;
+        }
+        
+        .status-completed {
+            background: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border: 1px solid #28a745;
+        }
+        
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border: 1px solid #dc3545;
+        }
+        
+        .purchase-items {
+            margin-bottom: 15px;
+        }
+        
+        .item-summary {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .item-summary:last-child {
+            border-bottom: none;
+        }
+        
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+            color: white;
+        }
+        
+        .item-icon.course {
+            background: var(--primary-color);
+        }
+        
+        .item-icon.test {
+            background: var(--accent-color);
+        }
+        
+        .item-icon.consultation {
+            background: #fd7e14;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+        
+        .item-type {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        .purchase-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .purchase-total {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .purchase-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: 1px solid var(--accent-color);
+        }
+        
+        .btn-primary:hover {
+            background: #45a085;
+            color: white;
+        }
+        
+        .btn-outline-primary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .pagination {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .page-link {
+            color: var(--text-dark);
+            border-color: #e0e0e0;
+            padding: 10px 15px;
+        }
+        
+        .page-link:hover {
+            color: var(--primary-color);
+            background-color: rgba(79, 185, 169, 0.1);
+            border-color: var(--accent-color);
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .purchases-nav {
+                padding: 15px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tabs .nav-link {
+                margin: 5px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .purchase-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .purchase-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .purchase-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="purchases-page">
+        <div class="container">
+            <div class="purchases-container">
+                <!-- Page Header -->
+                <div class="page-header" data-aos="fade-up">
+                    <h1>Lịch sử mua hàng</h1>
+                    <p>Quản lý và theo dõi các đơn hàng của bạn</p>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="purchases-nav" data-aos="fade-up" data-aos-delay="100">
+                    <ul class="nav nav-tabs" id="purchasesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-purchases" type="button" role="tab">
+                                <i class="fas fa-list me-2"></i>Tất cả
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses-purchases" type="button" role="tab">
+                                <i class="fas fa-graduation-cap me-2"></i>Khóa học
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tests-tab" data-bs-toggle="tab" data-bs-target="#tests-purchases" type="button" role="tab">
+                                <i class="fas fa-clipboard-check me-2"></i>Trắc nghiệm
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="consultations-tab" data-bs-toggle="tab" data-bs-target="#consultations-purchases" type="button" role="tab">
+                                <i class="fas fa-user-md me-2"></i>Tư vấn
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="purchasesTabContent">
+                    <!-- All Purchases Tab -->
+                    <div class="tab-pane fade show active" id="all-purchases" role="tabpanel">
+                        <div class="purchases-content" data-aos="fade-up" data-aos-delay="200">
+                            <!-- Filters -->
+                            <div class="filters-section">
+                                <div class="filters-row">
+                                    <div class="filter-group">
+                                        <label for="statusFilter">Trạng thái</label>
+                                        <select id="statusFilter" class="filter-control">
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="pending">Chờ thanh toán</option>
+                                            <option value="completed">Hoàn thành</option>
+                                            <option value="cancelled">Đã hủy</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="dateFrom">Từ ngày</label>
+                                        <input type="date" id="dateFrom" class="filter-control">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="dateTo">Đến ngày</label>
+                                        <input type="date" id="dateTo" class="filter-control">
+                                    </div>
+                                    <div class="filter-group">
+                                        <button type="button" class="filter-btn" onclick="applyFilters()">
+                                            <i class="fas fa-search me-2"></i>Lọc
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Loading State -->
+                            <div class="loading-state" id="loadingPurchases">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h3>Đang tải dữ liệu...</h3>
+                            </div>
+
+                            <!-- Purchases List -->
+                            <div class="purchases-list" id="purchasesList" style="display: none;">
+                                <!-- Purchases will be loaded here -->
+                            </div>
+
+                            <!-- Pagination -->
+                            <div class="pagination-wrapper" id="paginationWrapper" style="display: none;">
+                                <!-- Pagination will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Courses Tab -->
+                    <div class="tab-pane fade" id="courses-purchases" role="tabpanel">
+                        <div class="purchases-content">
+                            <div class="loading-state">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h3>Đang tải khóa học...</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tests Tab -->
+                    <div class="tab-pane fade" id="tests-purchases" role="tabpanel">
+                        <div class="purchases-content">
+                            <div class="loading-state">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h3>Đang tải trắc nghiệm...</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consultations Tab -->
+                    <div class="tab-pane fade" id="consultations-purchases" role="tabpanel">
+                        <div class="purchases-content">
+                            <div class="loading-state">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h3>Đang tải lịch tư vấn...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                <!-- Toast message -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+
+    <!-- Main JS Files -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/authen.js"></script>
+    <script src="assets/js/purchases.js"></script>
+</body>
+</html>

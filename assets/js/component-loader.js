@@ -496,6 +496,12 @@ class ComponentLoader {
 // Initialize global component loader
 window.componentLoader = new ComponentLoader();
 
+// Global helper function for backward compatibility
+window.loadComponent = function(targetSelector, componentPath) {
+  const componentName = componentPath.replace('components/', '').replace('.html', '');
+  return window.componentLoader.loadComponent(componentName, `#${targetSelector}`);
+};
+
 // Auto-load components when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
   // Check if page has custom component loading (will be defined by specific pages)

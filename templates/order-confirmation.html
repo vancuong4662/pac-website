@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Xác nhận đơn hàng - Unlock Your Career</title>
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    
+    <!-- Main CSS Files -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .confirmation-page {
+            padding: 120px 0 80px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+        }
+        
+        .confirmation-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 8px 30px rgba(79, 185, 169, 0.3);
+        }
+        
+        .success-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .confirmation-header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .confirmation-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        
+        .order-details {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .order-info h3 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .order-status {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 20px;
+            color: #d39e00;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .order-status i {
+            margin-right: 8px;
+        }
+        
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .info-section h4 {
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section h4 i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .info-value {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        
+        .order-items {
+            margin-bottom: 30px;
+        }
+        
+        .order-items h4 {
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .order-items h4 i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        
+        .item-details {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .item-quantity {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .item-price {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        
+        .item-unit-price {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .item-total-price {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        
+        .order-summary {
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #45a085;
+            border-color: #45a085;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .payment-instructions {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .payment-instructions h4 {
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .payment-instructions h4 i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(79, 185, 169, 0.05);
+            border: 2px solid rgba(79, 185, 169, 0.2);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-method i {
+            font-size: 24px;
+            color: var(--accent-color);
+            margin-right: 15px;
+        }
+        
+        .payment-method-info h5 {
+            margin-bottom: 5px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .payment-method-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .bank-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .bank-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .bank-detail:last-child {
+            margin-bottom: 0;
+        }
+        
+        .bank-label {
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        .bank-value {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-family: 'Courier New', monospace;
+        }
+        
+        @media (max-width: 768px) {
+            .customer-info {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="confirmation-page">
+        <div class="container">
+            <div class="confirmation-container">
+                <!-- Success Header -->
+                <div class="confirmation-header" data-aos="fade-up">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h1>Đặt hàng thành công!</h1>
+                    <p>Cảm ơn bạn đã tin tương và đặt hàng. Chúng tôi sẽ xử lý đơn hàng trong thời gian sớm nhất.</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingOrder" data-aos="fade-up">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Đang tải thông tin đơn hàng...</p>
+                    </div>
+                </div>
+
+                <!-- Order Details -->
+                <div id="orderDetails" style="display: none;">
+                    <!-- Order Info -->
+                    <div class="order-details" data-aos="fade-up" data-aos-delay="100">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3 id="orderTitle">Đơn hàng #ORD123456</h3>
+                                <p class="text-muted mb-0" id="orderDate">Ngày đặt: 15/01/2024</p>
+                            </div>
+                            <div class="order-status">
+                                <i class="fas fa-clock"></i>
+                                Chờ thanh toán
+                            </div>
+                        </div>
+
+                        <!-- Customer Information -->
+                        <div class="customer-info">
+                            <div class="info-section">
+                                <h4><i class="fas fa-user"></i>Thông tin khách hàng</h4>
+                                <div id="customerInfo">
+                                    <!-- Customer info will be loaded here -->
+                                </div>
+                            </div>
+                            
+                            <div class="info-section">
+                                <h4><i class="fas fa-credit-card"></i>Thông tin thanh toán</h4>
+                                <div id="paymentInfo">
+                                    <!-- Payment info will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Items -->
+                        <div class="order-items">
+                            <h4><i class="fas fa-shopping-cart"></i>Sản phẩm đã đặt</h4>
+                            <div id="orderItemsList">
+                                <!-- Order items will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div class="order-summary" id="orderSummary">
+                            <!-- Order summary will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Payment Instructions -->
+                    <div class="payment-instructions" data-aos="fade-up" data-aos-delay="200" id="paymentInstructions">
+                        <!-- Payment instructions will be loaded here -->
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons" data-aos="fade-up" data-aos-delay="300">
+                        <button class="btn btn-primary btn-print" onclick="printOrder()">
+                            <i class="fas fa-print me-2"></i>
+                            In đơn hàng
+                        </button>
+                        <a href="products" class="btn btn-outline-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>
+                            Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                <!-- Toast message -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+
+    <!-- Main JS Files -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/authen.js"></script>
+    <script src="assets/js/order-confirmation.js"></script>
+</body>
+</html>

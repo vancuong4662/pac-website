@@ -87,6 +87,12 @@ docs/
 3. Duplicate CSS cho similar pages
 4. Hard-coded values thay vì sử dụng CSS variables
 5. **Type mismatch trong function parameters** - Check data types before processing
+6. **📍 ĐƯỜNG DẪN SAI - LUÔN SỬ DỤNG RELATIVE PATHS:**
+   - ❌ `/pac-new/assets/css/main.css` (absolute)
+   - ❌ `/pac-new/api/auth/login.php` (absolute)
+   - ✅ `assets/css/main.css` (relative)
+   - ✅ `api/auth/login.php` (relative)
+   - **Rule: Follow pattern của login.html và profile.js**
 
 ### 🐛 **Common JavaScript Errors:**
 - **`components.filter is not a function`**: Xảy ra khi pass object thay vì array
@@ -101,6 +107,7 @@ docs/
 4. **Minimal documentation** unless requested
 5. **Consistent naming** và structure patterns
 6. **Validate data types** trước khi xử lý trong functions
+7. **📍 LUÔN DÙNG RELATIVE PATHS** - assets/, api/, components/ (NO /pac-new/ prefix!)
 
 ## Project Structure Understanding
 

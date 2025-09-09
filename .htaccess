@@ -72,6 +72,33 @@ RewriteRule ^profile/?$ templates/profile.html [L]
 RewriteRule ^payment-history/?$ templates/payment-history.html [L]
 RewriteRule ^test-results/?$ templates/test-results.html [L]
 
+# E-commerce and Shopping Cart pages
+RewriteRule ^products/?$ templates/products.html [L]
+RewriteRule ^product/([^/]+)/?$ templates/product-detail.html?id=$1 [L]
+RewriteRule ^cart/?$ templates/cart.html [L]
+RewriteRule ^checkout/?$ templates/checkout.html [L]
+RewriteRule ^order-confirmation/?$ templates/order-confirmation.html [L]
+
+# Purchase Management pages
+RewriteRule ^my-purchases/?$ templates/my-purchases.html [L]
+RewriteRule ^my-courses/?$ templates/my-courses.html [L]
+RewriteRule ^my-tests/?$ templates/my-tests.html [L]
+RewriteRule ^my-consultations/?$ templates/my-consultations.html [L]
+
+# Course related pages
+RewriteRule ^course-detail/?$ templates/course-detail.html [L]
+RewriteRule ^course-player/?$ templates/course-player.html [L]
+
+# Test related pages  
+RewriteRule ^test/?$ templates/test.html [L]
+RewriteRule ^test-details/?$ templates/test-details.html [L]
+
+# Consultation related pages
+RewriteRule ^consultation-details/?$ templates/consultation-details.html [L]
+
+# Test route page (for development)
+RewriteRule ^test-routes/?$ test-routes.html [L]
+
 # Admin pages (with authentication check)
 RewriteRule ^admin/?$ templates/admin/login.html [L]
 RewriteRule ^admin/dashboard/?$ templates/admin/dashboard.html [L]
