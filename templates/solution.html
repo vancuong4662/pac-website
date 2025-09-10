@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng Nghiệp - PAC Website</title>
+    <meta name="description" content="Dịch vụ hướng nghiệp chuyên nghiệp của PAC Group - Test trắc nghiệm đánh giá tiềm năng và tư vấn hướng nghiệp cá nhân.">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .career-guidance-page {
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+        
+        .page-hero {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            color: var(--contrast-color);
+            padding: 140px 0 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/banner/banner-1024x507.png') center/cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .page-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            font-family: var(--heading-font);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 32px;
+            opacity: 0.95;
+            max-width: 800px;
+            font-family: var(--default-font);
+        }
+        
+        .services-section {
+            padding: 100px 0;
+            background: var(--background-color);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+        }
+        
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--neutral-gray);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-family: var(--default-font);
+        }
+        
+        .service-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            height: 100%;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--light-purple);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(var(--brand-secondary-rgb), 0.15);
+            border-color: var(--brand-primary);
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .service-icon i {
+            font-size: 2.2rem;
+            color: var(--contrast-color);
+        }
+        
+        .service-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 16px;
+            font-family: var(--heading-font);
+        }
+        
+        .service-description {
+            color: var(--default-color);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 1.05rem;
+            font-family: var(--default-font);
+        }
+        
+        .service-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+        
+        .service-features li {
+            padding: 8px 0;
+            color: var(--default-color);
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .service-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--brand-primary);
+            font-weight: 700;
+        }
+        
+        .service-cta {
+            margin-top: auto;
+        }
+        
+        .btn-service {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--default-font);
+        }
+        
+        .btn-service:hover {
+            color: var(--contrast-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--brand-secondary-rgb), 0.3);
+        }
+        
+        .btn-service-outline {
+            background: transparent;
+            color: var(--brand-primary);
+            border: 2px solid var(--brand-primary);
+            padding: 10px 30px;
+        }
+        
+        .btn-service-outline:hover {
+            background: var(--brand-primary);
+            color: var(--contrast-color);
+        }
+        
+        .stats-section {
+            background: var(--bg-secondary);
+            padding: 80px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+            font-family: var(--heading-font);
+        }
+        
+        .stat-label {
+            color: var(--default-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            font-family: var(--default-font);
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            color: var(--contrast-color);
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+        }
+        
+        .cta-description {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            font-family: var(--default-font);
+        }
+        
+        .btn-cta {
+            background: var(--contrast-color);
+            color: var(--brand-primary);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--default-font);
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: var(--brand-primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-hero {
+                padding: 120px 0 60px 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .services-section {
+                padding: 60px 0;
+            }
+            
+            .service-card {
+                padding: 30px;
+                margin-bottom: 30px;
+            }
+            
+            .stats-section {
+                padding: 60px 0;
+            }
+            
+            .cta-section {
+                padding: 60px 0;
+            }
+            
+            .cta-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="career-guidance-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Khám Phá Tiềm Năng<br>
+                        Định Hướng Tương Lai
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        PAC hiểu rằng, khách hàng có thể có những nhu cầu khác nhau, do đó chúng tôi sẵn sàng linh hoạt thiết kế những chương trình khóa học đảm bảo trang bị đầy đủ kỹ năng cần thiết.
+                    </p>
+                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="#services" class="btn btn-service me-3">
+                            <i class="fas fa-rocket"></i>
+                            Khám phá các giải pháp hướng nghiệp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section id="services" class="services-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Giải pháp Hướng Nghiệp</h2>
+                <p class="section-description">
+                    Chúng tôi cung cấp các giải pháp toàn diện để giúp bạn khám phá bản thân 
+                    và định hướng nghề nghiệp một cách khoa học và chính xác.
+                </p>
+            </div>
+            
+            <div class="row g-4" id="servicesGrid">
+                <!-- Services will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section id="stats" class="stats-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Học sinh được tư vấn</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Mức độ hài lòng</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Test trắc nghiệm</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-card">
+                        <div class="stat-number">5+</div>
+                        <div class="stat-label">Năm kinh nghiệm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title" data-aos="fade-up">
+                        Sẵn Sàng Khám Phá Tiềm Năng Của Bạn?
+                    </h2>
+                    <p class="cta-description" data-aos="fade-up" data-aos-delay="100">
+                        Hãy bắt đầu hành trình khám phá bản thân và định hướng tương lai cùng đội ngũ chuyên gia của chúng tôi.
+                    </p>
+                    <a href="#" class="btn btn-cta bg-brand-accent text-brand-secondary" data-aos="fade-up" data-aos-delay="200" onclick="showContactInfo()">
+                        <i class="fas fa-phone"></i>
+                        Liên Hệ Tư Vấn Ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/header-cart.js"></script>
+    <script src="assets/js/pac-services.js"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Load services into grid
+        function loadServices() {
+            const servicesGrid = document.getElementById('servicesGrid');
+            if (!servicesGrid) return;
+            
+            const services = PACServices.getCareerServices();
+            let servicesHTML = '';
+            
+            services.forEach((service, index) => {
+                servicesHTML += `
+                    <div class="col-lg-6 col-md-6" data-aos="fade-up" data-aos-delay="${(index + 1) * 100}">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="${service.icon}"></i>
+                            </div>
+                            <h3 class="service-title">${service.title}</h3>
+                            <p class="service-description">${service.description}</p>
+                            <ul class="service-features">
+                                ${service.features.map(feature => `<li>${feature}</li>`).join('')}
+                            </ul>
+                            <div class="service-cta">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="h5 text-primary mb-0">${PACServices.formatPrice(service.price)} VNĐ</span>
+                                        <div class="text-muted small">${service.duration}</div>
+                                    </div>
+                                    <button class="btn btn-service" onclick="addToCart('${service.id}', '${service.title}', ${service.price})">
+                                        <i class="fas fa-plus"></i>
+                                        Đăng Ký
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            servicesGrid.innerHTML = servicesHTML;
+        }
+        
+        // Add to cart function
+        function addToCart(serviceId, title, price) {
+            // Here you would integrate with your cart system
+            showToast('Thành công!', `Đã thêm "${title}" vào giỏ hàng`, 'success', 3000);
+            
+            // Update cart count if header cart manager is available
+            if (window.headerCartManager) {
+                window.headerCartManager.notifyCartUpdate();
+            }
+        }
+        
+        // Show contact info
+        function showContactInfo() {
+            showToast('Liên Hệ', 'Hotline: 096 501 3663 | Email: info@pacgroup.org', 'info', 5000);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+            
+            // Load services after components are loaded
+            setTimeout(() => {
+                loadServices();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
