@@ -63,7 +63,40 @@ Nội dung bao gồm:
 - Sprint planning & retrospective
 - Coaching và mentoring team
 Thời gian: 32 giờ học | Có chứng chỉ PSM I', 
-3500000.00, 'course', NULL, 'active');
+3500000.00, 'course', NULL, 'active'),
+
+('Khóa học Kỹ năng Phỏng vấn', 
+'Khóa học trực tuyến về kỹ năng phỏng vấn xin việc hiệu quả.
+Nội dung bao gồm:
+- Chuẩn bị CV ấn tượng và thu hút HR
+- Kỹ thuật trả lời phỏng vấn STAR method
+- Thực hành mock interview với feedback
+- Ngôn ngữ cơ thể và trang phục phỏng vấn
+- Đàm phán lương và benefits
+Thời gian: 20 giờ học | Hình thức: Online + Workshop', 
+399000.00, 'course', NULL, 'active'),
+
+('Khóa học Tư duy Phản biện', 
+'Khóa học phát triển tư duy phản biện và giải quyết vấn đề sáng tạo.
+Nội dung bao gồm:
+- Nguyên lý tư duy phản biện cơ bản
+- Kỹ năng phân tích và đánh giá thông tin
+- Tìm kiếm giải pháp sáng tạo cho vấn đề
+- Ứng dụng trong học tập và công việc
+- Case study và thực hành thực tế
+Thời gian: 25 giờ học | Áp dụng ngay được', 
+599000.00, 'course', NULL, 'active'),
+
+('Khóa học Public Speaking', 
+'Khóa học kỹ năng thuyết trình và nói trước đám đông tự tin.
+Nội dung bao gồm:
+- Vượt qua nỗi sợ nói trước đám đông
+- Kỹ thuật chuẩn bị và cấu trúc bài thuyết trình
+- Ngôn ngữ cơ thể và giọng nói hiệu quả
+- Sử dụng công cụ hỗ trợ (slides, props)
+- Tương tác với khán giả và xử lý tình huống
+Thời gian: 30 giờ học | Workshop thực hành', 
+799000.00, 'course', NULL, 'active');
 
 -- Trắc nghiệm online
 INSERT INTO products (name, description, price, type, package_type, status) VALUES 
@@ -86,30 +119,118 @@ Nội dung đánh giá:
 - Change management
 - Conflict resolution
 Thời gian: 100 câu hỏi / 90 phút | Báo cáo 20+ trang + Video giải thích', 
-1000000.00, 'online_test', 'premium', 'active');
+1000000.00, 'online_test', 'premium', 'active'),
 
--- Tư vấn offline
+('Test Trắc nghiệm Tính cách MBTI', 
+'Bài test đánh giá 16 kiểu tính cách MBTI để hiểu rõ bản thân.
+Nội dung đánh giá:
+- 16 kiểu tính cách MBTI chi tiết
+- Điểm mạnh và điểm yếu của từng type
+- Nghề nghiệp phù hợp với tính cách
+- Cách phát triển điểm mạnh và khắc phục điểm yếu
+- Tương thích với các type khác
+Thời gian: 80 câu hỏi / 45 phút | Báo cáo chi tiết', 
+199000.00, 'online_test', NULL, 'active'),
+
+('Test Đánh giá IQ', 
+'Bài test đánh giá chỉ số thông minh IQ chuẩn quốc tế.
+Nội dung đánh giá:
+- Logic và suy luận toán học
+- Khả năng nhận thức không gian
+- Tư duy ngôn ngữ và từ vựng
+- Trí nhớ và tập trung
+- Tốc độ xử lý thông tin
+Thời gian: 120 câu hỏi / 90 phút | Chuẩn IQ quốc tế', 
+149000.00, 'online_test', NULL, 'active'),
+
+('Test Định hướng Nghề nghiệp', 
+'Bài test Holland Code (RIASEC) giúp tìm ngành nghề phù hợp.
+Nội dung đánh giá:
+- 6 nhóm nghề nghiệp RIASEC
+- Sở thích và năng khiếu cá nhân
+- Danh sách ngành nghề phù hợp
+- Lộ trình phát triển sự nghiệp
+- Môi trường làm việc lý tưởng
+Thời gian: 60 câu hỏi / 30 phút | Kết quả ngay lập tức', 
+299000.00, 'online_test', NULL, 'active'),
+
+('Test Đánh giá EQ (Emotional Intelligence)', 
+'Bài test đánh giá chỉ số thông minh cảm xúc và kỹ năng mềm.
+Nội dung đánh giá:
+- Nhận thức cảm xúc bản thân
+- Kiểm soát cảm xúc
+- Đồng cảm và hiểu người khác
+- Kỹ năng giao tiếp xã hội
+- Động lực và khả năng thích ứng
+Thời gian: 70 câu hỏi / 40 phút | Báo cáo cải thiện EQ', 
+249000.00, 'online_test', NULL, 'active');
+
+-- Tư vấn (Consultations) - Giải pháp hướng nghiệp
 INSERT INTO products (name, description, price, type, package_type, status) VALUES 
-('Tư vấn Phát triển Sự nghiệp - Gói Cơ bản', 
-'Buổi tư vấn 1-1 với chuyên gia về phát triển sự nghiệp cá nhân.
+('Tư vấn Hướng nghiệp Cơ bản', 
+'Buổi tư vấn hướng nghiệp cá nhân với chuyên gia PAC.
 Chuyên gia: Nguyễn Văn An - 15 năm kinh nghiệm quản lý nhân sự
-- Đánh giá hiện trạng sự nghiệp
-- Xác định mục tiêu và định hướng
-- Lập kế hoạch phát triển 6 tháng
-- Tư vấn kỹ năng cần thiết
+- Đánh giá năng lực, sở thích nghề nghiệp
+- Phân tích điểm mạnh và điểm yếu
+- Lập kế hoạch phát triển sự nghiệp ngắn hạn (6 tháng)
+- Tư vấn về CV và kỹ năng phỏng vấn
 Thời gian: 60 phút | Hình thức: Online hoặc Offline', 
-1500000.00, 'consultation', 'basic', 'active'),
+299000.00, 'consultation', 'basic', 'active'),
 
-('Tư vấn Phát triển Sự nghiệp - Gói Nâng cao', 
-'Gói tư vấn toàn diện phát triển sự nghiệp với mentor cá nhân.
+('Tư vấn Hướng nghiệp Premium', 
+'Gói tư vấn hướng nghiệp toàn diện với chuyên gia cao cấp.
 Chuyên gia: Trần Thị Bình - Giám đốc HR tại tập đoàn đa quốc gia
-- 3 buổi tư vấn (90 phút/buổi) trong 3 tháng
-- Đánh giá 360 độ với đồng nghiệp
-- Kế hoạch phát triển cá nhân chi tiết
-- Follow-up hàng tháng qua email/phone
-- Giới thiệu cơ hội việc làm phù hợp
+- Test tính cách MBTI chuyên sâu
+- Đánh giá năng lực 360 độ
+- Xây dựng lộ trình sự nghiệp 3-5 năm
+- Tư vấn theo dõi và hỗ trợ trong 3 tháng
+- 2 buổi tư vấn (90 phút/buổi)
 Hình thức: Online + Offline kết hợp', 
-4000000.00, 'consultation', 'premium', 'active');
+799000.00, 'consultation', 'premium', 'active'),
+
+('Tư vấn Hướng nghiệp VIP', 
+'Gói tư vấn hướng nghiệp cao cấp nhất với CEO PAC.
+Chuyên gia: CEO Lê Văn Cường - 20 năm kinh nghiệm doanh nghiệp
+- Đánh giá toàn diện 360 độ từ nhiều góc độ
+- Xây dựng thương hiệu cá nhân (Personal Branding)
+- Kết nối cơ hội việc làm và networking
+- Mentoring và coaching cá nhân 6 tháng
+- 4 buổi tư vấn (120 phút/buổi) + follow-up không giới hạn
+Hình thức: Face-to-face + Online support', 
+1999000.00, 'consultation', 'vip', 'active'),
+
+('Tư vấn Chuyển ngành nghề', 
+'Tư vấn chuyên biệt cho những người muốn chuyển đổi ngành nghề.
+Chuyên gia: Phạm Thị Dung - Career Coach chuyên nghiệp
+- Phân tích gap skills giữa ngành cũ và ngành mới
+- Lộ trình transition chi tiết theo từng giai đoạn
+- Kế hoạch học tập và phát triển kỹ năng
+- Tư vấn cách thuyết phục nhà tuyển dụng
+- Hỗ trợ viết CV và cover letter cho ngành mới
+Thời gian: 90 phút | Follow-up 2 tháng', 
+599000.00, 'consultation', 'premium', 'active'),
+
+('Tư vấn Phát triển Leadership', 
+'Tư vấn phát triển kỹ năng lãnh đạo cho manager và tiềm năng.
+Chuyên gia: Hoàng Minh Tuấn - Executive Coach
+- Đánh giá leadership style hiện tại
+- Xây dựng kỹ năng quản lý đội nhóm
+- Phát triển emotional intelligence
+- Kỹ năng coaching và mentoring nhân viên
+- Chiến lược xây dựng team hiệu quả
+Thời gian: 90 phút | Bao gồm báo cáo đánh giá', 
+899000.00, 'consultation', 'premium', 'active'),
+
+('Tư vấn Khởi nghiệp', 
+'Tư vấn cho người có ý định khởi nghiệp và phát triển kinh doanh.
+Chuyên gia: Đỗ Thành Long - Serial Entrepreneur & Angel Investor
+- Đánh giá tính khả thi của ý tưởng kinh doanh
+- Xây dựng business model canvas
+- Chiến lược marketing và sales cơ bản
+- Tư vấn về tài chính khởi nghiệp
+- Kết nối với mentor, nhà đầu tư trong hệ sinh thái
+Thời gian: 120 phút | Bao gồm template và tools', 
+1299000.00, 'consultation', 'vip', 'active');
 
 -- =====================================================
 -- PHẦN 3: DỮ LIỆU MẪU CART VÀ ORDERS (CHO DEMO)

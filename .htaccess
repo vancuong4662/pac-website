@@ -100,11 +100,15 @@ RewriteRule ^consultation-details/?$ templates/consultation-details.html [L]
 # Test route page (for development)
 RewriteRule ^test-routes/?$ test-routes.html [L]
 
-# Admin pages (with authentication check)
+# Admin pages (with authentication check) - All at root level
 RewriteRule ^admin/?$ templates/admin/login.html [L]
-RewriteRule ^admin/dashboard/?$ templates/admin/dashboard.html [L]
-RewriteRule ^admin/services/?$ templates/admin/manage-services.html [L]
-RewriteRule ^admin/users/?$ templates/admin/manage-users.html [L]
+RewriteRule ^admin-dashboard/?$ templates/admin/dashboard.html [L]
+RewriteRule ^admin-consultations/?$ templates/admin/consultations.html [L]
+RewriteRule ^admin-courses/?$ templates/admin/courses.html [L]
+RewriteRule ^admin-tests/?$ templates/admin/tests.html [L]
+RewriteRule ^admin-orders/?$ templates/admin/orders.html [L]
+RewriteRule ^admin-users/?$ templates/admin/users.html [L]
+RewriteRule ^admin-settings/?$ templates/admin/settings.html [L]
 
 # Cache Control for static assets
 <IfModule mod_expires.c>

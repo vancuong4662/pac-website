@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Quản lý Giải Pháp Tư vấn</title>
+    <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Quill Editor CSS -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+      <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-user-tie me-2 text-primary"></i>Quản lý Dịch vụ Tư vấn</h2>
+                <p class="text-muted mb-0">Thêm, sửa, xóa các dịch vụ tư vấn cho website</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-primary" id="add-consultation-btn">
+                  <i class="fas fa-plus me-2"></i>Thêm Dịch vụ Tư vấn
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filter Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Trạng thái</label>
+                  <select class="form-select" id="filter-status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active">Hoạt động</option>
+                    <option value="inactive">Không hoạt động</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Tìm kiếm</label>
+                  <input type="text" class="form-control" id="search-input" placeholder="Tên dịch vụ...">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">&nbsp;</label>
+                  <div>
+                    <button class="btn btn-outline-primary" id="apply-filters">
+                      <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                    <button class="btn btn-outline-secondary" id="reset-filters">
+                      <i class="fas fa-undo me-1"></i>Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Consultations Table Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="consultations-table">                  <thead>
+                    <tr>
+                      <th style="width: 80px;">ID</th>
+                      <th style="width: 300px;">Tên Dịch vụ</th>
+                      <th>Mô tả</th>
+                      <th style="width: 120px;">Giá</th>
+                      <th style="width: 140px;">Ngày tạo</th>
+                      <th style="width: 140px;">Thao tác</th>
+                    </tr>
+                  </thead>                  <tbody id="consultations-tbody">
+                    <tr>
+                      <td colspan="6" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Consultation Modal -->
+  <div class="modal fade" id="consultationModal" tabindex="-1" aria-labelledby="consultationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="consultationModalTitle">
+            <i class="fas fa-plus-circle me-2"></i>Thêm Dịch vụ Tư vấn
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>        <div class="modal-body">
+          <form id="consultation-form">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="consultation-name" class="form-label">
+                    <i class="fas fa-tag me-1"></i>Tên Dịch vụ <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="consultation-name" required 
+                         placeholder="Nhập tên dịch vụ tư vấn...">
+                  <div class="form-text">Tên hiển thị của dịch vụ trên website</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="consultation-description" class="form-label">
+                <i class="fas fa-align-left me-1"></i>Mô tả chi tiết <span class="text-danger">*</span>
+              </label>
+              <div id="consultation-description-editor" style="height: 200px;"></div>
+              <input type="hidden" id="consultation-description" required>
+              <div class="form-text">Mô tả sẽ hiển thị khi người dùng xem chi tiết</div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="consultation-price" class="form-label">
+                    <i class="fas fa-money-bill me-1"></i>Giá dịch vụ (VNĐ) <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" class="form-control" id="consultation-price" required min="0" step="1000"
+                         placeholder="Nhập giá dịch vụ...">
+                  <div class="form-text">Giá tính bằng VNĐ</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="consultation-package-type" class="form-label">
+                    <i class="fas fa-box me-1"></i>Loại gói
+                  </label>
+                  <select class="form-select" id="consultation-package-type">
+                    <option value="">Không có</option>
+                    <option value="basic">Cơ bản</option>
+                    <option value="premium">Cao cấp</option>
+                    <option value="vip">VIP</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Hủy bỏ
+          </button>
+          <button type="button" class="btn btn-primary" id="save-consultation-btn">
+            <i class="fas fa-save me-1"></i>Lưu Dịch vụ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+          <p>Bạn có chắc chắn muốn xóa dịch vụ tư vấn này?</p>
+          <p class="small text-muted">Hành động này không thể hoàn tác!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+            <i class="fas fa-trash me-1"></i>Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Quill Editor JS -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/consultations.js"></script>
+</body>
+</html>
