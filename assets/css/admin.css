@@ -519,3 +519,283 @@
   border-color: #964bdf;
   box-shadow: 0 0 0 0.2rem rgba(150, 75, 223, 0.25);
 }
+
+/* =======================================================
+   CONSULTATION TYPE BADGES & TABLE ENHANCEMENTS
+======================================================= */
+
+/* Consultation type badges with distinct colors and icons */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge i {
+  font-size: 0.7rem;
+}
+
+/* Automated consultation badges */
+.badge.bg-info {
+  background: linear-gradient(135deg, #17a2b8, #138496) !important;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, #964bdf, #5d2e8b) !important;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(150, 75, 223, 0.3);
+}
+
+/* Expert consultation badges */
+.badge.bg-success {
+  background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+  color: #212529 !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+}
+
+.badge.bg-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268) !important;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+/* Table row hover effects */
+.table-hover tbody tr:hover {
+  background-color: rgba(150, 75, 223, 0.05);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Price display styling */
+.price-display {
+  font-weight: 600;
+  color: #964bdf;
+  font-size: 0.95rem;
+}
+
+/* Action buttons styling */
+.btn-action {
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  border: none;
+  transition: all 0.2s ease;
+  margin: 0 0.125rem;
+}
+
+.btn-action.btn-edit {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: #fff;
+}
+
+.btn-action.btn-edit:hover {
+  background: linear-gradient(135deg, #138496, #117a8b);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(23, 162, 184, 0.3);
+}
+
+.btn-action.btn-delete {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: #fff;
+}
+
+.btn-action.btn-delete:hover {
+  background: linear-gradient(135deg, #c82333, #bd2130);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Table responsive enhancements */
+.table-responsive {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+  background: linear-gradient(135deg, #964bdf, #5d2e8b);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 1rem 0.75rem;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  padding: 0.875rem 0.75rem;
+  border-color: #e9ecef;
+}
+
+/* Text truncation with tooltip effect */
+.text-truncate {
+  cursor: help;
+  position: relative;
+}
+
+.text-truncate:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  background: #333;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  white-space: normal;
+  max-width: 300px;
+  z-index: 1000;
+  opacity: 0.95;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Empty state styling */
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+.empty-state i {
+  opacity: 0.6;
+}
+
+.empty-state h5 {
+  margin-top: 1rem;
+  color: #6c757d;
+}
+
+.empty-state p {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+/* Loading state animation */
+.spinner-border {
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Form enhancements for modal */
+.form-text {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.25rem;
+}
+
+.modal .form-select optgroup {
+  font-weight: 600;
+  color: #964bdf;
+  background-color: #f8f9fa;
+}
+
+.modal .form-select option {
+  padding: 0.5rem;
+}
+
+/* Responsive badge adjustments */
+@media (max-width: 768px) {
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .badge i {
+    font-size: 0.6rem;
+  }
+  
+  .btn-action {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.8rem;
+  }
+  
+  .table thead th {
+    font-size: 0.75rem;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .table tbody td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Consultation Type Badges */
+.badge.consultation-type {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.badge.consultation-type i {
+  font-size: 0.65rem;
+}
+
+/* Automated consultation badges */
+.badge.automated-basic {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge.automated-premium {
+  background: linear-gradient(135deg, #964bdf 0%, #7b39d1 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Expert consultation badges */
+.badge.expert-basic {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge.expert-premium {
+  background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+  color: #212529;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effects for badges */
+.badge.consultation-type:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Loading and error states */
+.consultation-badge-loading {
+  background: #e9ecef;
+  color: #6c757d;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}

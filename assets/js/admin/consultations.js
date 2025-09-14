@@ -72,10 +72,7 @@ async function loadConsultations(filters = {}) {
             type: 'consultation',
             ...filters
         });
-        
-        const apiUrl = `api/admin/products.php?${params}`;
-        console.log('🔍 Loading consultations from:', apiUrl);
-        console.log('🔍 Filters:', filters);
+          const apiUrl = `api/admin/products.php?${params}`;
         
         const response = await fetch(apiUrl, {
             method: 'GET',
@@ -85,37 +82,19 @@ async function loadConsultations(filters = {}) {
             credentials: 'same-origin'
         });
         
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response headers:', response.headers);
-        
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Get response text first to debug
-        const responseText = await response.text();
-        console.log('📋 Raw response:', responseText);
-        
-        // Try to parse JSON
-        let result;
-        try {
-            result = JSON.parse(responseText);
-            console.log('✅ Parsed JSON result:', result);
-        } catch (parseError) {
-            console.error('❌ JSON Parse Error:', parseError);
-            console.error('📋 Response text that failed to parse:', responseText.substring(0, 500) + '...');
-            throw new Error('Server returned invalid JSON response');
-        }
+        const result = await response.json();
         
         if (result.success) {
-            console.log('✅ Data loaded successfully:', result.data);
             renderConsultations(result.data || []);
         } else {
-            console.error('❌ API Error:', result.message);
+            console.error('API Error:', result.message);
             showErrorState(result.message || 'Không thể tải danh sách dịch vụ tư vấn');
-        }
-    } catch (error) {
-        console.error('❌ Error loading consultations:', error);
+        }    } catch (error) {
+        console.error('Error loading consultations:', error);
         showErrorState('Không thể kết nối đến server. Vui lòng thử lại sau.');
     }
 }
@@ -126,11 +105,10 @@ function renderConsultations(consultations) {
     if (!tbody) {
         console.error('Consultations table body not found');
         return;
-    }
-      if (consultations.length === 0) {
+    }if (consultations.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center py-5">
+                <td colspan="7" class="text-center py-5">
                     <div class="empty-state">
                         <i class="fas fa-user-tie fa-3x text-muted mb-3"></i>
                         <h5 class="text-muted">Chưa có dịch vụ tư vấn nào</h5>
@@ -143,8 +121,7 @@ function renderConsultations(consultations) {
             </tr>
         `;
         return;
-    }
-      tbody.innerHTML = consultations.map(consultation => `
+    }    tbody.innerHTML = consultations.map(consultation => `
         <tr data-consultation-id="${consultation.id}">
             <td>
                 <span class="badge bg-secondary">#${consultation.id}</span>
@@ -153,14 +130,16 @@ function renderConsultations(consultations) {
                 <div class="d-flex align-items-start">
                     <div>
                         <strong>${escapeHtml(consultation.name)}</strong>
-                        ${consultation.package_type ? `<br><small class="type-badge type-consultation">${consultation.package_type}</small>` : ''}
                     </div>
                 </div>
             </td>
             <td>
-                <div class="text-truncate" style="max-width: 350px;" title="${escapeHtml(consultation.description || '')}">
+                <div class="text-truncate" style="max-width: 300px;" title="${escapeHtml(consultation.description || '')}">
                     ${consultation.description ? escapeHtml(consultation.description.replace(/<[^>]*>/g, '')) : '<em class="text-muted">Chưa có mô tả</em>'}
                 </div>
+            </td>
+            <td>
+                ${formatConsultationType(consultation.package_type)}
             </td>
             <td>
                 <span class="price-display">${formatPrice(consultation.price)}</span>
@@ -519,6 +498,43 @@ function formatPrice(price) {
     return new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 }
 
+function formatConsultationType(packageType) {
+    if (!packageType) return '<span class="badge bg-secondary">Chưa phân loại</span>';
+    
+    const typeMap = {
+        'automated_basic': {
+            label: 'Tự động - Cơ bản',
+            class: 'consultation-type automated-basic',
+            icon: 'fas fa-robot'
+        },
+        'automated_premium': {
+            label: 'Tự động - Cao cấp', 
+            class: 'consultation-type automated-premium',
+            icon: 'fas fa-robot'
+        },
+        'expert_basic': {
+            label: 'Chuyên gia - Cơ bản',
+            class: 'consultation-type expert-basic',
+            icon: 'fas fa-user-md'
+        },
+        'expert_premium': {
+            label: 'Chuyên gia - Cao cấp',
+            class: 'consultation-type expert-premium',
+            icon: 'fas fa-user-md'
+        }
+    };
+    
+    const type = typeMap[packageType] || {
+        label: packageType,
+        class: 'bg-secondary',
+        icon: 'fas fa-question'
+    };
+    
+    return `<span class="badge ${type.class}">
+                <i class="${type.icon}"></i>${type.label}
+            </span>`;
+}
+
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -535,7 +551,7 @@ function showLoading() {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center py-5">
+                <td colspan="7" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -551,7 +567,7 @@ function showErrorState(message) {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center py-5">
+                <td colspan="7" class="text-center py-5">
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                         <h5 class="text-muted">Có lỗi xảy ra</h5>

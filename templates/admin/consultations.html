@@ -86,19 +86,19 @@
           <!-- Consultations Table Card -->
           <div class="card">
             <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-hover" id="consultations-table">                  <thead>
+              <div class="table-responsive">                <table class="table table-hover" id="consultations-table">                  <thead>
                     <tr>
                       <th style="width: 80px;">ID</th>
-                      <th style="width: 300px;">Tên Dịch vụ</th>
+                      <th style="width: 250px;">Tên Dịch vụ</th>
                       <th>Mô tả</th>
+                      <th style="width: 160px;">Loại Tư vấn</th>
                       <th style="width: 120px;">Giá</th>
                       <th style="width: 140px;">Ngày tạo</th>
                       <th style="width: 140px;">Thao tác</th>
                     </tr>
                   </thead>                  <tbody id="consultations-tbody">
                     <tr>
-                      <td colspan="6" class="text-center py-4">
+                      <td colspan="7" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                           <span class="visually-hidden">Loading...</span>
                         </div>
@@ -158,18 +158,23 @@
                          placeholder="Nhập giá dịch vụ...">
                   <div class="form-text">Giá tính bằng VNĐ</div>
                 </div>
-              </div>
-              <div class="col-md-6">
+              </div>              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="consultation-package-type" class="form-label">
-                    <i class="fas fa-box me-1"></i>Loại gói
+                    <i class="fas fa-box me-1"></i>Loại Tư vấn <span class="text-danger">*</span>
                   </label>
-                  <select class="form-select" id="consultation-package-type">
-                    <option value="">Không có</option>
-                    <option value="basic">Cơ bản</option>
-                    <option value="premium">Cao cấp</option>
-                    <option value="vip">VIP</option>
+                  <select class="form-select" id="consultation-package-type" required>
+                    <option value="">Chọn loại tư vấn</option>
+                    <optgroup label="Tư vấn Tự động (Trắc nghiệm)">
+                      <option value="automated_basic">Tự động - Cơ bản</option>
+                      <option value="automated_premium">Tự động - Cao cấp</option>
+                    </optgroup>
+                    <optgroup label="Tư vấn với Chuyên gia">
+                      <option value="expert_basic">Chuyên gia - Cơ bản</option>
+                      <option value="expert_premium">Chuyên gia - Cao cấp</option>
+                    </optgroup>
                   </select>
+                  <div class="form-text">Chọn loại hình tư vấn phù hợp</div>
                 </div>
               </div>
             </div>

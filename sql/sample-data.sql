@@ -165,72 +165,63 @@ Nội dung đánh giá:
 Thời gian: 70 câu hỏi / 40 phút | Báo cáo cải thiện EQ', 
 249000.00, 'online_test', NULL, 'active');
 
--- Tư vấn (Consultations) - Giải pháp hướng nghiệp
+-- Tư vấn (Consultations) - 2 Loại hình tư vấn mới
+-- Xóa consultation data cũ nếu có
+DELETE FROM products WHERE type = 'consultation';
+
+-- LOẠI 1: TỰ VẤN TỰ ĐỘNG (sử dụng trắc nghiệm)
 INSERT INTO products (name, description, price, type, package_type, status) VALUES 
-('Tư vấn Hướng nghiệp Cơ bản', 
-'Buổi tư vấn hướng nghiệp cá nhân với chuyên gia PAC.
-Chuyên gia: Nguyễn Văn An - 15 năm kinh nghiệm quản lý nhân sự
-- Đánh giá năng lực, sở thích nghề nghiệp
-- Phân tích điểm mạnh và điểm yếu
-- Lập kế hoạch phát triển sự nghiệp ngắn hạn (6 tháng)
-- Tư vấn về CV và kỹ năng phỏng vấn
-Thời gian: 60 phút | Hình thức: Online hoặc Offline', 
-299000.00, 'consultation', 'basic', 'active'),
+('Tự vấn Hướng nghiệp Tự động - Cơ bản', 
+'Giải pháp tự vấn thông minh sử dụng thuật toán AI và trắc nghiệm tính cách chuẩn quốc tế.
+🤖 Tính năng:
+- Trắc nghiệm MBTI (16 personalities)
+- Test Holland Code định hướng nghề nghiệp
+- Đánh giá sở thích và năng lực cơ bản
+- Báo cáo tự động với khuyến nghị nghề nghiệp
+- Kết quả ngay lập tức sau khi hoàn thành
+Thời gian: 45-60 phút | Hình thức: Online 100%', 
+199000.00, 'consultation', 'automated_basic', 'active'),
 
-('Tư vấn Hướng nghiệp Premium', 
-'Gói tư vấn hướng nghiệp toàn diện với chuyên gia cao cấp.
-Chuyên gia: Trần Thị Bình - Giám đốc HR tại tập đoàn đa quốc gia
-- Test tính cách MBTI chuyên sâu
-- Đánh giá năng lực 360 độ
+('Tự vấn Hướng nghiệp Tự động - Cao cấp', 
+'Gói tự vấn toàn diện với công cụ đánh giá chuyên sâu và báo cáo chi tiết.
+🚀 Tính năng nâng cao:
+- Bao gồm tất cả tính năng Cơ bản
+- Test IQ và EQ chuyên sâu
+- Đánh giá 8 trí thông minh đa dạng
+- Phân tích môi trường làm việc phù hợp
+- Báo cáo 15-20 trang với lộ trình chi tiết
+- So sánh cơ sở dữ liệu nghề nghiệp VN
+- Truy cập lại kết quả không giới hạn
+Thời gian: 90-120 phút | Hình thức: Online 100%', 
+399000.00, 'consultation', 'automated_premium', 'active'),
+
+-- LOẠI 2: TƯ VẤN VỚI CHUYÊN GIA (book lịch tự động)
+('Tư vấn với Chuyên gia - Cơ bản', 
+'Buổi tư vấn cá nhân 1-on-1 với chuyên gia hướng nghiệp PAC có kinh nghiệm 5+ năm.
+👨‍💼 Bao gồm:
+- Buổi tư vấn trực tiếp 60 phút (online/offline)
+- Đánh giá năng lực và sở thích cá nhân
+- Phân tích SWOT cá nhân
+- Tư vấn định hướng nghề nghiệp ngắn hạn (1-2 năm)
+- Góp ý về CV và hồ sơ xin việc
+- Hệ thống book lịch tự động 24/7
+- Báo cáo tư vấn sau buổi gặp
+Thời gian: 60 phút | Booking: Linh hoạt 7 ngày/tuần', 
+699000.00, 'consultation', 'expert_basic', 'active'),
+
+('Tư vấn với Chuyên gia - Cao cấp', 
+'Gói tư vấn toàn diện với Senior Consultant, bao gồm follow-up và mentoring dài hạn.
+⭐ Premium features:
+- 2 buổi tư vấn (90 phút mỗi buổi)
+- Tư vấn với Senior Consultant 10+ năm kinh nghiệm
+- Đánh giá chuyên sâu với công cụ Psychometrics
 - Xây dựng lộ trình sự nghiệp 3-5 năm
-- Tư vấn theo dõi và hỗ trợ trong 3 tháng
-- 2 buổi tư vấn (90 phút/buổi)
-Hình thức: Online + Offline kết hợp', 
-799000.00, 'consultation', 'premium', 'active'),
-
-('Tư vấn Hướng nghiệp VIP', 
-'Gói tư vấn hướng nghiệp cao cấp nhất với CEO PAC.
-Chuyên gia: CEO Lê Văn Cường - 20 năm kinh nghiệm doanh nghiệp
-- Đánh giá toàn diện 360 độ từ nhiều góc độ
-- Xây dựng thương hiệu cá nhân (Personal Branding)
-- Kết nối cơ hội việc làm và networking
-- Mentoring và coaching cá nhân 6 tháng
-- 4 buổi tư vấn (120 phút/buổi) + follow-up không giới hạn
-Hình thức: Face-to-face + Online support', 
-1999000.00, 'consultation', 'vip', 'active'),
-
-('Tư vấn Chuyển ngành nghề', 
-'Tư vấn chuyên biệt cho những người muốn chuyển đổi ngành nghề.
-Chuyên gia: Phạm Thị Dung - Career Coach chuyên nghiệp
-- Phân tích gap skills giữa ngành cũ và ngành mới
-- Lộ trình transition chi tiết theo từng giai đoạn
-- Kế hoạch học tập và phát triển kỹ năng
-- Tư vấn cách thuyết phục nhà tuyển dụng
-- Hỗ trợ viết CV và cover letter cho ngành mới
-Thời gian: 90 phút | Follow-up 2 tháng', 
-599000.00, 'consultation', 'premium', 'active'),
-
-('Tư vấn Phát triển Leadership', 
-'Tư vấn phát triển kỹ năng lãnh đạo cho manager và tiềm năng.
-Chuyên gia: Hoàng Minh Tuấn - Executive Coach
-- Đánh giá leadership style hiện tại
-- Xây dựng kỹ năng quản lý đội nhóm
-- Phát triển emotional intelligence
-- Kỹ năng coaching và mentoring nhân viên
-- Chiến lược xây dựng team hiệu quả
-Thời gian: 90 phút | Bao gồm báo cáo đánh giá', 
-899000.00, 'consultation', 'premium', 'active'),
-
-('Tư vấn Khởi nghiệp', 
-'Tư vấn cho người có ý định khởi nghiệp và phát triển kinh doanh.
-Chuyên gia: Đỗ Thành Long - Serial Entrepreneur & Angel Investor
-- Đánh giá tính khả thi của ý tưởng kinh doanh
-- Xây dựng business model canvas
-- Chiến lược marketing và sales cơ bản
-- Tư vấn về tài chính khởi nghiệp
-- Kết nối với mentor, nhà đầu tư trong hệ sinh thái
-Thời gian: 120 phút | Bao gồm template và tools', 
-1299000.00, 'consultation', 'vip', 'active');
+- Kế hoạch phát triển kỹ năng cụ thể
+- 3 tháng follow-up qua email/chat
+- Kết nối cơ hội việc làm trong network PAC
+- Ưu tiên booking lịch linh hoạt
+Thời gian: 2x90 phút + 3 tháng support | Booking: Priority scheduling', 
+1299000.00, 'consultation', 'expert_premium', 'active');
 
 -- =====================================================
 -- PHẦN 3: DỮ LIỆU MẪU CART VÀ ORDERS (CHO DEMO)
