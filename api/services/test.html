@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test PAC Services API</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px; 
+        }
+        .api-section { 
+            margin: 30px 0; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        .api-header { 
+            background: #3498db; 
+            color: white; 
+            padding: 15px 20px; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+        .api-header:hover {
+            background: #2980b9;
+        }
+        .api-content { 
+            padding: 20px; 
+            display: none; 
+        }
+        .api-content.active { 
+            display: block; 
+        }
+        button { 
+            background: #27ae60; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+            font-size: 14px;
+        }
+        button:hover { 
+            background: #219a52; 
+        }
+        .loading { 
+            color: #f39c12; 
+            font-weight: bold; 
+        }
+        .error { 
+            color: #e74c3c; 
+            background: #fdf2f2; 
+            padding: 10px; 
+            border-radius: 5px; 
+            border-left: 4px solid #e74c3c; 
+        }
+        .result { 
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            border-radius: 5px; 
+            padding: 15px; 
+            margin-top: 15px; 
+            overflow-x: auto; 
+        }
+        .result pre { 
+            margin: 0; 
+            white-space: pre-wrap; 
+            font-size: 12px; 
+            line-height: 1.4; 
+        }
+        .url-display { 
+            background: #e8f4fd; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-bottom: 10px; 
+            font-family: monospace; 
+            font-size: 13px; 
+            color: #2c3e50;
+        }
+        .input-group { 
+            margin: 10px 0; 
+        }
+        .input-group label { 
+            display: inline-block; 
+            width: 120px; 
+            font-weight: bold; 
+            color: #2c3e50; 
+        }
+        .input-group input, .input-group select { 
+            padding: 8px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            width: 200px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test PAC Services API</h1>
+
+        <!-- API 1: List Services -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('list')">
+                📋 API 1: Danh sách dịch vụ (/api/services/list.php)
+            </div>
+            <div class="api-content" id="list">
+                <div class="input-group">
+                    <label>Type:</label>
+                    <select id="list-type">
+                        <option value="">Tất cả</option>
+                        <option value="course">Khóa học</option>
+                        <option value="consultation">Tư vấn</option>
+                        <option value="career_test">Test hướng nghiệp</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Include Packages:</label>
+                    <select id="list-packages">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <button onclick="testListServices()">🚀 Test API</button>
+                <div id="list-url" class="url-display"></div>
+                <div id="list-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 2: Service Detail -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('detail')">
+                🔍 API 2: Chi tiết dịch vụ (/api/services/detail.php)
+            </div>
+            <div class="api-content" id="detail">
+                <div class="input-group">
+                    <label>Slug:</label>
+                    <input type="text" id="detail-slug" placeholder="test-huong-nghiep-pac" value="test-huong-nghiep-pac">
+                </div>
+                <div class="input-group">
+                    <label>Include Packages:</label>
+                    <select id="detail-packages">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <button onclick="testServiceDetail()">🚀 Test API</button>
+                <div id="detail-url" class="url-display"></div>
+                <div id="detail-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 3: Packages -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('packages')">
+                📦 API 3: Danh sách gói (/api/services/packages.php)
+            </div>
+            <div class="api-content" id="packages">
+                <div class="input-group">
+                    <label>Product Slug:</label>
+                    <input type="text" id="packages-slug" placeholder="viet-luan-tang-cuong" value="viet-luan-tang-cuong">
+                </div>
+                <button onclick="testPackages()">🚀 Test API</button>
+                <div id="packages-url" class="url-display"></div>
+                <div id="packages-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 4: Package Detail -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('package-detail')">
+                📋 API 4: Chi tiết gói (/api/services/package-detail.php)
+            </div>
+            <div class="api-content" id="package-detail">
+                <div class="input-group">
+                    <label>Package Slug:</label>
+                    <input type="text" id="package-detail-slug" placeholder="nhom-6" value="nhom-6">
+                </div>
+                <div class="input-group">
+                    <label>Include Product:</label>
+                    <select id="package-detail-product">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <button onclick="testPackageDetail()">🚀 Test API</button>
+                <div id="package-detail-url" class="url-display"></div>
+                <div id="package-detail-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 5: By Type -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('by-type')">
+                🏷️ API 5: Dịch vụ theo loại (/api/services/by-type.php)
+            </div>
+            <div class="api-content" id="by-type">
+                <div class="input-group">
+                    <label>Type:</label>
+                    <select id="bytype-type">
+                        <option value="course">Khóa học</option>
+                        <option value="consultation">Tư vấn</option>
+                        <option value="career_test">Test hướng nghiệp</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Limit:</label>
+                    <input type="number" id="bytype-limit" placeholder="5" min="1">
+                </div>
+                <button onclick="testByType()">🚀 Test API</button>
+                <div id="bytype-url" class="url-display"></div>
+                <div id="bytype-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 6: Search -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('search')">
+                🔍 API 6: Tìm kiếm dịch vụ (/api/services/search.php)
+            </div>
+            <div class="api-content" id="search">
+                <div class="input-group">
+                    <label>Từ khóa:</label>
+                    <input type="text" id="search-query" placeholder="viết luận" value="viết luận">
+                </div>
+                <div class="input-group">
+                    <label>Type:</label>
+                    <select id="search-type">
+                        <option value="">Tất cả</option>
+                        <option value="course">Khóa học</option>
+                        <option value="consultation">Tư vấn</option>
+                        <option value="career_test">Test hướng nghiệp</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Limit:</label>
+                    <input type="number" id="search-limit" placeholder="10" min="1" value="10">
+                </div>
+                <button onclick="testSearch()">🚀 Test API</button>
+                <div id="search-url" class="url-display"></div>
+                <div id="search-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- API 7: Stats -->
+        <div class="api-section">
+            <div class="api-header" onclick="toggleSection('stats')">
+                📊 API 7: Thống kê dịch vụ (/api/services/stats.php)
+            </div>
+            <div class="api-content" id="stats">
+                <p><em>API này không cần tham số - trả về thống kê tổng quan về tất cả dịch vụ</em></p>
+                <button onclick="testStats()">🚀 Test API</button>
+                <div id="stats-url" class="url-display"></div>
+                <div id="stats-result" class="result" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ecf0f1; text-align: center; color: #7f8c8d;">
+            <p>🎯 <strong>PAC Services API Test Tool</strong></p>
+            <p>Công cụ này giúp kiểm tra các API endpoint của PAC. Click vào các header để mở rộng.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('active');
+        }
+
+        function showLoading(resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="loading">⏳ Đang gọi API...</div>';
+        }
+
+        function showResult(resultId, data, url) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            
+            const urlDiv = document.getElementById(resultId.replace('-result', '-url'));
+            urlDiv.innerHTML = '<strong>URL:</strong> ' + url;
+            
+            // Debug console
+            console.log('✅ API Response:', { url, data });
+        }
+
+        function showError(resultId, error) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="error">❌ Lỗi: ' + error + '</div>';
+            
+            // Debug console
+            console.error('❌ API Error:', error);
+        }
+
+        async function testListServices() {
+            const type = document.getElementById('list-type').value;
+            const packages = document.getElementById('list-packages').value;
+            
+            let url = 'list.php?';
+            const params = [];
+            if (type) params.push('type=' + type);
+            params.push('include_packages=' + packages);
+            url += params.join('&');
+            
+            console.log('🚀 Testing List Services API:', url);
+            showLoading('list-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                console.log('📡 Response headers:', response.headers);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('list-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('list-result', error.message);
+            }
+        }
+
+        async function testServiceDetail() {
+            const slug = document.getElementById('detail-slug').value.trim();
+            const packages = document.getElementById('detail-packages').value;
+            
+            if (!slug) {
+                showError('detail-result', 'Vui lòng nhập slug');
+                return;
+            }
+            
+            const url = 'detail.php?slug=' + encodeURIComponent(slug) + '&include_packages=' + packages;
+            
+            console.log('🚀 Testing Service Detail API:', url);
+            showLoading('detail-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('detail-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('detail-result', error.message);
+            }
+        }
+
+        async function testPackages() {
+            const slug = document.getElementById('packages-slug').value.trim();
+            
+            if (!slug) {
+                showError('packages-result', 'Vui lòng nhập product slug');
+                return;
+            }
+            
+            const url = 'packages.php?product_slug=' + encodeURIComponent(slug);
+            
+            console.log('🚀 Testing Packages API:', url);
+            showLoading('packages-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('packages-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('packages-result', error.message);
+            }
+        }
+
+        async function testPackageDetail() {
+            const slug = document.getElementById('package-detail-slug').value.trim();
+            const includeProduct = document.getElementById('package-detail-product').value;
+            
+            if (!slug) {
+                showError('package-detail-result', 'Vui lòng nhập package slug');
+                return;
+            }
+            
+            const url = 'package-detail.php?package_slug=' + encodeURIComponent(slug) + '&include_product=' + includeProduct;
+            
+            console.log('🚀 Testing Package Detail API:', url);
+            showLoading('package-detail-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('package-detail-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('package-detail-result', error.message);
+            }
+        }
+
+        async function testByType() {
+            const type = document.getElementById('bytype-type').value;
+            const limit = document.getElementById('bytype-limit').value;
+            
+            let url = 'by-type.php?type=' + type;
+            if (limit) {
+                url += '&limit=' + limit;
+            }
+            
+            console.log('🚀 Testing By Type API:', url);
+            showLoading('bytype-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('bytype-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('bytype-result', error.message);
+            }
+        }
+
+        async function testSearch() {
+            const query = document.getElementById('search-query').value.trim();
+            const type = document.getElementById('search-type').value;
+            const limit = document.getElementById('search-limit').value;
+            
+            if (!query) {
+                showError('search-result', 'Vui lòng nhập từ khóa tìm kiếm');
+                return;
+            }
+            
+            let url = 'search.php?q=' + encodeURIComponent(query);
+            if (type) url += '&type=' + type;
+            if (limit) url += '&limit=' + limit;
+            
+            console.log('🚀 Testing Search API:', url);
+            showLoading('search-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('search-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('search-result', error.message);
+            }
+        }
+
+        async function testStats() {
+            const url = 'stats.php';
+            
+            console.log('🚀 Testing Stats API:', url);
+            showLoading('stats-result');
+            
+            try {
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status, response.statusText);
+                
+                // Đọc response text để xem lỗi chi tiết
+                const responseText = await response.text();
+                console.log('📄 Raw response text:', responseText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${responseText}`);
+                }
+                
+                // Parse JSON từ text response
+                const data = JSON.parse(responseText);
+                showResult('stats-result', data, url);
+            } catch (error) {
+                console.error('💥 Fetch error:', error);
+                showError('stats-result', error.message);
+            }
+        }
+
+        // Auto-expand first section
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('list').classList.add('active');
+        });
+    </script>
+</body>
+</html>

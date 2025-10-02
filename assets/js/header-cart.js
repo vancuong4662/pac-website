@@ -3,11 +3,13 @@
  * Manages cart count display in header across all pages
  */
 
-class HeaderCartManager {
-    constructor() {
-        this.cartCountElement = null;
-        this.init();
-    }
+// Check if HeaderCartManager is already defined
+if (typeof HeaderCartManager === 'undefined') {
+    class HeaderCartManager {
+        constructor() {
+            this.cartCountElement = null;
+            this.init();
+        }
     
     init() {
         // Get cart count element
@@ -107,5 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
-// Make HeaderCartManager available globally
-window.HeaderCartManager = HeaderCartManager;
+    // Make HeaderCartManager available globally
+    window.HeaderCartManager = HeaderCartManager;
+}

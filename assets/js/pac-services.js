@@ -10,6 +10,7 @@ const careerGuidanceServices = [
         title: 'Test Trắc Nghiệm Tính Cách',
         description: 'Đánh giá toàn diện về tính cách, sở thích và khả năng của bạn thông qua các bài test khoa học được chuẩn hóa quốc tế.',
         icon: 'fas fa-brain',
+        image_url: 'assets/img/pic/career-test-mbti.jpg',
         features: [
             'Test tính cách MBTI chuyên sâu',
             'Đánh giá 16 kiểu tính cách',
@@ -18,7 +19,9 @@ const careerGuidanceServices = [
         ],
         price: 299000,
         duration: '45 phút',
-        type: 'online_test',
+        type: 'consultation',
+        consultation_type: 'automated',
+        package_type: 'basic',
         category: 'assessment'
     },
     {
@@ -26,6 +29,7 @@ const careerGuidanceServices = [
         title: 'Test Định Hướng Nghề Nghiệp',
         description: 'Khám phá những ngành nghề phù hợp nhất với bạn dựa trên năng lực, sở thích và giá trị cá nhân.',
         icon: 'fas fa-compass',
+        image_url: 'assets/img/pic/career-orientation.jpg',
         features: [
             'Test Holland Code (RIASEC)',
             'Đánh giá 6 nhóm nghề nghiệp',
@@ -34,7 +38,9 @@ const careerGuidanceServices = [
         ],
         price: 399000,
         duration: '60 phút',
-        type: 'online_test',
+        type: 'consultation',
+        consultation_type: 'automated',
+        package_type: 'premium',
         category: 'assessment'
     },
     {
@@ -42,6 +48,7 @@ const careerGuidanceServices = [
         title: 'Tư Vấn Cá Nhân 1-1',
         description: 'Buổi tư vấn trực tiếp với chuyên gia để giải đáp thắc mắc và xây dựng kế hoạch phát triển cá nhân.',
         icon: 'fas fa-user-tie',
+        image_url: 'assets/img/pic/personal-consultation.jpg',
         features: [
             'Tư vấn trực tiếp 60 phút',
             'Chuyên gia 10+ năm kinh nghiệm',
@@ -51,6 +58,8 @@ const careerGuidanceServices = [
         price: 799000,
         duration: '60 phút',
         type: 'consultation',
+        consultation_type: 'expert',
+        package_type: 'premium',
         category: 'consultation'
     },
     {
@@ -58,6 +67,7 @@ const careerGuidanceServices = [
         title: 'Tư Vấn Chọn Ngành Học',
         description: 'Hỗ trợ học sinh lựa chọn ngành học phù hợp với năng lực và định hướng nghề nghiệp trong tương lai.',
         icon: 'fas fa-graduation-cap',
+        image_url: 'assets/img/pic/academic-consultation.jpg',
         features: [
             'Phân tích khả năng học tập',
             'Tư vấn chọn trường và ngành',
@@ -67,6 +77,8 @@ const careerGuidanceServices = [
         price: 599000,
         duration: '45 phút',
         type: 'consultation',
+        consultation_type: 'expert',
+        package_type: 'basic',
         category: 'consultation'
     }
 ];
@@ -77,7 +89,7 @@ const coursesData = [
         id: 'essay_enhancement',
         title: 'Viết luận tăng cường - Essay Enhancement',
         description: 'Hướng dẫn các kỹ thuật viết bài luận học thuật ở các bậc học với phương pháp hiện đại và hiệu quả.',
-        image: 'assets/img/pic/2.png',
+        image_url: 'assets/img/pic/2.png',
         duration: '16 giờ',
         level: 'Trung cấp',
         category: 'writing',
@@ -97,7 +109,7 @@ const coursesData = [
         id: 'essay_coaching',
         title: 'Viết luận chuyên sâu – Essay Coaching',
         description: 'Hướng dẫn hoàn chỉnh 01 bài luận có độ dài 500-1000 từ theo ý tưởng và chủ đề học sinh tự chọn.',
-        image: 'assets/img/pic/1.jpg',
+        image_url: 'assets/img/pic/1.jpg',
         duration: '10 giờ',
         level: 'Nâng cao',
         category: 'writing',
@@ -117,7 +129,7 @@ const coursesData = [
         id: 'cv_interview_skills',
         title: 'Xây dựng CV và Kỹ năng Phỏng vấn',
         description: 'Hướng dẫn học sinh cách thức để có buổi phỏng vấn thành công và gây ấn tượng với nhà tuyển dụng.',
-        image: 'assets/img/pic/3.png',
+        image_url: 'assets/img/pic/3.png',
         duration: '8 giờ',
         level: 'Cơ bản',
         category: 'career',
@@ -137,7 +149,7 @@ const coursesData = [
         id: 'communication_skills',
         title: 'Kỹ năng Giao tiếp và Thuyết trình',
         description: 'Phát triển khả năng giao tiếp hiệu quả và kỹ năng thuyết trình chuyên nghiệp trong môi trường học tập và làm việc.',
-        image: 'assets/img/pic/2.png',
+        image_url: 'assets/img/pic/2.png',
         duration: '12 giờ',
         level: 'Trung cấp',
         category: 'skills',
@@ -157,7 +169,7 @@ const coursesData = [
         id: 'study_methods',
         title: 'Phương pháp Học tập Hiệu quả',
         description: 'Học cách học thông minh với các phương pháp khoa học được chứng minh để tối ưu hóa khả năng ghi nhớ và hiểu bài.',
-        image: 'assets/img/pic/1.jpg',
+        image_url: 'assets/img/pic/1.jpg',
         duration: '14 giờ',
         level: 'Cơ bản',
         category: 'academic',
@@ -177,7 +189,7 @@ const coursesData = [
         id: 'critical_thinking',
         title: 'Tư duy Phản biện và Giải quyết Vấn đề',
         description: 'Phát triển khả năng tư duy logic, phân tích và giải quyết vấn đề một cách sáng tạo trong học tập và cuộc sống.',
-        image: 'assets/img/pic/3.png',
+        image_url: 'assets/img/pic/3.png',
         duration: '18 giờ',
         level: 'Nâng cao',
         category: 'academic',

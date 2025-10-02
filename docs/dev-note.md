@@ -87,12 +87,36 @@ docs/
 3. Duplicate CSS cho similar pages
 4. Hard-coded values thay vì sử dụng CSS variables
 5. **Type mismatch trong function parameters** - Check data types before processing
-6. **📍 ĐƯỜNG DẪN SAI - LUÔN SỬ DỤNG RELATIVE PATHS:**
-   - ❌ `/pac-new/assets/css/main.css` (absolute)
-   - ❌ `/pac-new/api/auth/login.php` (absolute)
-   - ✅ `assets/css/main.css` (relative)
-   - ✅ `api/auth/login.php` (relative)
-   - **Rule: Follow pattern của login.html và profile.js**
+6. **📍 ĐƯỜNG DẪN SAI - QUY TẮC ĐƯỜNG DẪN CHÍNH XÁC:**
+   
+   **❌ SAI - Absolute paths với `/pac-new/` prefix:**
+   ```javascript
+   // SAI: Đừng dùng /pac-new/ prefix
+   fetch('/pac-new/api/services/list.php')
+   fetch('/pac-new/assets/css/main.css')  
+   fetch('/pac-new/components/header.html')
+   ```
+   
+   **✅ ĐÚNG - Relative paths từ document root:**
+   ```javascript
+   // ĐÚNG: Bỏ /pac-new/ prefix, bắt đầu từ folder con
+   fetch('api/services/list.php')          // Khi đang ở /pac-new/
+   fetch('assets/css/main.css')            // Khi đang ở /pac-new/  
+   fetch('components/header.html')         // Khi đang ở /pac-new/
+   ```
+   
+   **🎯 QUY TẮC CỤ THỂ:**
+   - **Browser context**: Khi file HTML được load từ `http://localhost/pac-new/`, 
+     thì đường dẫn `api/services/list.php` sẽ resolve thành `http://localhost/pac-new/api/services/list.php`
+   - **Rule**: Luôn bỏ `/pac-new/` prefix, chỉ giữ đường dẫn từ folder con
+   - **Pattern**: Follow pattern của `login.html` và `profile.js`
+   
+   **📂 Examples theo vị trí file:**
+   ```
+   From: /pac-new/index.html → 'api/auth/login.php'
+   From: /pac-new/templates/profile.html → '../api/auth/login.php' 
+   From: /pac-new/api/services/test.html → '../auth/login.php'
+   ```
 
 ### 🐛 **Common JavaScript Errors:**
 - **`components.filter is not a function`**: Xảy ra khi pass object thay vì array
@@ -150,6 +174,21 @@ pac-new/
 - Always check for reusable components first
 - Maintain consistent patterns
 - Update this dev-note.md with new learnings
+
+## 🚨 QUICK REFERENCE - ĐƯỜNG DẪN
+
+**❌ ĐỪNG BAO GIỜ DÙNG:**
+```
+/pac-new/api/services/list.php
+/pac-new/assets/css/main.css
+```
+
+**✅ LUÔN DÙNG:**
+```
+api/services/list.php        (từ root /pac-new/)
+assets/css/main.css          (từ root /pac-new/)
+../api/auth/login.php        (từ subfolder)
+```
 
 ---
 *Updated: September 2025*

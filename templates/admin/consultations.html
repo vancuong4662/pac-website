@@ -89,16 +89,18 @@
               <div class="table-responsive">                <table class="table table-hover" id="consultations-table">                  <thead>
                     <tr>
                       <th style="width: 80px;">ID</th>
-                      <th style="width: 250px;">Tên Dịch vụ</th>
+                      <th style="width: 200px;">Tên Dịch vụ</th>
+                      <th style="width: 120px;">Hình ảnh</th>
                       <th>Mô tả</th>
-                      <th style="width: 160px;">Loại Tư vấn</th>
-                      <th style="width: 120px;">Giá</th>
-                      <th style="width: 140px;">Ngày tạo</th>
-                      <th style="width: 140px;">Thao tác</th>
+                      <th style="width: 120px;">Loại Tư vấn</th>
+                      <th style="width: 100px;">Gói</th>
+                      <th style="width: 100px;">Giá</th>
+                      <th style="width: 120px;">Ngày tạo</th>
+                      <th style="width: 120px;">Thao tác</th>
                     </tr>
                   </thead>                  <tbody id="consultations-tbody">
                     <tr>
-                      <td colspan="7" class="text-center py-4">
+                      <td colspan="9" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                           <span class="visually-hidden">Loading...</span>
                         </div>
@@ -138,6 +140,15 @@
                 </div>
               </div>
             </div>
+
+            <div class="mb-3">
+              <label for="consultation-image-url" class="form-label">
+                <i class="fas fa-image me-1"></i>Hình ảnh Banner
+              </label>
+              <input type="url" class="form-control" id="consultation-image-url" 
+                     placeholder="Nhập URL hình ảnh banner...">
+              <div class="form-text">URL hình ảnh banner hiển thị trên card dịch vụ (khuyến nghị kích thước: 400x250px)</div>
+            </div>
             
             <div class="mb-3">
               <label for="consultation-description" class="form-label">
@@ -149,7 +160,33 @@
             </div>
             
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="consultation-type" class="form-label">
+                    <i class="fas fa-cogs me-1"></i>Loại Tư vấn <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" id="consultation-type" required>
+                    <option value="">Chọn loại tư vấn</option>
+                    <option value="automated">Trắc nghiệm tự động</option>
+                    <option value="expert">Tư vấn với chuyên gia</option>
+                  </select>
+                  <div class="form-text">Chọn phương thức tư vấn</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="consultation-package-type" class="form-label">
+                    <i class="fas fa-box me-1"></i>Gói dịch vụ <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" id="consultation-package-type" required>
+                    <option value="">Chọn gói dịch vụ</option>
+                    <option value="basic">Gói cơ bản</option>
+                    <option value="premium">Gói cao cấp</option>
+                  </select>
+                  <div class="form-text">Mức độ dịch vụ</div>
+                </div>
+              </div>
+              <div class="col-md-4">
                 <div class="mb-3">
                   <label for="consultation-price" class="form-label">
                     <i class="fas fa-money-bill me-1"></i>Giá dịch vụ (VNĐ) <span class="text-danger">*</span>
@@ -157,24 +194,6 @@
                   <input type="number" class="form-control" id="consultation-price" required min="0" step="1000"
                          placeholder="Nhập giá dịch vụ...">
                   <div class="form-text">Giá tính bằng VNĐ</div>
-                </div>
-              </div>              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="consultation-package-type" class="form-label">
-                    <i class="fas fa-box me-1"></i>Loại Tư vấn <span class="text-danger">*</span>
-                  </label>
-                  <select class="form-select" id="consultation-package-type" required>
-                    <option value="">Chọn loại tư vấn</option>
-                    <optgroup label="Tư vấn Tự động (Trắc nghiệm)">
-                      <option value="automated_basic">Tự động - Cơ bản</option>
-                      <option value="automated_premium">Tự động - Cao cấp</option>
-                    </optgroup>
-                    <optgroup label="Tư vấn với Chuyên gia">
-                      <option value="expert_basic">Chuyên gia - Cơ bản</option>
-                      <option value="expert_premium">Chuyên gia - Cao cấp</option>
-                    </optgroup>
-                  </select>
-                  <div class="form-text">Chọn loại hình tư vấn phù hợp</div>
                 </div>
               </div>
             </div>
