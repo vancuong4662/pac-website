@@ -298,14 +298,132 @@
             font-size: 3rem;
             font-weight: 800;
             color: var(--brand-primary);
-            margin-bottom: 10px;
+        }
+        
+        /* Package Cards Styles */
+        .packages-section {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 24px;
+            border: 1px solid var(--light-purple);
+        }
+        
+        .package-card {
+            background: var(--surface-color);
+            border: 2px solid var(--light-purple);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .package-card:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--brand-primary-rgb), 0.15);
+        }
+        
+        .package-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .package-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .package-image {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .package-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .package-card:hover .package-image img {
+            transform: scale(1.05);
+        }
+        
+        .package-image-placeholder {
+            color: var(--light-purple);
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        
+        .package-header {
+            margin-bottom: 16px;
+        }
+        
+        .package-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 8px;
             font-family: var(--heading-font);
+        }
+        
+        .package-price {
+            margin-bottom: 12px;
+        }
+        
+        .price-free {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
+            color: var(--contrast-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .price-amount {
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .service-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        
+        .meta-item {
+            font-size: 0.95rem;
+            color: var(--default-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .service-info-section {
+            flex: 1;
         }
         
         .stat-label {
             color: var(--default-color);
             font-weight: 600;
             font-size: 1.1rem;
+            margin-bottom: 10px;
             font-family: var(--default-font);
         }
         
@@ -539,7 +657,7 @@
                 servicesGrid.innerHTML = `
                     <div class="col-12">
                         <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
+                            <div class="spinner-border text-brand-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                             <p class="mt-3 text-muted">Đang tải các giải pháp hướng nghiệp...</p>
@@ -598,10 +716,18 @@
                         // Calculate price display
                         let priceDisplay = '';
                         if (service.packages && service.packages.length > 0) {
-                            const minPrice = Math.min(...service.packages.map(p => p.price));
-                            const maxPrice = Math.max(...service.packages.map(p => p.price));
+                            const prices = service.packages.map(p => {
+                                if (p.is_free) return 0;
+                                return p.final_price || p.sale_price || p.original_price;
+                            });
+                            const minPrice = Math.min(...prices);
+                            const maxPrice = Math.max(...prices);
                             
-                            if (minPrice === maxPrice) {
+                            if (minPrice === 0 && maxPrice === 0) {
+                                priceDisplay = 'Miễn phí';
+                            } else if (minPrice === 0) {
+                                priceDisplay = 'Miễn phí - ' + formatPrice(maxPrice) + ' VNĐ';
+                            } else if (minPrice === maxPrice) {
                                 priceDisplay = formatPrice(minPrice) + ' VNĐ';
                             } else {
                                 priceDisplay = formatPrice(minPrice) + ' - ' + formatPrice(maxPrice) + ' VNĐ';
@@ -619,6 +745,53 @@
                             }
                         };
                         
+                        // Generate packages HTML
+                        let packagesHTML = '';
+                        if (service.packages && service.packages.length > 0) {
+                            packagesHTML = `
+                                <div class="packages-section mt-4">
+                                    <h5 class="text-brand-primary mb-3"><i class="fas fa-box me-2"></i>Các gói dịch vụ</h5>
+                                    <div class="row g-3">
+                                        ${service.packages.map(pkg => {
+                                            const displayPrice = pkg.is_free ? 0 : (pkg.final_price || pkg.sale_price || pkg.original_price);
+                                            const packageId = pkg.package_id || pkg.id;
+                                            
+                                            return `
+                                            <div class="col-md-6 col-lg-4">
+                                                <div class="package-card h-100">
+                                                    ${pkg.image_url ? `
+                                                    <div class="package-image">
+                                                        <img src="${pkg.image_url}" alt="${pkg.package_name}" loading="lazy">
+                                                    </div>
+                                                    ` : `
+                                                    <div class="package-image">
+                                                        <i class="fas fa-box package-image-placeholder"></i>
+                                                    </div>
+                                                    `}
+                                                    <div class="package-header">
+                                                        <h6 class="package-name">${pkg.package_name}</h6>
+                                                        <div class="package-price">
+                                                            ${pkg.is_free ? 
+                                                                '<span class="price-free">Miễn phí</span>' : 
+                                                                `<span class="price-amount">${formatPrice(displayPrice)} VNĐ</span>`
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div class="package-action">
+                                                        <a href="huong-nghiep-goi-${packageId}" class="btn btn-pac-primary btn-sm w-100">
+                                                            <i class="fas fa-eye me-1"></i>
+                                                            Xem chi tiết
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
                         servicesHTML += `
                             <div class="col-12 mb-5" data-aos="fade-up" data-aos-delay="${(index + 1) * 200}">
                                 <div class="service-card service-card-full">
@@ -641,29 +814,36 @@
                                                     <h3 class="service-title mb-0">${service.name}</h3>
                                                 </div>
                                                 <p class="service-description mb-4">${service.short_description || ''}</p>
-                                                <div class="row">
-                                                    <div class="col-md-8">
-                                                        <ul class="service-features">
-                                                            ${learningOutcomes && learningOutcomes.length > 0 
-                                                                ? learningOutcomes.slice(0, 4).map(outcome => `<li>${outcome}</li>`).join('') 
-                                                                : '<li>Dịch vụ chuyên nghiệp</li><li>Tư vấn cá nhân hóa</li><li>Hỗ trợ toàn diện</li><li>Chuyên gia giàu kinh nghiệm</li>'
-                                                            }
-                                                        </ul>
+                                                
+                                                <!-- Service Features -->
+                                                <div class="service-info-section mb-4">
+                                                    <ul class="service-features">
+                                                        ${learningOutcomes && learningOutcomes.length > 0 
+                                                            ? learningOutcomes.slice(0, 3).map(outcome => `<li>${outcome}</li>`).join('') 
+                                                            : '<li>Dịch vụ chuyên nghiệp</li><li>Tư vấn cá nhân hóa</li><li>Hỗ trợ toàn diện</li>'
+                                                        }
+                                                    </ul>
+                                                    <div class="service-meta">
+                                                        <span class="meta-item">
+                                                            <i class="fas fa-clock text-brand-primary me-1"></i>
+                                                            ${service.duration || 'Thời gian linh hoạt'}
+                                                        </span>
+                                                        <span class="meta-item ms-3">
+                                                            <i class="fas fa-tag text-brand-primary me-1"></i>
+                                                            ${priceDisplay}
+                                                        </span>
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <div class="service-cta">
-                                                            <div class="service-pricing mb-3">
-                                                                <div class="price-badge">
-                                                                    <span class="h4 text-primary mb-0">${priceDisplay}</span>
-                                                                </div>
-                                                                <div class="text-muted small">${service.duration || 'Thời gian linh hoạt'}</div>
-                                                            </div>
-                                                            <button class="btn btn-service btn-lg w-100" onclick="viewServiceDetails('${service.slug}')">
-                                                                <i class="fas fa-eye me-2"></i>
-                                                                Xem Chi Tiết & Đăng Ký
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Packages Section -->
+                                                ${packagesHTML}
+                                                
+                                                <!-- Main CTA -->
+                                                <div class="service-cta mt-auto pt-3">
+                                                    <button class="btn btn-service btn-lg" onclick="viewServiceDetails('${service.slug}')">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        Xem Thông Tin Đầy Đủ
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -689,7 +869,7 @@
                             <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                             <h3 class="text-muted">Có lỗi xảy ra</h3>
                             <p class="text-muted">Không thể tải danh sách giải pháp hướng nghiệp. Vui lòng thử lại sau.</p>
-                            <button class="btn btn-primary" onclick="loadServices()">
+                            <button class="btn btn-pac-primary" onclick="loadServices()">
                                 <i class="fas fa-redo"></i>
                                 Thử lại
                             </button>

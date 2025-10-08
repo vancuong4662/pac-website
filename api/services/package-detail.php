@@ -43,6 +43,7 @@ try {
                 pp.id as package_id, pp.package_name, pp.package_slug,
                 pp.package_description, pp.original_price, pp.sale_price,
                 pp.is_free, pp.group_size, pp.special_features,
+                pp.image_url as package_image_url,
                 pp.sort_order as package_sort_order, pp.product_id";
     
     if ($include_product) {
@@ -50,7 +51,7 @@ try {
                   p.type, p.category, p.short_description, p.full_description,
                   p.duration, p.target_audience, p.learning_outcomes,
                   p.curriculum, p.instructor_info, p.teaching_format,
-                  p.question_count, p.age_range, p.image_url";
+                  p.question_count, p.age_range, p.image_url as product_image_url";
         $sql .= " FROM product_packages pp 
                   LEFT JOIN products p ON pp.product_id = p.id";
     } else {
@@ -96,6 +97,7 @@ try {
         'is_free' => (bool)$result['is_free'],
         'group_size' => $result['group_size'],
         'special_features' => $result['special_features'] ? json_decode($result['special_features'], true) : null,
+        'image_url' => $result['package_image_url'],
         'package_sort_order' => (int)$result['package_sort_order'],
         'product_id' => (int)$result['product_id']
     ];
@@ -129,7 +131,7 @@ try {
             'teaching_format' => $result['teaching_format'],
             'question_count' => $result['question_count'] ? (int)$result['question_count'] : null,
             'age_range' => $result['age_range'],
-            'image_url' => $result['image_url']
+            'image_url' => $result['product_image_url']
         ];
         
         $response = [

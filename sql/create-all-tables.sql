@@ -130,6 +130,9 @@ CREATE TABLE product_packages (
     group_size VARCHAR(50) NULL, -- '1 học viên', '3-4 học viên', '5-6 học viên'
     special_features TEXT, -- Các tính năng đặc biệt của gói này
     
+    -- Media và hiển thị
+    image_url VARCHAR(500) DEFAULT NULL, -- Hình ảnh riêng cho gói
+    
     -- Sắp xếp và trạng thái
     sort_order INT DEFAULT 0, -- Thứ tự hiển thị các gói
     status ENUM('active', 'inactive') DEFAULT 'active',

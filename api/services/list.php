@@ -83,6 +83,7 @@ try {
                                 pp.id as package_id, pp.package_name, pp.package_slug,
                                 pp.package_description, pp.original_price, pp.sale_price,
                                 pp.is_free, pp.group_size, pp.special_features,
+                                pp.image_url,
                                 pp.sort_order as package_sort_order
                             FROM product_packages pp 
                             WHERE pp.product_id = :product_id 

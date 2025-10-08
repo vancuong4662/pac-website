@@ -1,261 +1,642 @@
 -- =====================================================
--- PAC Sample Data - Dữ liệu mẫu để vận hành ngay
--- =====================================================
--- 
--- HƯỚNG DẪN:
--- 1. Chạy file create-all-tables.sql trước
--- 2. Sau đó chạy file này để có dữ liệu mẫu
--- 3. File này có thể chạy nhiều lần (sẽ cập nhật dữ liệu)
---
+-- PAC Shopping Cart Database - Dữ liệu mẫu mới
+-- Dựa trên tài liệu thực tế của PAC
 -- =====================================================
 
--- =====================================================
--- PHẦN 1: TÀI KHOẢN ADMIN VÀ USER MẪU
--- =====================================================
+-- Xóa dữ liệu cũ (nếu có)
+DELETE FROM consultation_bookings;
+DELETE FROM purchased_tests;
+DELETE FROM purchased_courses;
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM cart;
+DELETE FROM product_packages;
+DELETE FROM products;
+DELETE FROM sessions;
+DELETE FROM users;
 
--- Tài khoản admin mặc định
-INSERT INTO users (fullname, email, username, password, role, status, email_verified, phone, address) 
-VALUES 
-('Administrator', 'admin@pacgroup.com', 'adminpac', '123456', 'admin', 'active', 1, '0901234567', 'Tầng 10, Tòa nhà PAC Group, Hà Nội'),
-('Nguyễn Văn Demo', 'demo@pacgroup.com', 'democlient', '123456', 'user', 'active', 1, '0987654321', '123 Nguyễn Huệ, Q1, TP.HCM')
-ON DUPLICATE KEY UPDATE 
-    fullname = VALUES(fullname),
-    phone = VALUES(phone),
-    address = VALUES(address);
-
--- =====================================================
--- PHẦN 2: SẢN PHẨM MẪU
--- =====================================================
-
--- Xóa sản phẩm mẫu cũ (nếu có)
-DELETE FROM products WHERE name LIKE '%Quản lý Dự án%' OR name LIKE '%Đánh giá năng lực%' OR name LIKE '%Tư vấn Phát triển%';
-
--- Khóa học
-INSERT INTO products (name, description, price, type, package_type, status) VALUES 
-('Khóa học Quản lý Dự án Cơ bản', 
-'Khóa học cung cấp kiến thức nền tảng về quản lý dự án, phù hợp cho người mới bắt đầu. 
-Nội dung bao gồm:
-- Tổng quan về quản lý dự án
-- Các giai đoạn của dự án
-- Công cụ lập kế hoạch
-- Quản lý rủi ro cơ bản
-- Thực hành với case study thực tế
-Thời gian: 40 giờ học | Hình thức: Online + Offline', 
-2500000.00, 'course', NULL, 'active'),
-
-('Khóa học Quản lý Dự án Nâng cao', 
-'Khóa học chuyên sâu về quản lý dự án, dành cho những người đã có kinh nghiệm.
-Nội dung bao gồm:
-- Agile & Scrum methodology
-- Quản lý stakeholder nâng cao
-- Leadership trong dự án
-- Quản lý tài chính dự án
-- Chuẩn bị thi chứng chỉ PMP
-Thời gian: 60 giờ học | Hình thức: Online + Offline', 
-4500000.00, 'course', NULL, 'active'),
-
-('Khóa học Agile & Scrum Master', 
-'Khóa học về phương pháp Agile và chuẩn bị cho chứng chỉ Scrum Master.
-Nội dung bao gồm:
-- Nguyên lý và giá trị Agile
-- Scrum framework chi tiết
-- Vai trò của Scrum Master
-- Sprint planning & retrospective
-- Coaching và mentoring team
-Thời gian: 32 giờ học | Có chứng chỉ PSM I', 
-3500000.00, 'course', NULL, 'active'),
-
-('Khóa học Kỹ năng Phỏng vấn', 
-'Khóa học trực tuyến về kỹ năng phỏng vấn xin việc hiệu quả.
-Nội dung bao gồm:
-- Chuẩn bị CV ấn tượng và thu hút HR
-- Kỹ thuật trả lời phỏng vấn STAR method
-- Thực hành mock interview với feedback
-- Ngôn ngữ cơ thể và trang phục phỏng vấn
-- Đàm phán lương và benefits
-Thời gian: 20 giờ học | Hình thức: Online + Workshop', 
-399000.00, 'course', NULL, 'active'),
-
-('Khóa học Tư duy Phản biện', 
-'Khóa học phát triển tư duy phản biện và giải quyết vấn đề sáng tạo.
-Nội dung bao gồm:
-- Nguyên lý tư duy phản biện cơ bản
-- Kỹ năng phân tích và đánh giá thông tin
-- Tìm kiếm giải pháp sáng tạo cho vấn đề
-- Ứng dụng trong học tập và công việc
-- Case study và thực hành thực tế
-Thời gian: 25 giờ học | Áp dụng ngay được', 
-599000.00, 'course', NULL, 'active'),
-
-('Khóa học Public Speaking', 
-'Khóa học kỹ năng thuyết trình và nói trước đám đông tự tin.
-Nội dung bao gồm:
-- Vượt qua nỗi sợ nói trước đám đông
-- Kỹ thuật chuẩn bị và cấu trúc bài thuyết trình
-- Ngôn ngữ cơ thể và giọng nói hiệu quả
-- Sử dụng công cụ hỗ trợ (slides, props)
-- Tương tác với khán giả và xử lý tình huống
-Thời gian: 30 giờ học | Workshop thực hành', 
-799000.00, 'course', NULL, 'active');
-
--- Trắc nghiệm online
-INSERT INTO products (name, description, price, type, package_type, status) VALUES 
-('Đánh giá năng lực Quản lý - Gói Cơ bản', 
-'Bài test đánh giá năng lực quản lý cơ bản phù hợp cho mọi đối tượng.
-Nội dung đánh giá:
-- Kỹ năng lãnh đạo cơ bản
-- Quản lý thời gian
-- Ra quyết định
-- Giao tiếp và làm việc nhóm
-Thời gian: 50 câu hỏi / 60 phút | Báo cáo kết quả chi tiết', 
-500000.00, 'online_test', 'basic', 'active'),
-
-('Đánh giá năng lực Quản lý - Gói Nâng cao', 
-'Bài test đánh giá năng lực quản lý nâng cao với phân tích tâm lý học sâu.
-Nội dung đánh giá:
-- Leadership style assessment
-- Emotional Intelligence (EQ)
-- Strategic thinking
-- Change management
-- Conflict resolution
-Thời gian: 100 câu hỏi / 90 phút | Báo cáo 20+ trang + Video giải thích', 
-1000000.00, 'online_test', 'premium', 'active'),
-
-('Test Trắc nghiệm Tính cách MBTI', 
-'Bài test đánh giá 16 kiểu tính cách MBTI để hiểu rõ bản thân.
-Nội dung đánh giá:
-- 16 kiểu tính cách MBTI chi tiết
-- Điểm mạnh và điểm yếu của từng type
-- Nghề nghiệp phù hợp với tính cách
-- Cách phát triển điểm mạnh và khắc phục điểm yếu
-- Tương thích với các type khác
-Thời gian: 80 câu hỏi / 45 phút | Báo cáo chi tiết', 
-199000.00, 'online_test', NULL, 'active'),
-
-('Test Đánh giá IQ', 
-'Bài test đánh giá chỉ số thông minh IQ chuẩn quốc tế.
-Nội dung đánh giá:
-- Logic và suy luận toán học
-- Khả năng nhận thức không gian
-- Tư duy ngôn ngữ và từ vựng
-- Trí nhớ và tập trung
-- Tốc độ xử lý thông tin
-Thời gian: 120 câu hỏi / 90 phút | Chuẩn IQ quốc tế', 
-149000.00, 'online_test', NULL, 'active'),
-
-('Test Định hướng Nghề nghiệp', 
-'Bài test Holland Code (RIASEC) giúp tìm ngành nghề phù hợp.
-Nội dung đánh giá:
-- 6 nhóm nghề nghiệp RIASEC
-- Sở thích và năng khiếu cá nhân
-- Danh sách ngành nghề phù hợp
-- Lộ trình phát triển sự nghiệp
-- Môi trường làm việc lý tưởng
-Thời gian: 60 câu hỏi / 30 phút | Kết quả ngay lập tức', 
-299000.00, 'online_test', NULL, 'active'),
-
-('Test Đánh giá EQ (Emotional Intelligence)', 
-'Bài test đánh giá chỉ số thông minh cảm xúc và kỹ năng mềm.
-Nội dung đánh giá:
-- Nhận thức cảm xúc bản thân
-- Kiểm soát cảm xúc
-- Đồng cảm và hiểu người khác
-- Kỹ năng giao tiếp xã hội
-- Động lực và khả năng thích ứng
-Thời gian: 70 câu hỏi / 40 phút | Báo cáo cải thiện EQ', 
-249000.00, 'online_test', NULL, 'active');
-
--- Tư vấn (Consultations) - 2 Loại hình tư vấn mới
--- Xóa consultation data cũ nếu có
-DELETE FROM products WHERE type = 'consultation';
-
--- LOẠI 1: TỰ VẤN TỰ ĐỘNG (sử dụng trắc nghiệm)
-INSERT INTO products (name, description, price, type, package_type, status) VALUES 
-('Tự vấn Hướng nghiệp Tự động - Cơ bản', 
-'Giải pháp tự vấn thông minh sử dụng thuật toán AI và trắc nghiệm tính cách chuẩn quốc tế.
-🤖 Tính năng:
-- Trắc nghiệm MBTI (16 personalities)
-- Test Holland Code định hướng nghề nghiệp
-- Đánh giá sở thích và năng lực cơ bản
-- Báo cáo tự động với khuyến nghị nghề nghiệp
-- Kết quả ngay lập tức sau khi hoàn thành
-Thời gian: 45-60 phút | Hình thức: Online 100%', 
-199000.00, 'consultation', 'automated_basic', 'active'),
-
-('Tự vấn Hướng nghiệp Tự động - Cao cấp', 
-'Gói tự vấn toàn diện với công cụ đánh giá chuyên sâu và báo cáo chi tiết.
-🚀 Tính năng nâng cao:
-- Bao gồm tất cả tính năng Cơ bản
-- Test IQ và EQ chuyên sâu
-- Đánh giá 8 trí thông minh đa dạng
-- Phân tích môi trường làm việc phù hợp
-- Báo cáo 15-20 trang với lộ trình chi tiết
-- So sánh cơ sở dữ liệu nghề nghiệp VN
-- Truy cập lại kết quả không giới hạn
-Thời gian: 90-120 phút | Hình thức: Online 100%', 
-399000.00, 'consultation', 'automated_premium', 'active'),
-
--- LOẠI 2: TƯ VẤN VỚI CHUYÊN GIA (book lịch tự động)
-('Tư vấn với Chuyên gia - Cơ bản', 
-'Buổi tư vấn cá nhân 1-on-1 với chuyên gia hướng nghiệp PAC có kinh nghiệm 5+ năm.
-👨‍💼 Bao gồm:
-- Buổi tư vấn trực tiếp 60 phút (online/offline)
-- Đánh giá năng lực và sở thích cá nhân
-- Phân tích SWOT cá nhân
-- Tư vấn định hướng nghề nghiệp ngắn hạn (1-2 năm)
-- Góp ý về CV và hồ sơ xin việc
-- Hệ thống book lịch tự động 24/7
-- Báo cáo tư vấn sau buổi gặp
-Thời gian: 60 phút | Booking: Linh hoạt 7 ngày/tuần', 
-699000.00, 'consultation', 'expert_basic', 'active'),
-
-('Tư vấn với Chuyên gia - Cao cấp', 
-'Gói tư vấn toàn diện với Senior Consultant, bao gồm follow-up và mentoring dài hạn.
-⭐ Premium features:
-- 2 buổi tư vấn (90 phút mỗi buổi)
-- Tư vấn với Senior Consultant 10+ năm kinh nghiệm
-- Đánh giá chuyên sâu với công cụ Psychometrics
-- Xây dựng lộ trình sự nghiệp 3-5 năm
-- Kế hoạch phát triển kỹ năng cụ thể
-- 3 tháng follow-up qua email/chat
-- Kết nối cơ hội việc làm trong network PAC
-- Ưu tiên booking lịch linh hoạt
-Thời gian: 2x90 phút + 3 tháng support | Booking: Priority scheduling', 
-1299000.00, 'consultation', 'expert_premium', 'active');
+-- Reset AUTO_INCREMENT
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE products AUTO_INCREMENT = 1;
+ALTER TABLE product_packages AUTO_INCREMENT = 1;
+ALTER TABLE orders AUTO_INCREMENT = 1;
 
 -- =====================================================
--- PHẦN 3: DỮ LIỆU MẪU CART VÀ ORDERS (CHO DEMO)
+-- PHẦN 1: TẠO TÀI KHOẢN DEMO
 -- =====================================================
 
--- Thêm một số sản phẩm vào giỏ hàng của user demo (ID = 2)
-INSERT INTO cart (user_id, product_id, quantity) 
-SELECT 2, p.id, 1 
-FROM products p 
-WHERE p.name IN ('Khóa học Quản lý Dự án Cơ bản', 'Đánh giá năng lực Quản lý - Gói Cơ bản')
-ON DUPLICATE KEY UPDATE quantity = VALUES(quantity);
+-- Tài khoản admin
+INSERT INTO users (fullname, email, username, password, phone, status, role, email_verified) VALUES
+('Admin PAC', 'admin@pac.edu.vn', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0966013663', 'active', 'admin', 1);
 
--- Tạo một đơn hàng mẫu đã hoàn thành
-INSERT INTO orders (user_id, total_amount, status, payment_method, payment_status) 
-VALUES (2, 3000000.00, 'completed', 'bank_transfer', 'paid');
+-- Tài khoản khách hàng demo
+INSERT INTO users (fullname, email, username, password, phone, status, role, email_verified) VALUES
+('Nguyễn Văn A', 'customer@example.com', 'customer', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0901234567', 'active', 'user', 1);
 
--- Lấy ID của đơn hàng vừa tạo và thêm items
-SET @order_id = LAST_INSERT_ID();
+-- =====================================================
+-- PHẦN 2: TẠO SẢN PHẨM VÀ CÁC GÓI
+-- =====================================================
 
-INSERT INTO order_items (order_id, product_id, quantity, price)
-SELECT @order_id, p.id, 1, p.price
-FROM products p 
-WHERE p.name = 'Khóa học Quản lý Dự án Cơ bản';
+-- 1. SẢN PHẨM: TEST HƯỚNG NGHIỆP
+INSERT INTO products (
+    name, slug, short_description, full_description, type, category,
+    duration, target_audience, learning_outcomes, 
+    question_count, age_range, image_url, status, sort_order
+) VALUES (
+    'Hướng nghiệp trực tuyến',
+    'huong-nghiep-truc-tuyen',
+    'Ngay lập tức khám phá tính cách và định hướng nghề nghiệp phù hợp',
+    '<h3>🧠 Giới thiệu</h3>
+    <p>Bài kiểm tra và đánh giá về tính cách, nhận thức, và kĩ năng của học sinh được thiết kế và xây dựng dựa trên các nghiên cứu và mô hình khoa học về đánh giá tâm lý, lý thuyết chọn nghề, và bao gồm các hoạt động đánh giá trực tuyến và đánh giá, tư vấn trực tiếp.</p>
+    
+    <h3>🎯 Đối tượng phù hợp</h3>
+    <ul>
+        <li>Học sinh PTTH (14-18 tuổi)</li>
+        <li>Sinh viên đại học (18-22 tuổi)</li>
+        <li>Người cần định hướng nghề nghiệp</li>
+    </ul>
+    
+    <h3>📋 Nội dung đánh giá</h3>
+    <p>Thông qua hoạt động này, học sinh sẽ tự khám phá điểm mạnh, điểm yếu, tiềm năng, và mức độ phù hợp giữa nhận thức và tính cách của bản thân với các ngành nghề và lĩnh vực cụ thể.</p>',
+    'career_test',
+    'assessment',
+    '30-45 phút',
+    '["Học sinh PTTH", "Sinh viên đại học", "Người cần định hướng nghề nghiệp"]',
+    '<h3>✅ Kết quả sau khi hoàn thành</h3>
+    <ul>
+        <li>Khám phá điểm mạnh, điểm yếu, tiềm năng của bản thân</li>
+        <li>Tìm hiểu về các nhóm nghề phù hợp với tính cách và sở thích cá nhân</li>
+        <li>Nhận được báo cáo chi tiết về tính cách và định hướng nghề nghiệp</li>
+        <li>Hiểu rõ môi trường làm việc phù hợp với bản thân</li>
+    </ul>',
+    120, -- Câu hỏi tối đa (tùy gói)
+    '14-22 tuổi',
+    'assets/img/pic/huong_nghiep_truc_tuyen.jpg',
+    'active',
+    1
+);
 
--- Tạo purchased course cho đơn hàng này
-INSERT INTO purchased_courses (user_id, order_id, product_id, course_code, status, expires_at)
-SELECT 2, @order_id, p.id, CONCAT('COURSE_', LPAD(p.id, 4, '0'), '_', DATE_FORMAT(NOW(), '%Y%m%d')), 'active', DATE_ADD(NOW(), INTERVAL 1 YEAR)
-FROM products p 
-WHERE p.name = 'Khóa học Quản lý Dự án Cơ bản';
+-- Gói miễn phí cho test hướng nghiệp
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, special_features, 
+    image_url, sort_order
+) VALUES (
+    1, 'Gói Khởi động', 'khoi-dong',
+    '<h3>🆓 Hướng nghiệp trực tuyến - Miễn phí</h3>
+    <p><strong>Test miễn phí</strong> với báo cáo cơ bản giúp bạn khởi đầu hành trình khám phá bản thân.</p>
+    
+    <h3>📊 Thông tin chi tiết</h3>
+    <ul>
+        <li><strong>Số câu hỏi:</strong> 30 câu</li>
+        <li><strong>Thời gian:</strong> 30 phút</li>
+        <li><strong>Lứa tuổi:</strong> 14-18 tuổi</li>
+        <li><strong>Báo cáo:</strong> 5 trang</li>
+    </ul>
+    
+    <h3>📋 Nội dung báo cáo</h3>
+    <ul>
+        <li>Tổng quan mã tính cách tương ứng với môi trường nghề nghiệp, xu hướng và sở thích cá nhân</li>
+        <li>Đánh giá điểm mạnh của bản thân</li>
+        <li>Gợi ý giá trị cần bồi dưỡng</li>
+        <li>Gợi ý về đặc điểm của môi trường làm việc phù hợp</li>
+        <li>Gợi ý nhóm nghề phù hợp với sở thích</li>
+    </ul>',
+    0.00, NULL, TRUE,
+    '["30 câu hỏi", "Báo cáo 5 trang", "Tổng quan tính cách", "Gợi ý nghề nghiệp cơ bản", "Miễn phí 100%"]',
+    'assets/img/icon/start.jpg',
+    1
+);
+
+-- Gói có phí cho test hướng nghiệp  
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, special_features, 
+    image_url, sort_order
+) VALUES (
+    1, 'Gói Tăng tốc', 'tang-toc',
+    '<h3>🚀 Hướng nghiệp trực tuyến - Tăng tốc</h3>
+    <p><strong>Test chuyên sâu</strong> với báo cáo chi tiết 25-26 trang, phân tích toàn diện về tính cách và nghề nghiệp.</p>
+    
+    <h3>📊 Thông tin chi tiết</h3>
+    <ul>
+        <li><strong>Số câu hỏi:</strong> 120 câu</li>
+        <li><strong>Ngôn ngữ:</strong> Tiếng Việt</li>
+        <li><strong>Lứa tuổi:</strong> 14-22 tuổi</li>
+        <li><strong>Báo cáo:</strong> 25-26 trang chi tiết</li>
+    </ul>
+    
+    <h3>📋 Nội dung báo cáo chi tiết</h3>
+    <ul>
+        <li>Tổng quan mã tính cách tương ứng với môi trường nghề nghiệp, xu hướng và sở thích cá nhân</li>
+        <li>Phân tích nhóm tính cách, điểm mạnh và phong cách làm việc đặc trưng</li>
+        <li>Gợi ý giá trị cần bồi dưỡng</li>
+        <li>Đánh giá các lĩnh vực quan tâm và ngành học/lĩnh vực học</li>
+        <li>Phân tích vai trò trong công việc và môi trường làm việc phù hợp</li>
+        <li>Gợi ý nhóm nghề để phát triển tối đa các mối quan tâm và sở thích của bản thân</li>
+        <li>Hướng dẫn sử dụng các công cụ và nguồn tài nguyên để phân tích điểm mạnh, điểm yếu, và độ phù hợp của bản thân với ngành, nghề cụ thể</li>
+    </ul>',
+    1975000.00, NULL, FALSE,
+    '["120 câu hỏi", "Báo cáo 25-26 trang", "Phân tích tính cách chi tiết", "Gợi ý nghề nghiệp cụ thể", "Hướng dẫn phát triển", "Ngôn ngữ Tiếng Việt"]',
+    'assets/img/icon/speedup.jpg',
+    2
+);
+
+-- 2. SẢN PHẨM: KHÓA HỌC VIẾT LUẬN TĂNG CƯỜNG
+INSERT INTO products (
+    name, slug, short_description, full_description, type, category,
+    duration, target_audience, learning_outcomes, curriculum,
+    instructor_info, teaching_format, image_url, status, sort_order
+) VALUES (
+    'Viết luận tăng cường',
+    'viet-luan-tang-cuong',
+    'Hướng dẫn các kỹ thuật viết bài luận học thuật ở các bậc học',
+    '<h3>📚 Giới thiệu khóa học</h3>
+    <p>Khóa học được thiết kế để hướng dẫn học sinh tiếp cận và hiểu các khái niệm, kỹ năng viết luận căn bản, giúp học viên có thể xử lý các dạng bài luận học thuật một cách tự tin và có kĩ năng.</p>
+    
+    <h3>🎯 Đối tượng</h3>
+    <ul>
+        <li>Học sinh PTTH chuẩn bị đi du học</li>
+        <li>Học sinh Đại học chuẩn bị đi du học</li>
+        <li>Học sinh PTTH hoặc Đại học chuẩn bị học tập tại các trường Quốc tế tại Việt Nam</li>
+    </ul>
+    
+    <h3>📖 Nội dung học</h3>
+    <p>Nội dung chính của khóa học tập trung vào các lý thuyết và kĩ thuật viết luận cả tổng quát và chi tiết:</p>
+    <ul>
+        <li>Các loại viết học thuật thường gặp</li>
+        <li>Cấu trúc bài luận và đoạn văn</li>
+        <li>Kỹ thuật liên kết ý và cấu trúc câu</li>
+        <li>Đánh giá nguồn tài liệu và ghi chú</li>
+        <li>Kỹ thuật tóm tắt và trích dẫn</li>
+        <li>Cách tránh lỗi đạo văn</li>
+    </ul>
+    
+    <h3>👨‍🏫 Thông tin giảng dạy</h3>
+    <ul>
+        <li><strong>Thời lượng:</strong> 16 giờ</li>
+        <li><strong>Hình thức:</strong> Trực tiếp hoặc trực tuyến</li>
+        <li><strong>Giảng viên:</strong> Thạc sĩ Ngôn ngữ Anh</li>
+        <li><strong>Ưu đãi:</strong> Khi đăng ký cùng các khóa học khác hoặc đăng ký theo nhóm</li>
+    </ul>',
+    'course',
+    'writing',
+    '16 giờ',
+    '["Học sinh PTTH chuẩn bị du học", "Sinh viên đại học chuẩn bị du học", "Học sinh học tại trường quốc tế"]',
+    '<h3>🏆 Kết quả mong đợi sau khóa học</h3>
+    <ul>
+        <li>Hiểu về các dạng bài luận căn bản, áp dụng kĩ thuật viết hiệu quả để thực hành viết với các mục đích học thuật khác nhau</li>
+        <li>Hiểu và áp dụng trích dẫn, viết lại ý và tóm tắt</li>
+        <li>Biết cách lập luận thuyết phục trên cơ sở dẫn chứng</li>
+        <li>Có thể đọc và phân tích, hiểu cấu trúc của đoạn văn/bài đọc, nắm bắt cách tổ chức ý của bài</li>
+        <li>Biết cách đánh giá nguồn tài liệu và chọn tài liệu phù hợp để tham khảo</li>
+        <li>Hiểu đúng về cách trích dẫn tài liệu tham khảo để tránh lỗi đạo văn</li>
+    </ul>',
+    '<h3>📚 Chương trình học</h3>
+    <p><em>Nội dung chi tiết sẽ được cung cấp khi đăng ký</em></p>
+    
+    <h3>🏛️ Cấu trúc bài giảng</h3>
+    <p><em>Nội dung chi tiết sẽ được cung cấp khi đăng ký</em></p>',
+    'Thạc sĩ Ngôn ngữ Anh',
+    'both',
+    'assets/img/pic/essay-enhancement.jpg',
+    'active',
+    2
+);
+
+-- Gói nhóm 6 học viên
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    2, 'Nhóm 6 học viên', 'nhom-6',
+    '<h3>👥 Chương trình giảng dạy nhóm 5-6 học viên</h3>
+    <p>Chương trình giảng dạy chuyên biệt dành cho nhóm 5-6 học viên với mức giá ưu đãi nhất.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong class="text-success">5.199.000đ</strong> <span class="text-muted"><s>6.999.000đ</s></span></p>
+    
+    <h3>✨ Đặc điểm</h3>
+    <ul>
+        <li>📅 Lịch học cố định</li>
+        <li>👥 Tương tác nhóm tốt</li>
+        <li>💲 Giá ưu đãi nhất</li>
+        <li>📞 Liên hệ Hotline 0966013663 nếu có nhu cầu tổ chức khóa học khác</li>
+    </ul>',
+    6999000.00, 5199000.00, FALSE,
+    '5-6 học viên',
+    '["Lịch học cố định", "Tương tác nhóm", "Giá ưu đãi nhất", "Hotline hỗ trợ 0966013663"]',
+    'assets/img/packages/course-group-6.jpg',
+    1
+);
+
+-- Gói nhóm 4 học viên  
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    2, 'Nhóm 4 học viên', 'nhom-4',
+    '<h3>👥 Chương trình giảng dạy nhóm 3-4 học viên</h3>
+    <p>Chương trình giảng dạy chuyên biệt dành cho nhóm 3-4 học viên với lịch học linh hoạt.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong class="text-success">7.600.000đ</strong> <span class="text-muted"><s>9.999.000đ</s></span></p>
+    
+    <h3>✨ Đặc điểm</h3>
+    <ul>
+        <li>🔄 Lịch học linh hoạt theo sắp xếp của giảng viên và học viên</li>
+        <li>💬 Tương tác tốt hơn</li>
+        <li>⭐ Chất lượng cao</li>
+        <li>📞 Liên hệ Hotline 0966013663 nếu có nhu cầu tổ chức khóa học khác</li>
+    </ul>',
+    9999000.00, 7600000.00, FALSE,
+    '3-4 học viên',
+    '["Lịch học linh hoạt", "Tương tác tốt hơn", "Chất lượng cao", "Hotline hỗ trợ 0966013663"]',
+    'assets/img/packages/course-group-4.jpg',
+    2
+);
+
+-- Gói cá nhân 1:1
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    2, 'Học cá nhân 1:1', 'ca-nhan-1-1',
+    '<h3>👨‍🎓 Chương trình cá nhân hóa 1:1</h3>
+    <p>Chương trình và hoạt động giảng dạy cá nhân hóa theo nhu cầu, thời gian, và trình độ đầu vào của học viên.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong class="text-success">19.800.000đ</strong> <span class="text-muted"><s>21.000.000đ</s></span></p>
+    
+    <h3>✨ Đặc điểm</h3>
+    <ul>
+        <li>🎯 Lịch học hoàn toàn cá nhân hóa</li>
+        <li>📚 Nội dung tùy chỉnh theo nhu cầu</li>
+        <li>⭐ Chất lượng tối ưu</li>
+        <li>🤝 Hỗ trợ 1:1 toàn thời gian</li>
+        <li>📞 Liên hệ Hotline 0966013663 để trao đổi thêm chi tiết</li>
+    </ul>',
+    21000000.00, 19800000.00, FALSE,
+    '1 học viên',
+    '["Lịch học cá nhân hóa", "Nội dung tùy chỉnh", "Chất lượng tối ưu", "Hỗ trợ 1:1", "Hotline 0966013663"]',
+    'assets/img/packages/course-1on1.jpg',
+    3
+);
+
+-- 3. SẢN PHẨM: KHÓA HỌC ESSAY COACHING  
+INSERT INTO products (
+    name, slug, short_description, full_description, type, category,
+    duration, target_audience, learning_outcomes, curriculum,
+    instructor_info, teaching_format, image_url, status, sort_order
+) VALUES (
+    'Viết luận chuyên sâu – Essay Coaching',
+    'essay-coaching',
+    'Hướng dẫn hoàn chỉnh 01 bài luận có độ dài 500-1000 từ',
+    '<h3>✍️ Hướng dẫn hoàn chỉnh 1 bài luận</h3>
+    <p>Hướng dẫn hoàn chỉnh 01 bài luận có độ dài 500-1000 từ theo ý tưởng và chủ đề học sinh tự chọn.</p>
+    
+    <h3>🎯 Đối tượng</h3>
+    <ul>
+        <li>Học sinh chuẩn bị bài luận cá nhân ứng tuyển hồ sơ PTTH và Đại học</li>
+        <li>Học sinh chuẩn bị bài luận chuyên biệt xin học bổng PTTH và Đại học</li>
+        <li>Học sinh chuẩn bị hồ sơ ứng tuyển chương trình hè</li>
+        <li>Học sinh chuẩn bị bài luận ứng tuyển các cuộc thi viết, các dự án nghiên cứu bậc PTTH</li>
+    </ul>
+    
+    <h3>📖 Chủ điểm học</h3>
+    <p>Khóa học được thiết kế để hướng dẫn học sinh tiếp cận và hiểu các khái niệm, kỹ năng viết luận căn bản, giúp học viên có thể xử lý các dạng bài luận học thuật một cách tự tin và có kĩ năng.</p>
+    
+    <h3>👨‍🏫 Thông tin khóa học</h3>
+    <ul>
+        <li><strong>Thời lượng:</strong> 10 giờ</li>
+        <li><strong>Hình thức:</strong> Trực tiếp hoặc trực tuyến 1-1</li>
+        <li><strong>Giảng viên:</strong> Cử nhân hoặc Thạc sĩ trong và ngoài nước</li>
+        <li><strong>Áp dụng cho:</strong> 01 bài luận PTTH, Đại học, Thạc sĩ, Chương trình hè/Dự án nghiên cứu có độ dài 500-1000 từ</li>
+        <li><strong>Ưu đãi:</strong> Khi đăng ký cùng các khóa học khác hoặc đăng ký theo nhóm</li>
+    </ul>',
+    'course',
+    'writing',
+    '10 giờ (5 buổi)',
+    '["Học sinh chuẩn bị hồ sơ PTTH", "Học sinh xin học bổng", "Học sinh tham gia chương trình hè", "Học sinh tham gia cuộc thi viết"]',
+    '<h3>🏆 Kết quả mong đợi sau khóa học</h3>
+    <ul>
+        <li>Nắm được cấu trúc bài luận</li>
+        <li>Biết cách lên ý tưởng và chủ đề dựa trên câu chuyện của chính mình</li>
+        <li>Học được cách bố cục một bài luận</li>
+        <li>Học sinh có bài luận theo tiêu chí và yêu cầu đề bài</li>
+    </ul>',
+    '<h3>📚 Chương trình học (5 buổi)</h3>
+    <ul>
+        <li><strong>Buổi 1:</strong> Phân tích bộ hồ sơ cá nhân: điểm mạnh, điểm yếu, thành tích đã có. Tìm kiếm ý tưởng và câu chuyện cho bài luận chính. Đạo đức trong viết luận và chuẩn bị bộ hồ sơ cá nhân.</li>
+        
+        <li><strong>Buổi 2:</strong> Phản biện và phân tích về tính phù hợp và độc đáo của chủ đề. Các cách khai thác và triển khai bài luận theo chủ đề, cấu trúc đoạn văn và bài văn. Luyện tập viết bản nháp số 1.</li>
+        
+        <li><strong>Buổi 3:</strong> Phân tích và phản hồi bài luận nháp số 1: ngữ pháp và từ vựng, khả năng triển khai ý, văn phong, và thủ pháp văn học. Hướng dẫn cách phân tích các bài luận mẫu tham khảo và các kỹ năng viết hiệu quả.</li>
+        
+        <li><strong>Buổi 4:</strong> Phân tích và phản hồi bài luận nháp số 2: ngữ pháp và từ vựng, khả năng triển khai ý, văn phong, và thủ pháp văn học. Luyện tập phân tích các bài luận mẫu tham khảo và áp dụng các kỹ năng viết nâng cao.</li>
+        
+        <li><strong>Buổi 5:</strong> Sự thống nhất về cấu trúc và cách thức thể hiện của bài luận với toàn bộ hồ sơ xin học của học sinh. Hướng dẫn viết bài luận hoàn chỉnh.</li>
+    </ul>
+    
+    <h3>🏛️ Cấu trúc bài giảng</h3>
+    <ul>
+        <li>📝 Thảo luận</li>
+        <li>✍️ Viết</li>
+        <li>❓ Hỏi đáp</li>
+        <li>📊 Phân tích tình huống</li>
+    </ul>',
+    'Cử nhân hoặc Thạc sĩ trong và ngoài nước',
+    'both',
+    'assets/img/pic/essay-coaching.jpg',
+    'active',
+    3
+);
+
+-- Essay Coaching chỉ có 1 gói (1:1 coaching)
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    3, 'Essay Coaching 1:1', 'essay-coaching-1-1',
+    '<h3>👨‍🎓 Essay Coaching cá nhân 1:1</h3>
+    <p>Hướng dẫn cá nhân hoàn thiện 1 bài luận từ ý tưởng đến thành phẩm hoàn chỉnh.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong>Nội dung trống trong tài liệu gốc</strong></p>
+    
+    <h3>✨ Đặc điểm nổi bật</h3>
+    <ul>
+        <li>⏰ 10 giờ học 1:1 với chuyên gia</li>
+        <li>📅 5 buổi coaching chi tiết</li>
+        <li>📝 1 bài luận hoàn chỉnh chất lượng cao</li>
+        <li>💬 Feedback chi tiết từ chuyên gia</li>
+        <li>🔄 Lịch học linh hoạt theo nhu cầu</li>
+        <li>🎯 Cá nhân hóa 100% theo mục tiêu của học sinh</li>
+    </ul>',
+    1299000.00, 899000.00, FALSE,
+    '1 học viên',
+    '["10 giờ học 1:1", "5 buổi coaching", "1 bài luận hoàn chỉnh", "Feedback chi tiết", "Lịch học linh hoạt", "Cá nhân hóa 100%"]',
+    'assets/img/packages/essay-coaching.jpg',
+    1
+);
+
+-- 4. SẢN PHẨM: KHÓA HỌC CV VÀ PHỎNG VẤN
+INSERT INTO products (
+    name, slug, short_description, full_description, type, category,
+    duration, target_audience, learning_outcomes,
+    instructor_info, teaching_format, image_url, status, sort_order
+) VALUES (
+    'Xây dựng CV và Hướng dẫn kỹ năng Phỏng vấn',
+    'cv-va-phong-van',
+    'Hướng dẫn học sinh có buổi phỏng vấn thành công và gây ấn tượng',
+    '<h3>💼 Xây dựng CV (Resumé) và Hướng dẫn kỹ năng Phỏng vấn</h3>
+    <p>Hướng dẫn học sinh cách thức để có buổi phỏng vấn thành công và gây ấn tượng với nhà tuyển dụng.</p>
+    
+    <h3>🎯 Đối tượng</h3>
+    <ul>
+        <li>Học sinh chuẩn bị ứng tuyển hồ sơ PTTH và Đại học</li>
+        <li>Học sinh chuẩn bị ứng tuyển các cuộc thi/dự án chuyên biệt bậc PTTH và Đại học</li>
+    </ul>
+    
+    <h3>📖 Chủ điểm học/Nội dung học</h3>
+    <p>Hướng dẫn học sinh cách thức để có buổi phỏng vấn thành công và gây ấn tượng.</p>
+    
+    <h3>👨‍🏫 Thông tin khóa học</h3>
+    <ul>
+        <li><strong>Thời lượng:</strong> 08 giờ</li>
+        <li><strong>Hình thức:</strong> Trực tiếp hoặc trực tuyến 1-1</li>
+        <li><strong>Giảng viên:</strong> Cử nhân hoặc Thạc sĩ trong và ngoài nước</li>
+        <li><strong>Ưu đãi:</strong> Khi đăng ký cùng các khóa học khác hoặc đăng ký theo nhóm</li>
+    </ul>
+    
+    <h3>🏛️ Cấu trúc bài giảng</h3>
+    <ul>
+        <li>📝 Thảo luận</li>
+        <li>✍️ Viết</li>
+        <li>❓ Hỏi đáp</li>
+        <li>📊 Phân tích tình huống</li>
+    </ul>',
+    'course',
+    'career_skills',
+    '8 giờ',
+    '["Học sinh chuẩn bị ứng tuyển PTTH", "Học sinh chuẩn bị ứng tuyển đại học", "Học sinh tham gia cuộc thi/dự án"]',
+    '<h3>🏆 Kết quả mong đợi sau khóa học</h3>
+    <ul>
+        <li>Biết cách lên ý tưởng và chủ đề dựa trên câu chuyện của chính mình</li>
+        <li>Học được cách bố cục một bài luận</li>
+        <li>Học sinh có bài luận theo tiêu chí và yêu cầu đề bài</li>
+    </ul>',
+    'Cử nhân hoặc Thạc sĩ trong và ngoài nước',
+    'both',
+    'assets/img/pic/cv-interview.jpg',
+    'active',
+    4
+);
+
+-- 5. SẢN PHẨM: HƯỚNG NGHIỆP CHUYÊN GIA
+INSERT INTO products (
+    name, slug, short_description, full_description, type, category,
+    duration, target_audience, learning_outcomes, curriculum,
+    instructor_info, teaching_format, image_url, status, sort_order
+) VALUES (
+    'Hướng nghiệp cùng chuyên gia',
+    'huong-nghiep-chuyen-gia',
+    'Tư vấn hướng nghiệp chuyên sâu 1:1 với chuyên gia giáo dục quốc tế',
+    'Dịch vụ hướng nghiệp toàn diện với chuyên gia từ IECA, ACAC, CIS. Bao gồm đánh giá tâm lý có bản quyền, tư vấn 1:1, và báo cáo cá nhân hóa chi tiết.',
+    'consultation',
+    'career_guidance',
+    'Theo lịch cá nhân (5-6 buổi)',
+    '["Học sinh 14-18 tuổi", "Học sinh chuẩn bị du học", "Học sinh chưa định hướng rõ ngành nghề"]',
+    'Xác định rõ nghề nghiệp và ngành học phù hợp. Lập được lộ trình học tập dài hạn. Hiểu rõ điểm mạnh và phương hướng phát triển.',
+    '{"buoc_1": "3 bài đánh giá tâm lý có bản quyền", "buoc_2": "Tư vấn 1:1 với chuyên gia về nghề nghiệp", "buoc_3": "Phân tích báo cáo và định hướng", "extras": "Tư vấn môn học quốc tế (gói Toàn diện)"}',
+    'Chuyên gia từ IECA, ACAC, CIS với 10+ năm kinh nghiệm',
+    'both',
+    'assets/img/pic/huong_nghiep_chuyen_gia.jpg',
+    'active',
+    5
+);
+
+-- Gói Cố vấn Thành viên
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    4, 'Cố vấn Thành viên', 'co-van-thanh-vien',
+    '<h3>👨‍💼 Cố vấn Thành viên</h3>
+    <p>Tư vấn cơ bản về CV và kỹ năng phỏng vấn với chuyên gia có kinh nghiệm.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong>9.900.000đ</strong> (giá gốc 9.900.000đ)</p>
+    <p><em>Ưu đãi khi đăng ký cùng các khóa học khác hoặc đăng ký theo nhóm.</em></p>
+    
+    <h3>✨ Đặc điểm nổi bật</h3>
+    <ul>
+        <li>⏰ 8 giờ tư vấn chuyên sâu</li>
+        <li>📝 CV cá nhân hóa theo ngành</li>
+        <li>🎭 Luyện phỏng vấn thực tế</li>
+        <li>👨‍🏫 Cố vấn có kinh nghiệm</li>
+        <li>📞 Hỗ trợ tư vấn thêm qua hotline</li>
+    </ul>',
+    9900000.00, NULL, FALSE,
+    '1 học viên',
+    '["8 giờ tư vấn", "CV cá nhân hóa", "Luyện phỏng vấn", "Cố vấn có kinh nghiệm", "Ưu đãi khi đăng ký combo"]',
+    'assets/img/packages/cv-advisor-basic.jpg',
+    1
+);
+
+-- Gói Cố vấn Cao cấp
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    4, 'Cố vấn Cao cấp', 'co-van-cao-cap',
+    '<h3>⭐ Cố vấn Cao cấp</h3>
+    <p>Tư vấn chuyên sâu với chuyên gia hàng đầu, dịch vụ cao cấp và toàn diện.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong>15.900.000đ</strong> (giá gốc 15.900.000đ)</p>
+    <p><em>Ưu đãi khi đăng ký cùng các khóa học khác hoặc đăng ký theo nhóm.</em></p>
+    
+    <h3>✨ Đặc điểm nổi bật</h3>
+    <ul>
+        <li>⏰ 8 giờ tư vấn cao cấp với chuyên gia senior</li>
+        <li>💼 CV chuyên nghiệp đẳng cấp quốc tế</li>
+        <li>🎬 Mock interview (phỏng vấn mô phỏng) chi tiết</li>
+        <li>👔 Chuyên gia senior với kinh nghiệm quốc tế</li>
+        <li>🤝 Hỗ trợ sau khóa học dài hạn</li>
+        <li>📞 Ưu tiên hỗ trợ qua hotline</li>
+    </ul>',
+    15900000.00, NULL, FALSE,
+    '1 học viên',
+    '["8 giờ tư vấn cao cấp", "CV chuyên nghiệp quốc tế", "Mock interview", "Chuyên gia senior", "Hỗ trợ sau khóa học", "Ưu đãi combo"]',
+    'assets/img/packages/cv-advisor-premium.jpg',
+    2
+);
+
+-- CÁC GÓI CHO HƯỚNG NGHIỆP CHUYÊN GIA (product_id = 5)
+-- Gói Học đường
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    5, 'Gói Học đường', 'hoc-duong',
+    '<h3>🎓 Gói Học đường</h3>
+    <p><strong>Hướng nghiệp chuyên sâu cho học sinh 15-18 tuổi</strong></p>
+    <p>Dành cho học sinh đang tìm hiểu về định hướng chuyên ngành và lộ trình học tập phù hợp.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong>14.750.000đ</strong> (giá gốc 14.750.000đ)</p>
+    <p><em>Dành riêng cho học sinh 15-18 tuổi</em></p>
+    
+    <h3>🎯 Đối tượng phù hợp</h3>
+    <ul>
+        <li>📚 Học sinh 15-18 tuổi</li>
+        <li>🎯 Cần định hướng chuyên ngành</li>
+        <li>📈 Lập kế hoạch học tập dài hạn</li>
+        <li>🌟 Khám phá điểm mạnh bản thân</li>
+    </ul>
+    
+    <h3>📋 Quy trình thực hiện</h3>
+    <ul>
+        <li>🧠 <strong>3 bài đánh giá tâm lý có bản quyền</strong></li>
+        <li>👨‍🏫 <strong>5 buổi tư vấn 1:1</strong> với chuyên gia</li>
+        <li>📊 <strong>3 báo cáo cá nhân hóa</strong> chi tiết</li>
+        <li>🌐 <strong>Song ngữ Việt-Anh</strong> linh hoạt</li>
+    </ul>
+    
+    <h3>👨‍💼 Đội ngũ chuyên gia</h3>
+    <ul>
+        <li>🏆 Chứng nhận từ IECA, ACAC, CIS</li>
+        <li>🌍 Kinh nghiệm quốc tế 10+ năm</li>
+        <li>🎓 Chuyên sâu về giáo dục</li>
+    </ul>
+    
+    <h3>🏆 Kết quả đạt được</h3>
+    <ul>
+        <li>🗺️ Lộ trình học tập rõ ràng</li>
+        <li>🎯 Chuyên ngành phù hợp</li>
+        <li>💡 Hiểu rõ điểm mạnh bản thân</li>
+        <li>📈 Kế hoạch phát triển cá nhân</li>
+    </ul>',
+    14750000.00, NULL, FALSE,
+    '1 học viên',
+    '["3 bài đánh giá tâm lý có bản quyền", "5 buổi tư vấn 1:1", "3 báo cáo cá nhân hóa", "Chuyên gia IECA/ACAC/CIS", "Lứa tuổi 15-18", "Song ngữ Việt-Anh"]',
+    'assets/img/icon/sand_clock.png',
+    1
+);
+
+-- Gói Toàn diện  
+INSERT INTO product_packages (
+    product_id, package_name, package_slug, package_description,
+    original_price, sale_price, is_free, group_size,
+    special_features, image_url, sort_order
+) VALUES (
+    5, 'Gói Toàn diện', 'toan-dien',
+    '<h3>🌟 Gói Toàn diện</h3>
+    <p><strong>Hướng nghiệp toàn diện với lộ trình 2 giai đoạn</strong></p>
+    <p>Chương trình hướng nghiệp toàn diện nhất dành cho học sinh 14-17 tuổi với nhiều tính năng độc quyền.</p>
+    
+    <h3>💰 Học phí</h3>
+    <p><strong>24.750.000đ</strong> (giá gốc 24.750.000đ)</p>
+    <p><em>Gói cao cấp nhất với nhiều tính năng độc quyền</em></p>
+    
+    <h3>🎯 Đối tượng phù hợp</h3>
+    <ul>
+        <li>📚 Học sinh 14-17 tuổi</li>
+        <li>🌍 Định hướng học tập quốc tế</li>
+        <li>🎯 Cần lộ trình dài hạn chi tiết</li>
+        <li>🏆 Mong muốn phát triển toàn diện</li>
+    </ul>
+    
+    <h3>📋 Quy trình thực hiện (2 giai đoạn)</h3>
+    <ul>
+        <li>🧠 <strong>3 bài đánh giá tâm lý có bản quyền</strong></li>
+        <li>👨‍🏫 <strong>6 buổi tư vấn 1:1</strong> với chuyên gia</li>
+        <li>📊 <strong>3 báo cáo cá nhân hóa</strong> chi tiết</li>
+        <li>📚 <strong>Tư vấn môn học quốc tế</strong> (IGCSE, AP, IB, A Levels)</li>
+        <li>🎓 <strong>Học chuyên ngành mô phỏng</strong></li>
+        <li>👥 <strong>Buổi trao đổi với phụ huynh</strong></li>
+        <li>🌐 <strong>Song ngữ Việt-Anh</strong> linh hoạt</li>
+    </ul>
+    
+    <h3>🏆 Tính năng độc quyền</h3>
+    <ul>
+        <li>📈 <strong>Lộ trình 2 giai đoạn</strong> chi tiết</li>
+        <li>🌍 <strong>Tư vấn chương trình quốc tế</strong></li>
+        <li>🎭 <strong>Trải nghiệm chuyên ngành mô phỏng</strong></li>
+        <li>👨‍👩‍👧‍👦 <strong>Buổi họp với phụ huynh</strong></li>
+        <li>📞 <strong>Hỗ trợ sau tư vấn dài hạn</strong></li>
+    </ul>
+    
+    <h3>🏆 Kết quả đạt được</h3>
+    <ul>
+        <li>🗺️ Lộ trình học tập toàn diện 2 giai đoạn</li>
+        <li>🎯 Định hướng chuyên ngành và nghề nghiệp</li>
+        <li>🌍 Hiểu rõ chương trình học quốc tế</li>
+        <li>💡 Trải nghiệm thực tế chuyên ngành</li>
+        <li>🤝 Sự đồng thuận từ gia đình</li>
+        <li>📈 Kế hoạch phát triển dài hạn</li>
+    </ul>',
+    24750000.00, NULL, FALSE,
+    '1 học viên',
+    '["3 bài đánh giá tâm lý có bản quyền", "6 buổi tư vấn 1:1", "3 báo cáo cá nhân hóa", "Lộ trình 2 giai đoạn", "Tư vấn môn học quốc tế (IGCSE, AP, IB, A Levels)", "Học chuyên ngành mô phỏng", "Buổi trao đổi với phụ huynh", "Lứa tuổi 14-17", "Song ngữ Việt-Anh"]',
+    'assets/img/icon/bulb.jpg',
+    2
+);
 
 -- =====================================================
 -- THÔNG BÁO HOÀN THÀNH
 -- =====================================================
-SELECT 'Sample data inserted successfully!' as message,
-       (SELECT COUNT(*) FROM users) as total_users,
-       (SELECT COUNT(*) FROM products) as total_products,
-       (SELECT COUNT(*) FROM orders) as total_orders;
+SELECT 
+    'Sample data updated with new PAC career guidance packages!' as message,
+    (SELECT COUNT(*) FROM products) as total_products,
+    (SELECT COUNT(*) FROM product_packages) as total_packages,
+    'Products: Test Hướng nghiệp + 3 Courses + CV/Interview + Career Expert Consultation' as products_summary,
+    'Ready for testing!' as status;
