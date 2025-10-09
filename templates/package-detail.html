@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết gói hướng nghiệp - PAC Group</title>
+    <meta name="description" content="Chi tiết gói hướng nghiệp của PAC Group - Thông tin đầy đủ về dịch vụ, giá cả và quy trình.">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .package-detail-page {
+            min-height: 100vh;
+            background: var(--background-color);
+        }
+        
+        .page-hero {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            color: var(--contrast-color);
+            padding: 140px 0 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/banner/1.jpg') center/cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .page-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-family: var(--heading-font);
+            color: #fff89e; /* PAC Yellow với chút trắng để nổi bật trên nền tím */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 24px;
+            opacity: 0.95;
+            font-family: var(--default-font);
+        }
+        
+        .breadcrumb-nav {
+            background: var(--bg-light);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light-purple);
+        }
+        
+        .breadcrumb {
+            background: none;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--brand-primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--neutral-gray);
+        }
+        
+        .package-detail-section {
+            padding: 60px 0;
+        }
+        
+        .package-header-section {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+        }
+        
+        .package-image {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            display: block;
+        }
+        
+        .package-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .package-image:hover img {
+            transform: scale(1.05);
+        }
+        
+        .package-main-info {
+            flex: 1;
+        }
+        
+        .package-name-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            font-family: var(--heading-font);
+        }
+        
+        .package-short-desc {
+            font-size: 1.1rem;
+            color: var(--default-color);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .package-price-display {
+            margin-bottom: 20px;
+        }
+        
+        .price-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .price-original-large {
+            color: var(--neutral-gray);
+            text-decoration: line-through;
+            font-size: 1.4rem;
+            margin-right: 15px;
+        }
+        
+        .price-savings {
+            background: var(--brand-accent);
+            color: var(--brand-secondary);
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .package-meta-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--brand-primary);
+        }
+        
+        .package-info {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .package-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+        }
+        
+        .package-price {
+            margin-bottom: 25px;
+        }
+        
+        .price-free {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
+            color: var(--contrast-color);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .price-amount {
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .price-original {
+            color: var(--neutral-gray);
+            text-decoration: line-through;
+            font-size: 1.2rem;
+            margin-left: 10px;
+        }
+        
+        .price-discount {
+            background: var(--brand-accent);
+            color: var(--brand-secondary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .package-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--light-purple);
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            color: var(--default-color);
+            font-size: 0.95rem;
+        }
+        
+        .meta-item i {
+            color: var(--brand-primary);
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .package-content {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .content-section {
+            margin-bottom: 40px;
+        }
+        
+        .content-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .content-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+            border-left: 4px solid var(--brand-primary);
+            padding-left: 15px;
+        }
+        
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .feature-item {
+            background: var(--bg-light);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid var(--brand-primary);
+        }
+        
+        .feature-item i {
+            color: var(--brand-primary);
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .btn-pac-primary {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border: none;
+            color: var(--contrast-color);
+            padding: 15px 30px;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-pac-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--brand-primary-rgb), 0.3);
+            color: var(--contrast-color);
+        }
+        
+        .btn-pac-outline {
+            background: transparent;
+            border: 2px solid var(--brand-primary);
+            color: var(--brand-primary);
+            padding: 13px 28px;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-pac-outline:hover {
+            background: var(--brand-primary);
+            color: var(--contrast-color);
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        .error-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--surface-color);
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+        
+        .error-message i {
+            font-size: 4rem;
+            color: var(--neutral-gray);
+            margin-bottom: 20px;
+        }
+        
+        .error-message h3 {
+            color: var(--heading-color);
+            margin-bottom: 15px;
+        }
+        
+        .error-message p {
+            color: var(--neutral-gray);
+            margin-bottom: 25px;
+        }
+        
+        .related-packages {
+            background: var(--bg-light);
+            padding: 60px 0;
+            margin-top: 60px;
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            text-align: center;
+            margin-bottom: 50px;
+            font-family: var(--heading-font);
+        }
+        
+        .package-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+        
+        .package-card-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .package-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .package-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 12px;
+        }
+        
+        .package-card-price {
+            color: var(--brand-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .package-header-section {
+                padding: 30px 20px;
+            }
+            
+            .package-content {
+                padding: 25px;
+                margin-bottom: 20px;
+            }
+            
+            .package-name-display {
+                font-size: 1.8rem;
+                text-align: center;
+                margin-top: 20px;
+            }
+            
+            .package-image {
+                max-width: 250px;
+                height: 250px;
+            }
+            
+            .price-large {
+                font-size: 2rem;
+                text-align: center;
+            }
+            
+            .package-meta-inline {
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 25px;
+            }
+            
+            .btn-pac-primary,
+            .btn-pac-outline {
+                text-align: center;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="package-detail-page">
+    <!-- Header -->
+    <div id="header-section"></div>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" id="page-title">Giải pháp hướng nghiệp</h1>
+                    <p class="hero-subtitle" id="page-subtitle">Tìm ra giải pháp định hướng phù hợp</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-nav">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="huongnghiep">Hướng nghiệp</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" id="breadcrumb-current">Chi tiết giải pháp</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="loading-spinner">
+        <div class="spinner-border text-brand-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-state" class="container" style="display: none;">
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Không tìm thấy gói dịch vụ</h3>
+            <p>Gói dịch vụ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+            <a href="huongnghiep" class="btn btn-pac-primary">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại trang hướng nghiệp
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" style="display: none;">
+        <section class="package-detail-section">
+            <div class="container">
+                <!-- Package Header Section -->
+                <div class="package-header-section">
+                    <div class="row align-items-center">
+                        <!-- Package Image -->
+                        <div class="col-lg-4 col-md-5 text-center mb-4 mb-md-0">
+                            <div class="package-image" id="package-image-container">
+                                <img id="package-image" src="" alt="Package Image">
+                            </div>
+                        </div>
+                        
+                        <!-- Package Main Info -->
+                        <div class="col-lg-8 col-md-7">
+                            <div class="package-main-info">
+                                <h1 class="package-name-display" id="package-title-main"></h1>
+                                <p class="package-short-desc" id="package-short-description"></p>
+                                
+                                <div class="package-price-display" id="package-price-main"></div>
+                                
+                                <div class="package-meta-inline" id="package-meta-inline"></div>
+                                
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-pac-primary" id="register-btn">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        Đăng ký ngay
+                                    </a>
+                                    <a href="#" class="btn-pac-outline" id="contact-btn">
+                                        <i class="fas fa-phone"></i>
+                                        Liên hệ tư vấn
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package Content Sections -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="package-content">
+                            <div class="content-section">
+                                <h3 class="content-title">Mô tả chi tiết</h3>
+                                <div id="package-description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="package-content">
+                            <div class="content-section">
+                                <h3 class="content-title">Đặc điểm nổi bật</h3>
+                                <div class="features-list" id="package-features"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Packages -->
+        <section class="related-packages">
+            <div class="container">
+                <h2 class="section-title">Các gói khác cùng dịch vụ</h2>
+                <div class="row g-4" id="related-packages-container">
+                    <!-- Related packages will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-section"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Vendor JS -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+
+    <!-- Main JS -->
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/main.js"></script>
+
+    <!-- Page specific JS -->
+    <script>
+        // Page components configuration
+        window.pageComponentsConfig = {
+            header: 'header.html',
+            footer: 'footer.html'
+        };
+
+        class PackageDetailManager {
+            constructor() {
+                this.packageId = null;
+                this.packageData = null;
+                this.init();
+            }
+
+            init() {
+                // Get package ID from URL parameter (set by .htaccess rewrite)
+                const urlParams = new URLSearchParams(window.location.search);
+                let packageId = urlParams.get('id');
+                
+                // Fallback: parse from URL path if rewrite didn't work
+                if (!packageId) {
+                    const pathMatch = window.location.pathname.match(/goihuongnghiep-(\d+)/);
+                    if (pathMatch) {
+                        packageId = pathMatch[1];
+                    }
+                }
+                
+                this.packageId = packageId;
+                
+                console.log('Full URL:', window.location.href);
+                console.log('URL pathname:', window.location.pathname);
+                console.log('URL search params:', window.location.search);
+                console.log('All URL params:', Object.fromEntries(urlParams));
+                console.log('Package ID from URL:', this.packageId);
+                
+                if (!this.packageId) {
+                    console.log('No package ID found, showing error');
+                    this.showError();
+                    return;
+                }
+
+                this.loadPackageDetail();
+            }
+
+            async loadPackageDetail() {
+                try {
+                    console.log('Loading package detail for ID:', this.packageId);
+                    const response = await fetch(`api/services/package-detail.php?package_id=${this.packageId}`);
+                    const data = await response.json();
+                    console.log('API response:', data);
+
+                    if (data.success && data.data) {
+                        this.packageData = data.data;
+                        console.log('Package data:', this.packageData);
+                        this.renderPackageDetail();
+                        this.loadRelatedPackages();
+                    } else {
+                        console.log('API error or no data:', data);
+                        this.showError();
+                    }
+                } catch (error) {
+                    console.error('Error loading package detail:', error);
+                    this.showError();
+                }
+            }
+
+            renderPackageDetail() {
+                const { package: pkg, product } = this.packageData;
+
+                // Update page title and meta
+                document.title = `${pkg.package_name} - PAC Group`;
+                document.getElementById('page-title').textContent = pkg.package_name;
+                document.getElementById('page-subtitle').textContent = product ? product.short_description : '';
+                document.getElementById('breadcrumb-current').textContent = pkg.package_name;
+
+                // Package image
+                const imageContainer = document.getElementById('package-image-container');
+                const imageEl = document.getElementById('package-image');
+                if (pkg.image_url) {
+                    imageEl.src = pkg.image_url;
+                    imageEl.alt = pkg.package_name;
+                } else {
+                    imageContainer.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 bg-light"><i class="fas fa-image fa-3x text-muted"></i></div>';
+                }
+
+                // Package main info
+                document.getElementById('package-title-main').textContent = pkg.package_name;
+                
+                // Short description from product
+                const shortDescEl = document.getElementById('package-short-description');
+                if (product && product.short_description) {
+                    shortDescEl.textContent = product.short_description;
+                } else {
+                    shortDescEl.style.display = 'none';
+                }
+
+                // Package price (main display)
+                this.renderMainPrice(pkg);
+
+                // Package meta (inline)
+                this.renderInlineMeta(pkg, product);
+
+                // Package description
+                document.getElementById('package-description').innerHTML = pkg.package_description;
+
+                // Package features
+                this.renderFeatures(pkg);
+
+                // Show main content
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+
+            renderMainPrice(pkg) {
+                const priceContainer = document.getElementById('package-price-main');
+                
+                if (pkg.is_free) {
+                    priceContainer.innerHTML = '<span class="price-free">Miễn phí</span>';
+                } else {
+                    let priceHTML = `<span class="price-large">${this.formatPrice(pkg.final_price)} VNĐ</span>`;
+                    
+                    if (pkg.discount_percent > 0) {
+                        priceHTML += `<div><span class="price-original-large">${this.formatPrice(pkg.original_price)} VNĐ</span>`;
+                        priceHTML += `<span class="price-savings">Tiết kiệm ${this.formatPrice(pkg.original_price - pkg.final_price)} VNĐ</span></div>`;
+                    }
+                    
+                    priceContainer.innerHTML = priceHTML;
+                }
+            }
+
+            renderInlineMeta(pkg, product) {
+                const metaContainer = document.getElementById('package-meta-inline');
+                let metaHTML = '';
+
+                if (pkg.group_size) {
+                    metaHTML += `
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span>${pkg.group_size}</span>
+                        </div>
+                    `;
+                }
+
+                if (product && product.duration) {
+                    metaHTML += `
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${product.duration}</span>
+                        </div>
+                    `;
+                }
+
+                if (product && product.type) {
+                    const typeLabel = this.getTypeLabel(product.type);
+                    metaHTML += `
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>${typeLabel}</span>
+                        </div>
+                    `;
+                }
+
+                metaContainer.innerHTML = metaHTML;
+            }
+
+            renderFeatures(pkg) {
+                const featuresContainer = document.getElementById('package-features');
+                
+                if (pkg.special_features && Array.isArray(pkg.special_features)) {
+                    const featuresHTML = pkg.special_features.map(feature => `
+                        <div class="feature-item">
+                            <i class="fas fa-check"></i>
+                            <span>${feature}</span>
+                        </div>
+                    `).join('');
+                    
+                    featuresContainer.innerHTML = featuresHTML;
+                } else {
+                    featuresContainer.innerHTML = '<p class="text-muted">Chưa có thông tin đặc điểm.</p>';
+                }
+            }
+
+            async loadRelatedPackages() {
+                if (!this.packageData.product) return;
+
+                try {
+                    const response = await fetch(`api/services/packages.php?product_id=${this.packageData.product.id}`);
+                    const data = await response.json();
+
+                    if (data.success && data.data.packages) {
+                        // Filter out current package
+                        const relatedPackages = data.data.packages.filter(pkg => 
+                            pkg.package_id !== this.packageData.package.package_id
+                        );
+                        
+                        this.renderRelatedPackages(relatedPackages);
+                    }
+                } catch (error) {
+                    console.error('Error loading related packages:', error);
+                }
+            }
+
+            renderRelatedPackages(packages) {
+                const container = document.getElementById('related-packages-container');
+                
+                if (packages.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Không có gói khác cùng dịch vụ.</p></div>';
+                    return;
+                }
+
+                const packagesHTML = packages.map(pkg => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="package-card">
+                            ${pkg.image_url ? `
+                                <div class="package-card-image">
+                                    <img src="${pkg.image_url}" alt="${pkg.package_name}" loading="lazy">
+                                </div>
+                            ` : ''}
+                            <h4 class="package-card-title">${pkg.package_name}</h4>
+                            <div class="package-card-price">
+                                ${pkg.is_free ? 
+                                    'Miễn phí' : 
+                                    `${this.formatPrice(pkg.final_price)} VNĐ`
+                                }
+                            </div>
+                            <a href="goihuongnghiep-${pkg.package_id}" class="btn btn-pac-primary btn-sm w-100">
+                                <i class="fas fa-eye me-1"></i>
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = packagesHTML;
+            }
+
+            showError() {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('error-state').style.display = 'block';
+            }
+
+            getTypeLabel(type) {
+                const typeLabels = {
+                    'career_test': 'Test hướng nghiệp',
+                    'course': 'Khóa học',
+                    'consultation': 'Tư vấn',
+                    'coaching': 'Coaching'
+                };
+                return typeLabels[type] || type;
+            }
+
+            formatPrice(price) {
+                return new Intl.NumberFormat('vi-VN').format(price);
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            new PackageDetailManager();
+        });
+    </script>
+</body>
+</html>
