@@ -771,7 +771,7 @@
                                 }
                             </ul>
                         </div>                                        <div class="course-footer-section">
-                                            <button class="btn btn-course" onclick="viewCourseDetails('${course.slug}')">
+                                            <button class="btn btn-course" onclick="viewCourseDetails('${course.id}')">
                                                 <i class="fas fa-graduation-cap"></i>
                                                 Xem Chi Tiết Khóa Học
                                             </button>
@@ -809,8 +809,8 @@
         }
         
         // View course details
-        function viewCourseDetails(slug) {
-            window.location.href = `product-detail.html?slug=${slug}`;
+        function viewCourseDetails(courseId) {
+            window.location.href = `chitietkhoahoc-${courseId}`;
         }
         
         // Load stats from API

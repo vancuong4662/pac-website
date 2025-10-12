@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Khóa Học - PAC Website</title>
+    <meta name="description" content="Thông tin chi tiết về khóa học và các gói đào tạo của PAC Group">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .course-detail-page {
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb-section {
+            background: var(--surface-color);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light-purple);
+        }
+        
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: var(--brand-primary);
+            font-weight: bold;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--brand-primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: var(--default-color);
+        }
+        
+        /* Course Hero Section */
+        .course-hero {
+            background: linear-gradient(135deg, rgba(96, 40, 170, 0.95) 0%, rgba(139, 69, 255, 0.95) 100%);
+            color: var(--contrast-color);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/banner/banner-1024x507.png') center/cover;
+            opacity: 0.05;
+            z-index: 1;
+        }
+        
+        .course-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .course-meta-badges {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .course-badge {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--brand-primary);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .course-hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: #fff200;
+        }
+        
+        .course-hero-description {
+            font-size: 1.3rem;
+            margin-bottom: 35px;
+            opacity: 1;
+            line-height: 1.6;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+            font-weight: 400;
+        }
+        
+        .course-hero-image {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        .course-hero-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .hero-cta {
+            margin-top: 20px;
+        }
+        
+        .hero-cta .btn-course {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--brand-primary);
+            border: none;
+            padding: 16px 32px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .hero-cta .btn-course:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            background: var(--contrast-color);
+            color: var(--brand-primary);
+        }
+        
+        /* Course Content Section */
+        .course-content {
+            padding: 80px 0;
+            background: var(--background-color);
+        }
+        
+        .course-content-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.08);
+            border: 1px solid var(--light-purple);
+            margin-bottom: 40px;
+        }
+        
+        .content-section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--brand-primary);
+            display: inline-block;
+        }
+        
+        .course-content-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin: 25px 0 15px 0;
+        }
+        
+        .course-content-card p {
+            color: var(--default-color);
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+        
+        .course-content-card ul {
+            color: var(--default-color);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .course-content-card li {
+            margin-bottom: 8px;
+        }
+        
+        /* Packages Section */
+        .packages-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+        
+        .packages-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .packages-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .packages-subtitle {
+            font-size: 1.2rem;
+            color: var(--neutral-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .package-card {
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.08);
+            border: 1px solid var(--light-purple);
+            height: 100%;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(var(--brand-secondary-rgb), 0.15);
+        }
+        
+        .package-card.featured {
+            border: 2px solid var(--brand-primary);
+            position: relative;
+        }
+        
+        .package-card.featured::before {
+            content: 'Phổ biến';
+            position: absolute;
+            top: -1px;
+            right: 30px;
+            background: var(--brand-primary);
+            color: var(--contrast-color);
+            padding: 8px 20px;
+            border-radius: 0 0 15px 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .package-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .package-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 10px;
+        }
+        
+        .package-price {
+            margin-bottom: 20px;
+        }
+        
+        .price-current {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            display: block;
+        }
+        
+        .price-original {
+            font-size: 1.1rem;
+            color: var(--neutral-gray);
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+        
+        .price-free {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--success-color);
+            display: block;
+        }
+        
+        .package-group-size {
+            background: var(--brand-accent);
+            color: var(--dark-color);
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .package-description {
+            margin-bottom: 25px;
+        }
+        
+        .package-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+        
+        .package-features li {
+            padding: 8px 0;
+            color: var(--default-color);
+            position: relative;
+            padding-left: 30px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .package-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            color: var(--brand-primary);
+            font-weight: bold;
+            font-size: 1rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(var(--brand-primary-rgb), 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-package {
+            width: 100%;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-package:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--brand-primary-rgb), 0.3);
+            color: var(--contrast-color);
+        }
+        
+        .btn-package-outline {
+            background: transparent;
+            color: var(--brand-primary);
+            border: 2px solid var(--brand-primary);
+        }
+        
+        .btn-package-outline:hover {
+            background: var(--brand-primary);
+            color: var(--contrast-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .course-hero {
+                padding: 60px 0;
+            }
+            
+            .course-hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .course-hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .course-hero-image img {
+                height: 300px;
+            }
+            
+            .packages-title {
+                font-size: 2rem;
+            }
+            
+            .course-meta-badges {
+                justify-content: flex-start;
+                gap: 10px;
+            }
+            
+            .course-badge {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .course-content {
+                padding: 60px 0;
+            }
+            
+            .packages-section {
+                padding: 60px 0;
+            }
+            
+            .course-content-card {
+                padding: 30px 20px;
+            }
+            
+            .package-card {
+                padding: 25px 20px;
+                margin-bottom: 25px;
+            }
+            
+            .course-meta-badges {
+                justify-content: center;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .course-hero {
+                text-align: center;
+            }
+            
+            .course-hero-title {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            
+            .course-hero-description {
+                font-size: 1rem;
+                margin-bottom: 25px;
+            }
+            
+            .hero-cta .btn-course {
+                padding: 14px 28px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="course-detail-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-section">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/khoahoc">Khóa học</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" id="breadcrumbCourseName">Chi tiết khóa học</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+    
+    <!-- Course Hero -->
+    <section class="course-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="course-meta-badges" id="courseMetaBadges">
+                        <!-- Course meta badges will be loaded here -->
+                    </div>
+                    
+                    <h1 class="course-hero-title" id="courseHeroTitle">
+                        <!-- Course title will be loaded here -->
+                    </h1>
+                    
+                    <p class="course-hero-description" id="courseHeroDescription">
+                        <!-- Course description will be loaded here -->
+                    </p>
+                    
+                    <div class="hero-cta">
+                        <a href="#packages" class="btn btn-course">
+                            <i class="fas fa-arrow-down"></i>
+                            Xem Các Gói Đào Tạo
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="course-hero-image">
+                        <img id="courseHeroImage" src="assets/img/khoa-hoc/default-course.jpg" alt="Course Image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Course Content -->
+    <section class="course-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="course-content-card" data-aos="fade-up">
+                        <h2 class="content-section-title">Thông Tin Chi Tiết Khóa Học</h2>
+                        <div id="courseFullDescription">
+                            <!-- Full course description will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Packages Section -->
+    <section class="packages-section" id="packages">
+        <div class="container">
+            <div class="packages-header" data-aos="fade-up">
+                <h2 class="packages-title">Chọn Gói Đào Tạo Phù Hợp</h2>
+                <p class="packages-subtitle">
+                    Chọn gói đào tạo phù hợp với nhu cầu và ngân sách của bạn
+                </p>
+            </div>
+            
+            <div class="row" id="packagesGrid">
+                <!-- Packages will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title" data-aos="fade-up">
+                        Sẵn Sàng Bắt Đầu Học Tập?
+                    </h2>
+                    <p class="cta-description" data-aos="fade-up" data-aos-delay="100">
+                        Đăng ký ngay để nhận tư vấn chi tiết về khóa học và chọn gói phù hợp nhất với bạn.
+                    </p>
+                    <a href="#" class="btn btn-cta" data-aos="fade-up" data-aos-delay="200" onclick="showContactInfo()">
+                        <i class="fas fa-phone"></i>
+                        Tư Vấn Miễn Phí
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/header-cart.js"></script>
+    <script src="assets/js/pac-services.js"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Course Detail Manager
+        class CourseDetailManager {
+            constructor() {
+                this.courseId = this.getCourseIdFromUrl();
+                this.courseData = null;
+                this.packagesData = [];
+            }
+            
+            getCourseIdFromUrl() {
+                const url = window.location.href;
+                console.log('🔍 Current URL:', url);
+                
+                // Extract ID from different URL patterns
+                let courseId = null;
+                
+                // Pattern 1: chitietkhoahoc-{id}
+                const rewriteMatch = url.match(/chitietkhoahoc-([^\/\?]+)/);
+                if (rewriteMatch) {
+                    courseId = rewriteMatch[1];
+                    console.log('📍 Found course ID from rewrite URL:', courseId);
+                    return courseId;
+                }
+                
+                // Pattern 2: course-detail.html?id=X
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('id')) {
+                    courseId = urlParams.get('id');
+                    console.log('📍 Found course ID from URL params:', courseId);
+                    return courseId;
+                }
+                
+                // Pattern 3: Extract from full path as fallback
+                const pathMatch = window.location.pathname.match(/chitietkhoahoc-([^\/]+)/);
+                if (pathMatch) {
+                    courseId = pathMatch[1];
+                    console.log('📍 Found course ID from pathname:', courseId);
+                    return courseId;
+                }
+                
+                console.warn('⚠️ No course ID found in URL');
+                return null;
+            }
+            
+            async loadCourseData() {
+                if (!this.courseId) {
+                    throw new Error('Course ID not found');
+                }
+                
+                try {
+                    console.log('🔄 Loading course data for ID:', this.courseId);
+                    
+                    // Call API to get course details
+                    const response = await fetch(`api/services/detail.php?id=${this.courseId}&include_packages=true`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const apiData = await response.json();
+                    console.log('📦 API Response:', apiData);
+                    
+                    if (!apiData.success || !apiData.data) {
+                        throw new Error('Invalid API response or course not found');
+                    }
+                    
+                    this.courseData = apiData.data;
+                    this.packagesData = apiData.data.packages || [];
+                    
+                    console.log('✅ Course data loaded:', this.courseData);
+                    console.log('📦 Packages data:', this.packagesData);
+                    
+                } catch (error) {
+                    console.error('❌ Error loading course data:', error);
+                    throw error;
+                }
+            }
+            
+            renderCourseHero() {
+                if (!this.courseData) return;
+                
+                const course = this.courseData;
+                
+                // Update page title
+                document.title = `${course.name} - PAC Website`;
+                
+                // Update breadcrumb
+                document.getElementById('breadcrumbCourseName').textContent = course.name;
+                
+                // Render meta badges
+                const metaBadges = [];
+                if (course.category) metaBadges.push(`<span class="course-badge">${course.category}</span>`);
+                if (course.duration) metaBadges.push(`<span class="course-badge"><i class="fas fa-clock me-1"></i>${course.duration}</span>`);
+                if (course.teaching_format) {
+                    const formatText = course.teaching_format === 'both' ? 'Trực tiếp & Online' : 
+                                     course.teaching_format === 'online' ? 'Trực tuyến' : 'Trực tiếp';
+                    metaBadges.push(`<span class="course-badge"><i class="fas fa-chalkboard-teacher me-1"></i>${formatText}</span>`);
+                }
+                document.getElementById('courseMetaBadges').innerHTML = metaBadges.join('');
+                
+                // Render hero content
+                document.getElementById('courseHeroTitle').textContent = course.name;
+                document.getElementById('courseHeroDescription').textContent = course.short_description || '';
+                
+                // Update hero image
+                const heroImage = document.getElementById('courseHeroImage');
+                if (course.image_url) {
+                    heroImage.src = course.image_url;
+                    heroImage.alt = course.name;
+                }
+            }
+            
+            renderCourseContent() {
+                if (!this.courseData) return;
+                
+                const course = this.courseData;
+                const contentContainer = document.getElementById('courseFullDescription');
+                
+                if (course.full_description) {
+                    contentContainer.innerHTML = course.full_description;
+                } else {
+                    contentContainer.innerHTML = '<p>Thông tin chi tiết sẽ được cập nhật sớm.</p>';
+                }
+            }
+            
+            renderPackages() {
+                const packagesGrid = document.getElementById('packagesGrid');
+                if (!packagesGrid) return;
+                
+                if (!this.packagesData || this.packagesData.length === 0) {
+                    packagesGrid.innerHTML = `
+                        <div class="col-12">
+                            <div class="text-center py-5">
+                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <h3 class="text-muted">Chưa có gói đào tạo</h3>
+                                <p class="text-muted">Vui lòng liên hệ để biết thêm thông tin về các gói đào tạo.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let packagesHTML = '';
+                this.packagesData.forEach((pkg, index) => {
+                    const isFeatured = index === 1; // Mark middle package as featured
+                    const delay = (index + 1) * 100;
+                    
+                    // Parse special features
+                    let specialFeatures = [];
+                    if (pkg.special_features) {
+                        try {
+                            specialFeatures = JSON.parse(pkg.special_features);
+                        } catch (e) {
+                            specialFeatures = [pkg.special_features];
+                        }
+                    }
+                    
+                    // Format price
+                    let priceHTML = '';
+                    if (pkg.is_free) {
+                        priceHTML = '<span class="price-free">Miễn Phí</span>';
+                    } else {
+                        const currentPrice = pkg.sale_price || pkg.original_price;
+                        priceHTML = `<span class="price-current">${this.formatPrice(currentPrice)}đ</span>`;
+                        if (pkg.sale_price && pkg.original_price > pkg.sale_price) {
+                            priceHTML += `<span class="price-original">${this.formatPrice(pkg.original_price)}đ</span>`;
+                        }
+                    }
+                    
+                    packagesHTML += `
+                        <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="${delay}">
+                            <div class="package-card ${isFeatured ? 'featured' : ''}">
+                                <div class="package-header">
+                                    <h3 class="package-name">${pkg.package_name}</h3>
+                                    ${pkg.group_size ? `<div class="package-group-size">${pkg.group_size}</div>` : ''}
+                                </div>
+                                
+                                <div class="package-price">
+                                    ${priceHTML}
+                                </div>
+                                
+                                <div class="package-description">
+                                    ${pkg.package_description || ''}
+                                </div>
+                                
+                                ${specialFeatures.length > 0 ? `
+                                <ul class="package-features">
+                                    ${specialFeatures.map(feature => `<li>${feature}</li>`).join('')}
+                                </ul>
+                                ` : ''}
+                                
+                                <button class="btn btn-package ${pkg.is_free ? 'btn-package-outline' : ''}" 
+                                        onclick="addToCart(${pkg.id}, '${pkg.package_name}', ${pkg.is_free ? 0 : (pkg.sale_price || pkg.original_price)})">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    ${pkg.is_free ? 'Đăng Ký Miễn Phí' : 'Thêm Vào Giỏ Hàng'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                packagesGrid.innerHTML = packagesHTML;
+            }
+            
+            formatPrice(price) {
+                if (typeof price !== 'number') return '0';
+                return new Intl.NumberFormat('vi-VN').format(price);
+            }
+            
+            async init() {
+                try {
+                    await this.loadCourseData();
+                    this.renderCourseHero();
+                    this.renderCourseContent();
+                    this.renderPackages();
+                    
+                    // Re-initialize AOS for new elements
+                    if (typeof AOS !== 'undefined') {
+                        AOS.refresh();
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Error initializing course detail:', error);
+                    this.showError(error.message);
+                }
+            }
+            
+            showError(message) {
+                const mainContent = document.querySelector('.course-hero');
+                if (mainContent) {
+                    mainContent.innerHTML = `
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-8">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                                        <h3 class="text-white">Không tìm thấy khóa học</h3>
+                                        <p class="text-white">${message}</p>
+                                        <a href="/khoahoc" class="btn btn-course mt-3">
+                                            <i class="fas fa-arrow-left"></i>
+                                            Quay Lại Danh Sách Khóa Học
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Initialize Course Detail Manager
+        const courseDetailManager = new CourseDetailManager();
+        
+        // Add to cart function
+        function addToCart(packageId, packageName, price) {
+            // Here you would integrate with your cart system
+            showToast('Thành công!', `Đã thêm "${packageName}" vào giỏ hàng`, 'success', 3000);
+            
+            // Update cart count if header cart manager is available
+            if (window.headerCartManager) {
+                window.headerCartManager.notifyCartUpdate();
+            }
+        }
+        
+        // Show contact info
+        function showContactInfo() {
+            showToast('Liên Hệ', 'Hotline: 096 501 3663 | Email: info@pacgroup.org', 'info', 5000);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+            
+            // Load course data after components are loaded
+            setTimeout(() => {
+                courseDetailManager.init();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
