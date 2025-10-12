@@ -150,6 +150,11 @@
             margin-bottom: 20px;
         }
         
+        .course-content-section {
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        
         .course-meta {
             display: flex;
             gap: 15px;
@@ -195,25 +200,50 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
-        .course-features li {
+        .course-features > li {
             color: var(--default-color);
             position: relative;
-            padding-left: 25px;
+            padding-left: 28px;
             font-size: 0.95rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
         }
         
-        .course-features li::before {
+        .course-features > li::before {
             content: '✓';
             position: absolute;
             left: 0;
+            top: 2px;
             color: var(--brand-primary);
             font-weight: bold;
+            font-size: 1rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(var(--brand-primary-rgb), 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        /* Ensure h3 in course features doesn't get styling */
+        .course-features h3 {
+            padding-left: 0;
+            margin-bottom: 10px;
             font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--heading-color);
+        }
+        
+        .course-features h3::before {
+            display: none;
         }
         
         .course-footer-section {
@@ -267,7 +297,18 @@
             }
             
             .course-features {
-                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            
+            .course-features > li {
+                font-size: 0.9rem;
+                padding-left: 24px;
+            }
+            
+            .course-features > li::before {
+                width: 18px;
+                height: 18px;
+                font-size: 0.9rem;
             }
             
             .course-footer-section {
@@ -686,9 +727,20 @@
                         if (course.learning_outcomes) {
                             if (typeof course.learning_outcomes === 'string') {
                                 try {
+                                    // First try to parse as JSON array
                                     learningOutcomes = JSON.parse(course.learning_outcomes);
                                 } catch (e) {
-                                    learningOutcomes = [course.learning_outcomes];
+                                    // If not JSON, check if it's HTML content
+                                    if (course.learning_outcomes.includes('<li>')) {
+                                        // Extract only li content from HTML
+                                        const tempDiv = document.createElement('div');
+                                        tempDiv.innerHTML = course.learning_outcomes;
+                                        const liElements = tempDiv.querySelectorAll('li');
+                                        learningOutcomes = Array.from(liElements).map(li => li.textContent.trim());
+                                    } else {
+                                        // Treat as single string
+                                        learningOutcomes = [course.learning_outcomes];
+                                    }
                                 }
                             } else if (Array.isArray(course.learning_outcomes)) {
                                 learningOutcomes = course.learning_outcomes;
@@ -711,19 +763,17 @@
                                             <p class="course-description">${course.short_description || ''}</p>
                                         </div>
                                         
-                                        <div class="course-content-section">
-                                            <ul class="course-features">
-                                                ${learningOutcomes && learningOutcomes.length > 0 
-                                                    ? learningOutcomes.slice(0, 4).map(outcome => `<li>${outcome}</li>`).join('') 
-                                                    : '<li>Học tập linh hoạt theo nhu cầu</li><li>Giáo viên chuyên nghiệp có kinh nghiệm</li><li>Chứng chỉ hoàn thành khóa học</li><li>Hỗ trợ học tập 24/7</li>'
-                                                }
-                                            </ul>
-                                        </div>
-                                        
-                                        <div class="course-footer-section">
+                        <div class="course-content-section">
+                            <ul class="course-features">
+                                ${learningOutcomes && learningOutcomes.length > 0 
+                                    ? learningOutcomes.slice(0, 3).map(outcome => `<li>${outcome.trim()}</li>`).join('') 
+                                    : '<li>Phát triển kỹ năng học thuật chuyên nghiệp</li><li>Hướng dẫn từ đội ngũ giảng viên giàu kinh nghiệm</li><li>Chứng nhận hoàn thành khóa học</li>'
+                                }
+                            </ul>
+                        </div>                                        <div class="course-footer-section">
                                             <button class="btn btn-course" onclick="viewCourseDetails('${course.slug}')">
                                                 <i class="fas fa-graduation-cap"></i>
-                                                Xem Chi Tiết Khoá Học
+                                                Xem Chi Tiết Khóa Học
                                             </button>
                                         </div>
                                     </div>

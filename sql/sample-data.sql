@@ -213,7 +213,7 @@ INSERT INTO products (
     <p><em>Nội dung chi tiết sẽ được cung cấp khi đăng ký</em></p>',
     'Thạc sĩ Ngôn ngữ Anh',
     'both',
-    'assets/img/pic/essay-enhancement.jpg',
+    'assets/img/pic/1.jpg',
     'active',
     2
 );
@@ -382,7 +382,7 @@ INSERT INTO products (
     </ul>',
     'Cử nhân hoặc Thạc sĩ trong và ngoài nước',
     'both',
-    'assets/img/pic/essay-coaching.jpg',
+    'assets/img/pic/2.png',
     'active',
     3
 );
@@ -477,7 +477,7 @@ INSERT INTO products (
     </ul>',
     'Cử nhân hoặc Thạc sĩ trong và ngoài nước',
     'both',
-    'assets/img/pic/cv-interview.jpg',
+    'assets/img/pic/3.png',
     'active',
     4
 );
