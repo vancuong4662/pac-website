@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sứ Mệnh và Tầm Nhìn - PAC Website</title>
+    <meta name="description" content="Tìm hiểu về sứ mệnh, tầm nhìn và các giá trị cốt lõi của PAC Group trong việc phát triển dịch vụ hướng nghiệp Unlock Your Career">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .about-page {
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+        
+        /* Hero Section */
+        .about-hero {
+            background: linear-gradient(135deg, rgba(96, 40, 170, 0.95) 0%, rgba(139, 69, 255, 0.95) 100%);
+            color: var(--contrast-color);
+            padding: 140px 0 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/banner/banner-1024x507.png') center/cover;
+            opacity: 0.05;
+            z-index: 1;
+        }
+        
+        .about-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            color: #fff200;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.4rem;
+            font-weight: 400;
+            margin-bottom: 32px;
+            opacity: 1;
+            max-width: 800px;
+            text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Values Section */
+        .values-section {
+            padding: 100px 0;
+            background: var(--background-color);
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 2px;
+        }
+        
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--neutral-gray);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .value-card {
+            background: var(--surface-color);
+            border-radius: 25px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(var(--brand-secondary-rgb), 0.08);
+            border: 1px solid var(--light-purple);
+            height: 100%;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(var(--brand-secondary-rgb), 0.15);
+        }
+        
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+        }
+        
+        .value-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--contrast-color);
+            box-shadow: 0 8px 25px rgba(var(--brand-primary-rgb), 0.3);
+        }
+        
+        .value-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .value-description {
+            color: var(--default-color);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        /* Mission Section */
+        .mission-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(96, 40, 170, 0.03) 0%, rgba(139, 69, 255, 0.03) 100%);
+            position: relative;
+        }
+        
+        .mission-content {
+            background: var(--surface-color);
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 15px 50px rgba(var(--brand-secondary-rgb), 0.1);
+            border: 1px solid var(--light-purple);
+            position: relative;
+        }
+        
+        .mission-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 32px;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .mission-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--contrast-color);
+            box-shadow: 0 10px 30px rgba(var(--brand-primary-rgb), 0.3);
+        }
+        
+        .mission-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .mission-text {
+            color: var(--default-color);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+        
+        .mission-text p {
+            margin-bottom: 20px;
+        }
+        
+        /* Vision Section */
+        .vision-section {
+            padding: 100px 0;
+            background: var(--background-color);
+        }
+        
+        .vision-content {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            border-radius: 30px;
+            padding: 60px;
+            color: var(--contrast-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .vision-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+        
+        .vision-content::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: translate(-50%, 50%);
+        }
+        
+        .vision-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--contrast-color);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .vision-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .vision-text {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            text-align: justify;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .vision-text p {
+            margin-bottom: 20px;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--default-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
+            color: var(--contrast-color);
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff200;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cta-description {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+        
+        .btn-cta {
+            background: var(--contrast-color);
+            color: var(--brand-primary);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: var(--brand-primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .about-hero {
+                padding: 120px 0 60px 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .values-section,
+            .mission-section,
+            .vision-section {
+                padding: 60px 0;
+            }
+            
+            .mission-content,
+            .vision-content {
+                padding: 40px 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .value-card {
+                padding: 40px 25px;
+                margin-bottom: 30px;
+            }
+            
+            .mission-content,
+            .vision-content {
+                padding: 30px 20px;
+            }
+            
+            .mission-title,
+            .vision-title {
+                font-size: 2rem;
+            }
+            
+            .mission-text,
+            .vision-text {
+                font-size: 1rem;
+                text-align: left;
+            }
+            
+            .cta-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="about-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Sứ Mệnh và Tầm Nhìn
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Khám phá triết lý kinh doanh và định hướng phát triển của PAC Group trong việc 
+                        mang đến những giải pháp hướng nghiệp tốt nhất cho thế hệ trẻ Việt Nam.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Giá Trị Cốt Lõi</h2>
+                <p class="section-description">
+                    Ba giá trị nền tảng định hình nên chất lượng dịch vụ và sự tin cậy của 
+                    Unlock Your Career trong suốt hành trình phát triển.
+                </p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3 class="value-title">Khoa Học</h3>
+                        <p class="value-description">
+                            Mô hình đánh giá được phát triển dựa trên các lý thuyết tâm lý học về đánh giá nghề 
+                            như mã nghề đặc trưng Holland Code, chỉ số loại hình tính cách MBTI, mô hình 5 tính cách lớn. 
+                            Nguồn dữ liệu nghề được tổng hợp từ nhiều nghiên cứu và công bố của Tổ chức Lao động Thế giới, 
+                            Cục Thống kê Lao động Mỹ, Mạng Thông tin Nghề nghiệp O*NET, Bộ Giáo dục và Đào tạo.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="value-title">Đáng Tin Cậy</h3>
+                        <p class="value-description">
+                            Hơn 1000 học sinh đã thực hiện và đánh giá cao Giải pháp Hướng nghiệp Unlock Your Career. 
+                            Giải pháp là cầu nối giúp học sinh lựa chọn và xác định chuyên ngành đại học phù hợp 
+                            trong quá trình nộp hồ sơ du học và các trường đại học trong nước.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="value-card">
+                        <div class="value-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="value-title">Tiện Lợi</h3>
+                        <p class="value-description">
+                            Thư viện thông tin, bài đánh giá, podcast, sự kiện và hoạt động trải nghiệm nghề 
+                            đưa ra góc nhìn toàn diện về xu hướng việc làm trong thực tế. Tiết kiệm thời gian 
+                            tra cứu thông tin về ngành, nghề, trường đại học và trường phổ thông.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="mission-content" data-aos="fade-up">
+                        <div class="mission-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h2 class="mission-title">Sứ Mệnh</h2>
+                        <div class="mission-text">
+                            <p>
+                                Thế kỷ 21, với cuộc cách mạng 4.0 đã tác động mạnh mẽ tới số lượng và chất lượng của các công việc 
+                                và nghề nghiệp thông qua các ứng dụng công nghệ, rô-bốt, máy móc và trí tuệ nhân tạo. Do đó rất nhiều 
+                                ngành, nghề đã bị đào thải, đồng thời xuất hiện thêm nhiều công việc mới với mức độ cạnh tranh cao, 
+                                đòi hỏi người lao động phải có 2 yếu tố cốt lõi là kiến thức và kỹ năng chuyên môn, cùng với 2 kỹ năng mềm 
+                                không thể thiếu là kỹ năng giao tiếp và khả năng thích nghi cao.
+                            </p>
+                            <p>
+                                Hiểu được điều này, PAC Group cho ra đời Giải pháp hướng nghiệp Unlock Your Career. Giải pháp này được 
+                                phát triển và mở rộng dựa trên dịch vụ Định hướng và Tư vấn chọn nghề Best-fit Career do PAC Group triển khai 
+                                từ năm 2014. Dịch vụ đã cung cấp tới hơn 1000 học sinh/sinh viên của các trường đại học và PTTH trên cả nước 
+                                nhằm giúp các bạn khám phá năng lực bản thân, cập nhật xu thế ngành nghề, hình thành khả năng định hướng tự thân 
+                                khi còn ngồi trên ghế nhà trường, sống có mục tiêu rõ ràng để theo đuổi ước mơ và thành công trong sự nghiệp 
+                                trong tương lai.
+                            </p>
+                            <p>
+                                Mỗi bạn trẻ, nếu có thêm nhiều thông tin và nhận được sự hỗ trợ đúng lúc và xuyên suốt, sẽ có cái nhìn khách quan, 
+                                cân bằng và toàn diện trên nhiều lĩnh vực việc làm, từ đó đưa ra lựa chọn danh mục nghề đúng đắn nhất với 
+                                năng lực và sở thích của mình.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Vision Section -->
+    <section class="vision-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="vision-content" data-aos="fade-up">
+                        <div class="vision-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h2 class="vision-title">Tầm Nhìn</h2>
+                        <div class="vision-text">
+                            <p>
+                                Unlock Your Career phấn đấu trở thành dịch vụ hướng nghiệp và tư vấn học đường chuyên sâu, sâu sát, 
+                                và uy tín hàng đầu Việt Nam, không ngừng cung cấp các giải pháp tư vấn và cố vấn hướng nghiệp dựa trên 
+                                nền tảng khoa học tới phụ huynh và học sinh một cách cập nhật và đáng tin cậy.
+                            </p>
+                            <p>
+                                Bên cạnh các dịch vụ đánh giá hướng nghiệp trực tuyến và chương trình hướng nghiệp cùng chuyên gia, 
+                                Unlock Your Career còn cung cấp các khóa đào tạo kỹ năng phát triển, các khóa học học thuật, và các 
+                                chương trình trải nghiệm nghề tại các doanh nghiệp, tổ chức, và nhà máy.
+                            </p>
+                            <p>
+                                Thông qua các hoạt động này, học sinh sẽ được trang bị và xây dựng một bộ kỹ năng thực tế và tư duy 
+                                nghề nghiệp phù hợp với yêu cầu công việc của thời đại kỹ thuật số. Các chương trình đào tạo và thư viện 
+                                nghề được xây dựng bởi đội ngũ chuyên gia, cố vấn được đào tạo bài bản và có nghiệp vụ về tư vấn hướng nghiệp 
+                                và chọn ngành học tại Việt Nam, và nhận được đóng góp từ ban cố vấn gồm học giả, chuyên gia về tâm lý học nhân sự, 
+                                tâm lý học hướng nghiệp, và tâm lý học giáo dục, và các cá nhân có ít nhất 10 năm kinh nghiệm trong một hoặc 
+                                đa lĩnh vực và đang đảm nhiệm các vị trí nghề nghiệp cụ thể.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Học sinh đã tham gia</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card">
+                        <div class="stat-number">10+</div>
+                        <div class="stat-label">Năm kinh nghiệm</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Dựa trên khoa học</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Hỗ trợ liên tục</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title" data-aos="fade-up">
+                        Sẵn Sàng Khám Phá Tiềm Năng?
+                    </h2>
+                    <p class="cta-description" data-aos="fade-up" data-aos-delay="100">
+                        Hãy bắt đầu hành trình khám phá bản thân và định hướng nghề nghiệp cùng với 
+                        đội ngũ chuyên gia hàng đầu của chúng tôi.
+                    </p>
+                    <a href="huongnghiep" class="btn btn-cta" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-compass"></i>
+                        Bắt Đầu Hướng Nghiệp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/header-cart.js"></script>
+    <script src="assets/js/pac-services.js"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+        });
+    </script>
+</body>
+</html>
