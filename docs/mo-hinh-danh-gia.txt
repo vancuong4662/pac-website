@@ -1,0 +1,23 @@
+Chương trình định hướng được phát triển dựa trên các nghiên cứu tâm lý về đánh giá tính cách, chọn nghề, đánh giá năng lực.
+
+- Mô hình đã được chúng tôi triển khai từ năm 2014 trên hơn 1000 học sinh tại các trường phổ thông công lập, tư thục và trường quốc tế tại Việt Nam.
+- Thông qua các hoạt động hướng nghiệp, tư vấn 1:1 và chương trình mô phỏng nghề, các bạn học sinh, sinh viên không chỉ xác định được nhóm ngành, nghề phù hợp với mong muốn và năng lực của bản thân, mà còn được hỗ trợ trong việc xây dựng lộ trình học và chọn môn, chọn khối học tương ứng.
+- Phương pháp và bộ dữ liệu bài đánh giá thường xuyên được cập nhật và tối ưu hóa để phù hợp với môi trường giáo dục, chương trình đào tạo, và đối tượng học sinh từ lớp 8 tới bậc sinh viên đại học tại các trường trong nước.
+
+Các bài kiểm tra được cá nhân hóa
+Mỗi người sẽ có danh sách câu hỏi, báo cáo, và gợi ý ngành, nghề riêng của mình. Tùy thuộc vào gói dịch vụ và từng giai đoạn của chương trình định hướng đã đăng ký, các bạn học sinh sẽ được đánh giá dựa trên các phương pháp đánh giá tâm lý học đã được kiểm chứng và phổ biến rộng rãi với mục đích bổ trợ, đối chiếu, và tái cân bằng những chỉ số về tính cách và sở thích nghề để đưa ra định hướng sát thực nhất.
+
+Các cốt lõi :
+Nghiên cứu - Tâm lý và lý thuyết về lựa chọn nghề của nhà tâm lý học John Holland
+Mô hình - OCEAN về 5 đặc điểm tính cách lớn của con người (Big Five Personality Traits)
+Chỉ số - Về loại hình tính cách Briggs-Myers Type Indicator
+Mô hình - Đánh giá dựa theo lý thuyết đa trí thông minh của Giáo sư Tâm lý học Howard Gardner
+Phương pháp - Đánh giá năng lực (đánh giá khả năng tư duy logic) kiểm tra năng lực nhận thức số học, không gian, ngữ nghĩa, và suy luận
+
+Các thông tin tra cứu về nghề nghiệp, chương trình giáo dục được tổng hợp, tham khảo, và trích dẫn từ các báo cáo, nghiên cứu, và nguồn thông tin đa dạng và đáng tin cậy:
+- Tổ chức Lao động Thế giới (ILO)
+- Cục Thống kê Lao động Mỹ (BLS)
+- Mạng Thông tin Nghề nghiệp (O*NET)
+- Bộ Lao động Thương Binh và Xã hội
+- Bộ Giáo dục và Đào tạo
+- Đồng thời được chúng tôi hiệu đính, bổ sung dựa trên khảo sát và quy trình đánh giá - PAC Group thực hiện trong suốt 6 năm qua.
