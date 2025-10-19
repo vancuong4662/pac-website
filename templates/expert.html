@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đội Ngũ Cố Vấn - PAC Website</title>
+    <meta name="description" content="Đội ngũ chuyên gia PAC Group với bằng cấp chuyên môn và kinh nghiệm tư vấn giáo dục, hướng nghiệp từ các trường đại học hàng đầu thế giới">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    <link href="assets/css/about-models.css" rel="stylesheet">
+    
+    <style>
+        /* Expert Member Card Styles */
+        .expert-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 50px;
+            margin-bottom: 60px;
+            box-shadow: 
+                0 20px 60px rgba(var(--brand-secondary-rgb), 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s ease;
+        }
+        
+        .expert-card::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, 
+                rgba(96, 40, 170, 0.3) 0%, 
+                rgba(255, 242, 0, 0.3) 25%,
+                rgba(139, 69, 255, 0.3) 50%,
+                rgba(96, 40, 170, 0.3) 75%,
+                rgba(255, 242, 0, 0.3) 100%);
+            border-radius: 43px;
+            z-index: -1;
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        
+        .expert-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 
+                0 30px 80px rgba(var(--brand-secondary-rgb), 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        
+        .expert-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 242, 0, 0.3);
+            box-shadow: 
+                0 15px 40px rgba(var(--brand-primary-rgb), 0.3),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            margin-bottom: 30px;
+        }
+        
+        .expert-card:hover .expert-image {
+            transform: scale(1.05);
+            border-color: rgba(255, 242, 0, 0.6);
+            box-shadow: 
+                0 20px 50px rgba(var(--brand-primary-rgb), 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .expert-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .expert-role {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--brand-primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .expert-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(var(--brand-primary-rgb), 0.3);
+        }
+        
+        .expert-titles {
+            margin-bottom: 25px;
+        }
+        
+        .expert-titles h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .expert-titles ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .expert-titles li {
+            background: var(--surface-color);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--brand-primary);
+            font-size: 1rem;
+            color: var(--default-color);
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(var(--brand-secondary-rgb), 0.08);
+            line-height: 1.5;
+        }
+        
+        .expert-titles li:hover {
+            background: rgba(var(--brand-primary-rgb), 0.05);
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(var(--brand-secondary-rgb), 0.15);
+        }
+        
+        .expert-description {
+            color: var(--default-color);
+            line-height: 1.8;
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+        
+        .expert-description h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        /* Team Section Background */
+        .team-section {
+            padding: 120px 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(96, 40, 170, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(139, 69, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(255, 242, 0, 0.02) 0%, rgba(96, 40, 170, 0.03) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle, rgba(96, 40, 170, 0.02) 0%, transparent 70%),
+                conic-gradient(from 45deg, transparent, rgba(255, 242, 0, 0.03), transparent);
+            animation: rotate 60s linear infinite;
+            z-index: 1;
+        }
+        
+        .team-section .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .expert-card {
+                padding: 30px 25px;
+                margin-bottom: 40px;
+            }
+            
+            .expert-image {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 20px;
+            }
+            
+            .expert-name {
+                font-size: 1.8rem;
+            }
+            
+            .expert-role {
+                font-size: 1.1rem;
+            }
+            
+            .expert-titles h4,
+            .expert-description h4 {
+                font-size: 1.2rem;
+            }
+            
+            .expert-description {
+                font-size: 0.95rem;
+                text-align: left;
+            }
+            
+            .expert-titles li {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body class="models-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="models-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Đội Ngũ Cố Vấn
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Đội ngũ chuyên gia có bằng cấp chuyên môn và kinh nghiệm tư vấn giáo dục, 
+                        hướng nghiệp từ các trường đại học hàng đầu thế giới.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Us Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="mission-content">
+                        <div class="mission-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h2 class="mission-title">Chúng Tôi Là Ai?</h2>
+                        <div class="mission-text">
+                            <p>
+                                Giải pháp hướng nghiệp Unlock Your Career được xây dựng và phát triển bởi 
+                                Tổ chức Giáo dục PAC Group, thành viên chuyên nghiệp thuộc Hiệp hội Cố vấn 
+                                Giáo dục Độc lập (IECA), Hiệp hội Tư vấn Tuyển sinh Đại học Quốc tế (ACAC), 
+                                và Hiệp hội Các Trường Quốc tế (CIS).
+                            </p>
+                            <p>
+                                Chúng tôi là một nhóm gồm các chuyên gia có ít nhất 10 năm kinh nghiệm và 
+                                bằng cấp chuyên môn, chứng chỉ nghiệp vụ về tư vấn tâm lý, tư vấn giáo dục 
+                                và hướng nghiệp, và tuyển sinh Đại học hiện đang làm việc tại các trường PTTH 
+                                Quốc tế trên thế giới và trong lĩnh vực giáo dục đại học, tư vấn tuyển sinh.
+                            </p>
+                            <p>
+                                Ban cố vấn dịch vụ gồm các chuyên gia có kinh nghiệm lâu năm và chuyên môn cao 
+                                trong một hoặc đa lĩnh vực và trên nhiều vị trí, thường xuyên cập nhật những 
+                                thay đổi mới nhất về môi trường và xu hướng việc làm của từng ngành, nghề ở cả 
+                                trong Việt Nam và ngoài nước.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="model-image">
+                        <img src="assets/img/pic/to-chuc.png" alt="Đội ngũ PAC Group" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Danh Sách Đội Ngũ Chuyên Gia</h2>
+                <p class="section-description">
+                    Các chuyên gia với bằng cấp và kinh nghiệm từ các trường đại học hàng đầu thế giới, 
+                    cam kết mang đến dịch vụ tư vấn giáo dục và hướng nghiệp chất lượng cao.
+                </p>
+            </div>
+            
+            <div id="team-members">
+                <!-- Team members will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title" data-aos="fade-up">
+                        Tư Vấn Cùng Chuyên Gia
+                    </h2>
+                    <p class="cta-description" data-aos="fade-up" data-aos-delay="100">
+                        Đặt lịch tư vấn 1:1 với đội ngũ chuyên gia PAC Group để nhận được 
+                        định hướng giáo dục và hướng nghiệp phù hợp nhất.
+                    </p>
+                    <a href="huongnghiep" class="btn btn-cta" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-calendar-check"></i>
+                        Đặt Lịch Tư Vấn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    <script src="assets/js/header-cart.js"></script>
+    <script src="assets/js/pac-services.js"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Load team data and render
+        async function loadTeamData() {
+            try {
+                const response = await fetch('static/team.json');
+                const data = await response.json();
+                renderTeamMembers(data.members);
+            } catch (error) {
+                console.error('Error loading team data:', error);
+            }
+        }
+        
+        function renderTeamMembers(members) {
+            const container = document.getElementById('team-members');
+            
+            members.forEach((member, index) => {
+                const memberElement = document.createElement('div');
+                memberElement.className = 'row mb-5';
+                memberElement.setAttribute('data-aos', 'fade-up');
+                memberElement.setAttribute('data-aos-delay', (index * 100).toString());
+                
+                memberElement.innerHTML = `
+                    <div class="col-12">
+                        <div class="expert-card">
+                            <div class="row align-items-center">
+                                <div class="col-lg-3 text-center">
+                                    <img src="${member.image}" alt="${member.name}" class="expert-image">
+                                    <div class="expert-badge">${member.badge}</div>
+                                </div>
+                                <div class="col-lg-9">
+                                    <h3 class="expert-name">${member.name}</h3>
+                                    <p class="expert-role">${member.role}</p>
+                                    
+                                    <div class="expert-titles">
+                                        <h4>Bằng Cấp & Chứng Chỉ</h4>
+                                        <ul>
+                                            ${member.title.map(title => `<li>${title}</li>`).join('')}
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="expert-description">
+                                        <h4>Giới Thiệu</h4>
+                                        <p>${member.description}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(memberElement);
+            });
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+            
+            // Load team data
+            loadTeamData();
+        });
+    </script>
+</body>
+</html>
