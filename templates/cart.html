@@ -1,467 +1,653 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giỏ hàng - PAC Website</title>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Giỏ hàng của bạn</title>
+  <meta name="description" content="PAC Group - Quản lý giỏ hàng và thanh toán các khóa học, tư vấn hướng nghiệp.">
+  <meta name="keywords" content="giỏ hàng, PAC Group, thanh toán, khóa học, hướng nghiệp">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts - Montserrat for PAC Group -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  
+  <!-- Toastbar CSS for notifications -->
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+  
+  <!-- Custom CSS for Cart Page -->
+  <style>
+    /* Cart Page specific styles using CSS variables from main.css */
+    .cart-page .page-header {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+      position: relative;
+      overflow: hidden;
+      margin-top: 78px !important;
+      padding-top: 50px !important;
+      padding-bottom: 60px;
+    }
+
+    .cart-page .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: url('../assets/img/s6-decor.png') no-repeat center right;
+      background-size: contain;
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    .cart-page .page-header .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cart-page .breadcrumb-item a {
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .cart-page .breadcrumb-item a:hover {
+      color: var(--contrast-color) !important;
+    }
+
+    /* Cart Content */
+    .cart-content {
+      background-color: var(--bg-light);
+    }
+
+    /* Force container to use full width */
+    .cart-content .container {
+      max-width: 1200px;
+      width: 100%;
+      padding-left: 15px;
+      padding-right: 15px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Reset Bootstrap row margins to default */
+    #cartContainer.row {
+      margin-left: -12px;
+      margin-right: -12px;
+    }
+
+    #cartContainer > [class*="col-"] {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    /* Table Styles */
+    .table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .table thead th {
+      background: linear-gradient(135deg, rgba(150, 75, 223, 0.05) 0%, rgba(150, 75, 223, 0.02) 100%);
+      border-bottom: 2px solid rgba(150, 75, 223, 0.1);
+      font-weight: 600;
+      color: var(--heading-color);
+      padding: 1rem;
+    }
+
+    .table tbody tr {
+      transition: background-color 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(150, 75, 223, 0.05);
+    }
+
+    .table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-bottom: 1px solid rgba(150, 75, 223, 0.05);
+    }
+
+    .cart-item-card {
+      border-radius: 15px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(150, 75, 223, 0.1);
+    }
+
+    .cart-item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(150, 75, 223, 0.15) !important;
+    }
+
+    /* Simplified styles for table view */
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Debug layout issues */
+    #cartContainer {
+      display: flex !important;
+      flex-wrap: wrap;
+    }
+
+    #cartContainer .col-lg-8 {
+      flex: 0 0 66.666667%;
+      max-width: 66.666667%;
+    }
+
+    #cartContainer .col-lg-4 {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+    }
+
+    /* Ensure no width overflow */
+    .cart-summary-card {
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid rgba(150, 75, 223, 0.1);
+      height: fit-content;
+      position: sticky;
+      top: 2rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .cart-summary-card:hover {
+      box-shadow: 0 10px 25px rgba(150, 75, 223, 0.1) !important;
+    }
+
+    .cart-summary-header {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+      color: white !important;
+      padding: 1.5rem;
+    }
     
-    <!-- Bootstrap CSS -->
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    
-    <!-- AOS Animation -->
-    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
-    <link href="assets/css/main.css" rel="stylesheet">
-    <link href="assets/css/product-card.css" rel="stylesheet">
-    
-    <style>
-        .cart-page {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 100px 0 60px 0;
-        }
-        
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            font-size: 1.1rem;
-            color: #6c757d;
-        }
-        
-        .cart-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .cart-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 24px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .cart-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .cart-count {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .cart-actions-header {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .btn-header {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-header:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .cart-content {
-            padding: 32px;
-        }
-        
-        .cart-items-section {
-            margin-bottom: 32px;
-        }
-        
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .loading-cart {
-            text-align: center;
-            padding: 60px 20px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .cart-summary {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .summary-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .summary-row:last-child {
-            border-bottom: none;
-            padding-top: 16px;
-            margin-top: 8px;
-            border-top: 2px solid #dee2e6;
-        }
-        
-        .summary-label {
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        .summary-value {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .summary-total {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #e74c3c;
-        }
-        
-        .checkout-section {
-            margin-top: 24px;
-            display: grid;
-            gap: 12px;
-        }
-        
-        .btn-checkout {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-checkout:hover {
-            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);
-            color: white;
-        }
-        
-        .btn-continue {
-            background: transparent;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-continue:hover {
-            background: #f8f9fa;
-            border-color: #adb5bd;
-            color: #495057;
-        }
-        
-        .promo-section {
-            margin-top: 20px;
-            padding: 20px;
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border-radius: 8px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        .promo-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 8px;
-        }
-        
-        .promo-input-group {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .promo-input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .promo-btn {
-            background: #ffc107;
-            color: #212529;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .promo-btn:hover {
-            background: #e0a800;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .cart-page {
-                padding: 80px 0 40px 0;
-            }
-            
-            .page-title {
-                font-size: 2rem;
-            }
-            
-            .cart-header {
-                padding: 20px;
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-            
-            .cart-content {
-                padding: 20px;
-            }
-            
-            .cart-actions-header {
-                justify-content: center;
-            }
-            
-            .checkout-section {
-                position: sticky;
-                bottom: 0;
-                background: white;
-                padding: 16px;
-                margin: -20px -20px 0 -20px;
-                border-top: 1px solid #dee2e6;
-            }
-        }
-    </style>
+    .cart-summary-header h4 {
+      color: white !important;
+    }
+
+    .cart-summary-content {
+      padding: 1.5rem;
+      background: var(--surface-color);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(150, 75, 223, 0.1);
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .summary-total {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .promo-code-section {
+      background: var(--bg-accent);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid var(--brand-accent);
+    }
+
+    .promo-input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .promo-input {
+      flex: 1;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .promo-input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 0.2rem rgba(150, 75, 223, 0.15);
+    }
+
+    .promo-btn {
+      background: var(--brand-accent);
+      color: var(--brand-secondary);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .promo-btn:hover {
+      background: color-mix(in srgb, var(--brand-accent), black 10%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 242, 0, 0.3);
+    }
+
+    .checkout-actions {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn-checkout {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-checkout:hover {
+      background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--accent-color) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
+      color: white;
+    }
+
+    .btn-continue-shopping {
+      background: transparent;
+      color: var(--neutral-gray);
+      border: 2px solid #e5e7eb;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .btn-continue-shopping:hover {
+      background: var(--bg-light);
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--neutral-gray);
+    }
+
+    .empty-cart-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      color: var(--accent-color);
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Cart header card styling */
+    .cart-header-card {
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid rgba(150, 75, 223, 0.1);
+    }
+
+    .cart-header-card:hover {
+      box-shadow: 0 8px 20px rgba(150, 75, 223, 0.1) !important;
+    }
+
+    .cart-header-card .card-header {
+      background: linear-gradient(135deg, rgba(150, 75, 223, 0.05) 0%, rgba(150, 75, 223, 0.02) 100%);
+      border-bottom: 1px solid rgba(150, 75, 223, 0.1);
+    }
+
+    .cart-icon-primary {
+      color: var(--accent-color);
+    }
+
+    .btn-outline-primary-custom {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      background: transparent;
+    }
+
+    .btn-outline-primary-custom:hover {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: white;
+    }
+
+    .btn-outline-danger-custom {
+      color: #dc3545;
+      border-color: #dc3545;
+      background: transparent;
+    }
+
+    .btn-outline-danger-custom:hover {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+      .cart-page .page-header {
+        margin-top: 78px !important;
+        padding-top: 40px !important;
+        padding-bottom: 3rem;
+      }
+      
+      .cart-page .page-header h1 {
+        font-size: 2rem;
+      }
+
+      /* Fix columns on tablet/mobile */
+      #cartContainer .col-lg-8,
+      #cartContainer .col-lg-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+      
+      .cart-summary-card {
+        position: relative !important;
+        top: 0 !important;
+        margin-top: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .cart-item-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .cart-item-actions {
+        justify-content: center;
+      }
+
+      .checkout-actions .btn-checkout,
+      .checkout-actions .btn-continue-shopping {
+        width: 100%;
+      }
+
+      /* Reset margins for mobile */
+      #cartContainer.row {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      #cartContainer > [class*="col-"] {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+    }
+  </style>
 </head>
-<body>
-    <!-- Include Header -->
-    <div id="header-placeholder"></div>
-    
-    <!-- Cart Page -->
-    <section class="cart-page">
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header" data-aos="fade-up">
-                <h1 class="page-title">Giỏ hàng của bạn</h1>
-                <p class="page-subtitle">Xem lại các sản phẩm đã chọn trước khi thanh toán</p>
-            </div>
-            
-            <!-- Loading State -->
-            <div class="loading-cart" id="loadingCart">
-                <div class="spinner"></div>
-                <h3>Đang tải giỏ hàng...</h3>
-            </div>
-            
-            <!-- Cart Container -->
-            <div class="cart-container" id="cartContainer" style="display: none;" data-aos="fade-up" data-aos-delay="100">
-                <!-- Cart Header -->
-                <div class="cart-header">
-                    <div class="cart-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        Giỏ hàng
-                        <span class="cart-count" id="cartCount">0 sản phẩm</span>
-                    </div>
-                    <div class="cart-actions-header">
-                        <a href="products" class="btn-header">
-                            <i class="fas fa-plus"></i>
-                            Thêm sản phẩm
-                        </a>
-                        <button class="btn-header" onclick="clearCart()" id="clearCartBtn">
-                            <i class="fas fa-trash"></i>
-                            Xóa tất cả
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Cart Content -->
-                <div class="cart-content">
-                    <div class="row">
-                        <!-- Cart Items -->
-                        <div class="col-lg-8">
-                            <div class="cart-items-section">
-                                <h3 class="section-title">
-                                    <i class="fas fa-list"></i>
-                                    Sản phẩm trong giỏ
-                                </h3>
-                                <div id="cartItems">
-                                    <!-- Cart items will be loaded here -->
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Cart Summary -->
-                        <div class="col-lg-4">
-                            <div class="cart-summary">
-                                <h4 class="summary-title">Tóm tắt đơn hàng</h4>
-                                
-                                <div id="cartSummaryDetails">
-                                    <!-- Summary details will be loaded here -->
-                                </div>
-                                
-                                <!-- Promo Code Section -->
-                                <div class="promo-section">
-                                    <div class="promo-title">Mã giảm giá</div>
-                                    <div class="promo-input-group">
-                                        <input type="text" class="promo-input" id="promoCode" placeholder="Nhập mã giảm giá">
-                                        <button class="promo-btn" onclick="applyPromoCode()">Áp dụng</button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Checkout Section -->
-                                <div class="checkout-section">
-                                    <a href="checkout" class="btn-checkout" id="checkoutBtn">
-                                        <i class="fas fa-credit-card"></i>
-                                        Thanh toán
-                                    </a>
-                                    <a href="products" class="btn-continue">
-                                        <i class="fas fa-arrow-left"></i>
-                                        Tiếp tục mua sắm
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+<body class="cart-page">
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Header Section Container -->
+  <div id="header-section">
+    <!-- Header component will be loaded here -->
+  </div>
+
+  <main class="main">
+    <!-- Cart Page Header -->
+    <section class="page-header text-white py-5">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <h1 class="display-6 fw-bold mb-2 text-white">Giỏ hàng của bạn</h1>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-dark mb-0">
+                <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="courses" class="text-white-50">Khóa học</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">Giỏ hàng</li>
+              </ol>
+            </nav>
+          </div>
         </div>
+      </div>
     </section>
-    
-    <!-- Include Footer -->
-    <div id="footer-placeholder"></div>
-    
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
-        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <i class="fas fa-info-circle text-primary me-2"></i>
-                <strong class="me-auto">Thông báo</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body" id="toastBody">
-                <!-- Toast message -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- Scripts -->
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
-    <script src="assets/js/component-loader.js"></script>
-    <script src="assets/js/cart.js"></script>
-    
-    <script>
-        // Configure components for this page
-        window.pageComponentsConfig = [
-            { name: 'header', target: '#header-placeholder' },
-            { name: 'footer', target: '#footer-placeholder' }
-        ];
+
+    <!-- Cart Content -->
+    <section class="cart-content py-5">
+      <div class="container">
         
-        // Initialize page after components loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize AOS
-            AOS.init({
-                duration: 1000,
-                easing: 'ease-in-out',
-                once: true,
-                mirror: false
-            });
+        <!-- Loading State -->
+        <div class="loading-spinner" id="loadingCart">
+          <div class="text-center">
+            <div class="spinner mb-3"></div>
+            <h5 class="text-muted">Đang tải giỏ hàng...</h5>
+          </div>
+        </div>
+
+        <!-- Main Cart Content -->
+        <div class="row" id="cartContainer" style="display: none;">
+          <!-- Cart Items Column -->
+          <div class="col-lg-8 col-md-12 mb-4">
+            <!-- Cart Header -->
+            <div class="card shadow-sm border-0 mb-4 cart-header-card">
+              <div class="card-header bg-white border-bottom-0 py-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="me-3">
+                      <i class="fas fa-shopping-cart fa-2x cart-icon-primary"></i>
+                    </div>
+                    <div>
+                      <h3 class="mb-1 fw-bold text-dark">Giỏ hàng</h3>
+                      <p class="text-muted mb-0" id="cartItemsCount">0 sản phẩm</p>
+                    </div>
+                  </div>
+                  <div class="cart-header-actions">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-sm btn-outline-primary-custom" id="refresh-cart-btn" title="Làm mới">
+                        <i class="fas fa-sync-alt"></i>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-danger-custom" id="clear-cart-btn" title="Xóa tất cả">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="cartItems">
+              <!-- Cart items will be loaded here dynamically -->
+            </div>
+
+            <!-- Empty Cart State -->
+            <div class="card shadow-sm border-0" id="emptyCartState" style="display: none;">
+              <div class="card-body">
+                <div class="empty-cart">
+                  <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                  </div>
+                  <h4 class="mb-3">Giỏ hàng trống</h4>
+                  <p class="mb-4">Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá các khóa học và dịch vụ tuyệt vời của chúng tôi!</p>
+                  <a href="courses" class="btn btn-lg btn-checkout">
+                    <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cart Summary Column -->
+          <div class="col-lg-4 col-md-12">
+            <div class="cart-summary-card">
+              <!-- Summary Header -->
+              <div class="cart-summary-header">
+                <h4 class="mb-0 fw-bold">
+                  <i class="fas fa-receipt me-2"></i>Tóm tắt đơn hàng
+                </h4>
+              </div>
+
+              <!-- Summary Content -->
+              <div class="cart-summary-content">
+                <div id="cartSummaryDetails">
+                  <!-- Summary rows will be loaded here -->
+                  <div class="summary-row">
+                    <span class="text-muted">Số lượng sản phẩm dịch vụ:</span>
+                    <span class="fw-semibold" id="subtotal">0 gói</span>
+                  </div>
+                  <div class="summary-row">
+                    <span class="fw-bold">Tổng cộng:</span>
+                    <span class="summary-total" id="total">0₫</span>
+                  </div>
+                </div>
+
+                <!-- Promo Code Section - Removed as per request -->
+
+                <!-- Checkout Actions -->
+                <div class="checkout-actions">
+                  <a href="checkout" class="btn-checkout" id="checkoutBtn">
+                    <i class="fas fa-credit-card"></i>
+                    Tiến hành thanh toán
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Section Container -->
+  <div id="footer-section">
+    <!-- Footer component will be loaded here -->
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Component Loader -->
+  <script src="assets/js/component-loader.js?v=1.1"></script>
+
+  <!-- Toastbar for notifications -->
+  <script src="assets/js/toastbar.js"></script>
+
+  <!-- Authentication -->
+  <script src="assets/js/authen.js"></script>
+
+  <!-- Cart specific JS -->
+  <script src="assets/js/cart.js?v=1.0"></script>
+  <script>
+    // Configure page-specific components
+    window.pageComponentsConfig = {
+      // No specific sidebar for cart page
+    };
+
+    // Check authentication before initializing cart page
+    document.addEventListener('DOMContentLoaded', async function() {
+        
+        try {
+            // Use authChecker to verify user is authenticated
+            const user = await authChecker.handleProtectedPageAccess('cart');
             
-            // Wait for components to load before initializing cart page
-            setTimeout(() => {
+            if (user) {
+                // User is authenticated, initialize cart page
+                console.log('[Cart Page] User authenticated:', user.fullname || user.username);
+                
+                // Initialize cart page functionality
                 if (typeof initializeCartPage === 'function') {
                     initializeCartPage();
+                } else {
+                    console.warn('[Cart Page] initializeCartPage function not found');
                 }
-            }, 500);
-        });
-    </script>
+            }
+            // If user is not authenticated, they will be redirected by authChecker
+            
+        } catch (error) {
+            console.error('[Cart Page] Error during authentication check:', error);
+            authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+        }
+    });
+  </script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js?v=1.1"></script>
+
 </body>
+
 </html>

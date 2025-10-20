@@ -77,7 +77,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('assets/img/banner/banner-1024x507.png') center/cover;
+            background: url('assets/img/banner/banner-1024x507.svg') center/cover;
             opacity: 0.05;
             z-index: 1;
         }
@@ -382,6 +382,24 @@
             color: var(--contrast-color);
         }
         
+        .btn-package:disabled {
+            opacity: 0.7;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+        
+        .btn-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         .btn-package-outline {
             background: transparent;
             color: var(--brand-primary);
@@ -515,12 +533,16 @@
                             <i class="fas fa-arrow-down"></i>
                             Xem Các Gói Đào Tạo
                         </a>
+                        <button class="btn btn-outline-light ms-2" onclick="debugAuth()">
+                            <i class="fas fa-bug"></i>
+                            Debug Auth
+                        </button>
                     </div>
                 </div>
                 
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="course-hero-image">
-                        <img id="courseHeroImage" src="assets/img/khoa-hoc/default-course.jpg" alt="Course Image">
+                        <img id="courseHeroImage" src="assets/img/khoa-hoc/default-course.svg" alt="Course Image">
                     </div>
                 </div>
             </div>
@@ -589,6 +611,7 @@
     <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
     <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/authen.js"></script>
     <script src="assets/js/component-loader.js"></script>
     <script src="assets/js/header-cart.js"></script>
     <script src="assets/js/pac-services.js"></script>
@@ -727,6 +750,8 @@
                 const packagesGrid = document.getElementById('packagesGrid');
                 if (!packagesGrid) return;
                 
+                console.log('🔧 Rendering packages:', this.packagesData);
+                
                 if (!this.packagesData || this.packagesData.length === 0) {
                     packagesGrid.innerHTML = `
                         <div class="col-12">
@@ -742,8 +767,17 @@
                 
                 let packagesHTML = '';
                 this.packagesData.forEach((pkg, index) => {
+                    console.log(`📦 Package ${index}:`, pkg);
+                    
                     const isFeatured = index === 1; // Mark middle package as featured
                     const delay = (index + 1) * 100;
+                    
+                    // Ensure we have a valid package ID
+                    const packageId = pkg.package_id || pkg.id;
+                    if (!packageId) {
+                        console.error('❌ Package missing ID:', pkg);
+                        return; // Skip this package
+                    }
                     
                     // Parse special features
                     let specialFeatures = [];
@@ -766,6 +800,8 @@
                             priceHTML += `<span class="price-original">${this.formatPrice(pkg.original_price)}đ</span>`;
                         }
                     }
+                    
+                    console.log(`🏷️ Package ${packageId} button onclick:`, `addToCart(${packageId}, '${pkg.package_name}', ${pkg.is_free ? 0 : (pkg.sale_price || pkg.original_price)})`);
                     
                     packagesHTML += `
                         <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="${delay}">
@@ -790,9 +826,16 @@
                                 ` : ''}
                                 
                                 <button class="btn btn-package ${pkg.is_free ? 'btn-package-outline' : ''}" 
-                                        onclick="addToCart(${pkg.id}, '${pkg.package_name}', ${pkg.is_free ? 0 : (pkg.sale_price || pkg.original_price)})">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    ${pkg.is_free ? 'Đăng Ký Miễn Phí' : 'Thêm Vào Giỏ Hàng'}
+                                        onclick="addToCart(${packageId}, '${pkg.package_name.replace(/'/g, "\\'")}', ${pkg.is_free ? 0 : (pkg.sale_price || pkg.original_price)})"
+                                        id="addToCartBtn-${packageId}">
+                                    <span class="btn-content">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        ${pkg.is_free ? 'Đăng Ký Miễn Phí' : 'Thêm Vào Giỏ Hàng'}
+                                    </span>
+                                    <span class="btn-loading" style="display: none;">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Đang xử lý...
+                                    </span>
                                 </button>
                             </div>
                         </div>
@@ -800,6 +843,7 @@
                 });
                 
                 packagesGrid.innerHTML = packagesHTML;
+                console.log('✅ Packages rendered successfully');
             }
             
             formatPrice(price) {
@@ -853,13 +897,201 @@
         const courseDetailManager = new CourseDetailManager();
         
         // Add to cart function
-        function addToCart(packageId, packageName, price) {
-            // Here you would integrate with your cart system
-            showToast('Thành công!', `Đã thêm "${packageName}" vào giỏ hàng`, 'success', 3000);
+        async function addToCart(packageId, packageName, price) {
+            console.log('🛒 Adding to cart - Raw params:', arguments);
+            console.log('🛒 Package details:', { packageId, packageName, price, type: typeof packageId });
             
-            // Update cart count if header cart manager is available
-            if (window.headerCartManager) {
-                window.headerCartManager.notifyCartUpdate();
+            // Validate packageId
+            if (!packageId || packageId === 'undefined') {
+                console.error('❌ Invalid packageId:', packageId);
+                showToast('Lỗi', 'ID gói không hợp lệ. Vui lòng thử lại.', 'error', 3000);
+                return;
+            }
+            
+            // Check authentication first with server verification
+            if (typeof authChecker !== 'undefined') {
+                console.log('🔐 Starting authentication check...');
+                
+                // Use quickAuthCheck for security-critical cart operations
+                const authResult = await authChecker.quickAuthCheck();
+                console.log('🔐 Auth result:', authResult);
+                
+                if (!authResult.authenticated) {
+                    console.warn('[Cart] User not authenticated:', authResult.message);
+                    
+                    // Let user choose to login or continue as guest
+                    const shouldLogin = confirm('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng. Đăng nhập ngay?');
+                    if (shouldLogin) {
+                        authChecker.redirectToLogin('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+                    }
+                    return;
+                }
+                console.log('✅ Authentication successful:', authResult.user);
+            } else {
+                console.error('[Cart] authChecker not available');
+                showToast('Lỗi hệ thống', 'Không thể kiểm tra trạng thái đăng nhập', 'error', 3000);
+                return;
+            }
+            
+            const buttonId = `addToCartBtn-${packageId}`;
+            const button = document.getElementById(buttonId);
+            
+            try {
+                // Set loading state
+                setButtonLoading(button, true);
+                
+                console.log('📡 Making API call to add.php...');
+                console.log('📦 Request body:', { product_package_id: packageId, quantity: 1 });
+                console.log('🍪 Sending cookies:', document.cookie);
+                
+                const response = await fetch('api/cart/add.php', {
+                    method: 'POST',
+                    credentials: 'include', // Include cookies for session
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_package_id: packageId,
+                        quantity: 1
+                    })
+                });
+                
+                console.log('📨 Response status:', response.status);
+                console.log('📨 Response headers:', response.headers);
+                
+                const responseText = await response.text();
+                console.log('📨 Raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('🔄 API Response:', data);
+                } catch (jsonError) {
+                    console.error('❌ JSON Parse Error:', jsonError);
+                    console.error('❌ Response was:', responseText.substring(0, 500));
+                    showToast('Lỗi', 'Server trả về dữ liệu không hợp lệ', 'error', 4000);
+                    return;
+                }
+                
+                if (data.success) {
+                    const action = data.action === 'added' ? 'thêm mới' : 'cập nhật';
+                    const message = data.message || `Đã ${action} "${packageName}" vào giỏ hàng`;
+                    
+                    showToast('Thành công!', message, 'success', 3000);
+                    
+                    // Update cart count if header cart manager is available
+                    if (window.headerCartManager) {
+                        window.headerCartManager.notifyCartUpdate();
+                    }
+                    
+                    // Notify other pages about cart update
+                    notifyCartUpdate();
+                    
+                } else {
+                    // Check if error is related to authentication
+                    if (data.error && (data.error.includes('Unauthorized') || data.error.includes('authentication'))) {
+                        if (typeof authChecker !== 'undefined') {
+                            authChecker.redirectToLogin('Phiên đăng nhập đã hết hạn');
+                            return;
+                        }
+                    }
+                    
+                    const errorMessage = data.error || 'Có lỗi xảy ra khi thêm vào giỏ hàng';
+                    showToast('Lỗi', errorMessage, 'error', 4000);
+                    console.error('[Cart] API Error:', data.error);
+                }
+                
+            } catch (error) {
+                console.error('[Cart] Network Error:', error);
+                showToast('Lỗi', 'Không thể kết nối đến máy chủ. Vui lòng thử lại.', 'error', 4000);
+            } finally {
+                // Remove loading state
+                setButtonLoading(button, false);
+            }
+        }
+        
+        // Set button loading state
+        function setButtonLoading(button, loading) {
+            if (!button) return;
+            
+            const content = button.querySelector('.btn-content');
+            const loadingSpinner = button.querySelector('.btn-loading');
+            
+            if (loading) {
+                button.disabled = true;
+                if (content) content.style.display = 'none';
+                if (loadingSpinner) loadingSpinner.style.display = 'inline-flex';
+                button.style.cursor = 'not-allowed';
+            } else {
+                button.disabled = false;
+                if (content) content.style.display = 'inline-flex';
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                button.style.cursor = 'pointer';
+            }
+        }
+        
+        // Notify other tabs about cart update
+        function notifyCartUpdate() {
+            try {
+                localStorage.setItem('cart_updated', Date.now().toString());
+                localStorage.removeItem('cart_updated');
+            } catch (e) {
+                console.warn('[Cart] Could not notify cart update:', e);
+            }
+        }
+        
+        // Debug authentication function
+        function debugAuth() {
+            console.log('=== AUTHENTICATION DEBUG ===');
+            
+            if (typeof authChecker !== 'undefined') {
+                console.log('✅ authChecker available');
+                
+                const authStatus = authChecker.getCurrentAuthStatus();
+                console.log('🔐 Auth status:', authStatus);
+                
+                const userInfo = authChecker.getUserInfo();
+                console.log('👤 User info:', userInfo);
+                
+                const sessionToken = authChecker.getSessionToken();
+                console.log('🎟️ Session token:', sessionToken);
+                
+                const isLocalAuth = authChecker.isAuthenticatedLocally();
+                console.log('🏠 Local auth:', isLocalAuth);
+                
+                console.log('🍪 All cookies:', document.cookie);
+                console.log('📦 LocalStorage userInfo:', localStorage.getItem('userInfo'));
+                
+                // Test API call
+                testAuthAPI();
+                
+            } else {
+                console.error('❌ authChecker not available');
+            }
+            
+            console.log('=== END DEBUG ===');
+        }
+        
+        // Test auth API
+        async function testAuthAPI() {
+            try {
+                console.log('🧪 Testing auth API...');
+                const response = await fetch('api/auth/verify-session.php', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                console.log('🔍 Auth API Response:', data);
+                
+                if (data.success) {
+                    console.log('✅ API says user is authenticated:', data.user);
+                } else {
+                    console.log('❌ API says user not authenticated:', data.message);
+                }
+                
+            } catch (error) {
+                console.error('❌ Auth API error:', error);
             }
         }
         

@@ -344,6 +344,25 @@
             color: var(--contrast-color);
         }
         
+        .btn-pac-primary:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        .btn-pac-primary.success:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+        
+        .btn-pac-primary.loading {
+            pointer-events: none;
+        }
+        
+        .btn-pac-primary.success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71) !important;
+        }
+        
         .btn-pac-outline {
             background: transparent;
             border: 2px solid var(--brand-primary);
@@ -576,9 +595,9 @@
                                 <div class="package-meta-inline" id="package-meta-inline"></div>
                                 
                                 <div class="action-buttons">
-                                    <a href="#" class="btn-pac-primary" id="register-btn">
+                                    <a href="#" class="btn-pac-primary" id="add-to-cart-btn" onclick="addToCartFromDetail()">
                                         <i class="fas fa-shopping-cart"></i>
-                                        Đăng ký ngay
+                                        Thêm vào giỏ hàng
                                     </a>
                                     <a href="#" class="btn-pac-outline" id="contact-btn">
                                         <i class="fas fa-phone"></i>
@@ -639,6 +658,12 @@
     <!-- Main JS -->
     <script src="assets/js/component-loader.js"></script>
     <script src="assets/js/main.js"></script>
+    
+    <!-- Toastbar for notifications -->
+    <script src="assets/js/toastbar.js"></script>
+    
+    <!-- Authentication -->
+    <script src="assets/js/authen.js"></script>
 
     <!-- Page specific JS -->
     <script>
@@ -653,6 +678,9 @@
                 this.packageId = null;
                 this.packageData = null;
                 this.init();
+                
+                // Store global reference for cart functionality
+                window.packageDetailManager = this;
             }
 
             init() {
@@ -901,6 +929,167 @@
         document.addEventListener('DOMContentLoaded', function() {
             new PackageDetailManager();
         });
+
+        // Add to cart functionality (based on course-detail.html pattern)
+        async function addToCartFromDetail() {
+            console.log('🛒 Add to cart clicked');
+            
+            const manager = window.packageDetailManager;
+            if (!manager || !manager.packageData) {
+                console.error('❌ Package data not available');
+                showToast('Lỗi', 'Thông tin gói chưa được tải', 'error');
+                return;
+            }
+
+            const packageData = manager.packageData.package;
+            const packageId = packageData.package_id;
+            const packageName = packageData.package_name;
+            const price = packageData.is_free ? 0 : (packageData.sale_price || packageData.original_price);
+            
+            console.log('� Adding to cart - Package details:', { packageId, packageName, price });
+            
+            // Validate packageId
+            if (!packageId || packageId === 'undefined') {
+                console.error('❌ Invalid packageId:', packageId);
+                showToast('Lỗi', 'ID gói không hợp lệ. Vui lòng thử lại.', 'error');
+                return;
+            }
+
+            // Check authentication first with server verification
+            if (typeof authChecker !== 'undefined') {
+                console.log('🔐 Starting authentication check...');
+                
+                // Use quickAuthCheck for security-critical cart operations
+                const authResult = await authChecker.quickAuthCheck();
+                console.log('🔐 Auth result:', authResult);
+                
+                if (!authResult.authenticated) {
+                    console.warn('[Cart] User not authenticated:', authResult.message);
+                    
+                    // Let user choose to login or continue as guest
+                    const shouldLogin = confirm('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng. Đăng nhập ngay?');
+                    if (shouldLogin) {
+                        authChecker.redirectToLogin('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+                    }
+                    return;
+                }
+                console.log('✅ Authentication successful:', authResult.user);
+            } else {
+                console.error('[Cart] authChecker not available');
+                showToast('Lỗi hệ thống', 'Không thể kiểm tra trạng thái đăng nhập', 'error');
+                return;
+            }
+
+            const button = document.getElementById('add-to-cart-btn');
+            
+            try {
+                // Set loading state
+                setButtonLoading(button, true);
+                
+                console.log('� Making API call to add.php...');
+                console.log('📦 Request body:', { product_package_id: packageId, quantity: 1 });
+                
+                const response = await fetch('api/cart/add.php', {
+                    method: 'POST',
+                    credentials: 'include', // Include cookies for session
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_package_id: packageId,
+                        quantity: 1
+                    })
+                });
+                
+                console.log('📨 Response status:', response.status);
+                
+                const responseText = await response.text();
+                console.log('📨 Raw response:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('🔄 API Response:', data);
+                } catch (jsonError) {
+                    console.error('❌ JSON Parse Error:', jsonError);
+                    console.error('❌ Response was:', responseText.substring(0, 500));
+                    showToast('Lỗi', 'Server trả về dữ liệu không hợp lệ', 'error');
+                    return;
+                }
+                
+                if (data.success) {
+                    const message = data.message || 'Đã thêm sản phẩm vào giỏ hàng!';
+                    console.log('✅ Success:', message);
+                    
+                    // Show success message
+                    showToast('Thành công', message, 'success');
+                    
+                    // Success visual feedback
+                    setButtonSuccess(button);
+                    
+                } else {
+                    console.error('❌ API Error:', data.error);
+                    
+                    // Check if error is related to authentication
+                    if (data.error && (data.error.includes('Unauthorized') || data.error.includes('authentication') || data.error.includes('Phiên đăng nhập'))) {
+                        if (typeof authChecker !== 'undefined') {
+                            authChecker.redirectToLogin('Phiên đăng nhập đã hết hạn');
+                        }
+                        return;
+                    }
+                    
+                    // Show error message
+                    const errorMessage = data.error || 'Có lỗi xảy ra khi thêm vào giỏ hàng';
+                    showToast('Lỗi', errorMessage, 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Network Error:', error);
+                showToast('Lỗi kết nối', 'Lỗi kết nối. Vui lòng thử lại.', 'error');
+            } finally {
+                // Reset button state
+                setButtonLoading(button, false);
+            }
+        }
+
+        // Button state management functions
+        function setButtonLoading(button, loading) {
+            if (!button) return;
+            
+            if (loading) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+                button.classList.add('loading');
+            } else {
+                // Only reset if not in success state
+                if (!button.classList.contains('success')) {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng';
+                }
+                button.classList.remove('loading');
+            }
+        }
+
+        function setButtonSuccess(button) {
+            if (!button) return;
+            
+            // Keep button disabled during success state
+            button.disabled = true;
+            button.classList.add('success');
+            button.innerHTML = '<i class="fas fa-check"></i> Đã thêm thành công!';
+            button.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            
+            setTimeout(() => {
+                button.disabled = false;
+                button.classList.remove('success');
+                button.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng';
+                button.style.background = '';
+                
+                // Redirect to cart page
+                console.log('🛒 Redirecting to cart page...');
+                window.location.href = 'cart';
+            }, 2000);
+        }
     </script>
 </body>
 </html>

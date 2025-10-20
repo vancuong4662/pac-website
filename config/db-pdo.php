@@ -15,6 +15,8 @@ try {
     ];
     
     $conn = new PDO($dsn, $username, $password, $options);
+    // Alias cho compatibility với các file khác
+    $pdo = $conn;
     
 } catch (PDOException $e) {
     // Log error và trả về response JSON cho API

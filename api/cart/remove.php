@@ -27,7 +27,9 @@ $cartId = isset($_GET['id']) ? (int)$_GET['id'] : null;
 // Hoặc từ JSON body nếu không có trong URL
 if (!$cartId) {
     $input = json_decode(file_get_contents('php://input'), true);
-    if (isset($input['cart_id'])) {
+    if (isset($input['item_id'])) {
+        $cartId = (int)$input['item_id'];
+    } elseif (isset($input['cart_id'])) {
         $cartId = (int)$input['cart_id'];
     }
 }
@@ -41,9 +43,22 @@ if ($cartId <= 0) {
 try {
     // Kiểm tra cart item có thuộc về user không và lấy thông tin trước khi xóa
     $stmt = $pdo->prepare("
-        SELECT c.id, c.quantity, p.name, p.price 
+        SELECT 
+            c.id, 
+            c.quantity, 
+            p.name as product_name,
+            pp.package_name,
+            pp.original_price,
+            pp.sale_price,
+            pp.is_free,
+            CASE 
+                WHEN pp.is_free = 1 THEN 0
+                WHEN pp.sale_price IS NOT NULL AND pp.sale_price > 0 THEN pp.sale_price
+                ELSE pp.original_price
+            END as current_price
         FROM cart c
         JOIN products p ON c.product_id = p.id
+        JOIN product_packages pp ON c.package_id = pp.id
         WHERE c.id = ? AND c.user_id = ?
     ");
     $stmt->execute([$cartId, $user['id']]);
@@ -71,11 +86,18 @@ try {
     $stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_items,
-            SUM(quantity) as total_quantity,
-            COALESCE(SUM(quantity * p.price), 0) as total_amount
+            SUM(c.quantity) as total_quantity,
+            COALESCE(SUM(c.quantity * 
+                CASE 
+                    WHEN pp.is_free = 1 THEN 0
+                    WHEN pp.sale_price IS NOT NULL AND pp.sale_price > 0 THEN pp.sale_price
+                    ELSE pp.original_price
+                END
+            ), 0) as total_amount
         FROM cart c
         JOIN products p ON c.product_id = p.id
-        WHERE c.user_id = ? AND p.status = 'active'
+        JOIN product_packages pp ON c.package_id = pp.id
+        WHERE c.user_id = ? AND p.status = 'active' AND pp.status = 'active'
     ");
     $stmt->execute([$user['id']]);
     $cartSummary = $stmt->fetch();
@@ -85,17 +107,19 @@ try {
         'data' => [
             'removed_item' => [
                 'cart_id' => $cartId,
-                'name' => $cartItem['name'],
-                'quantity' => $cartItem['quantity']
+                'product_name' => $cartItem['product_name'],
+                'package_name' => $cartItem['package_name'],
+                'quantity' => $cartItem['quantity'],
+                'price' => $cartItem['current_price']
             ],
             'cart_summary' => [
                 'total_items' => (int)$cartSummary['total_items'],
                 'total_quantity' => (int)$cartSummary['total_quantity'],
                 'total_amount' => (float)$cartSummary['total_amount'],
-                'total_formatted' => number_format($cartSummary['total_amount'], 0, ',', '.') . ' VND'
+                'total_formatted' => number_format($cartSummary['total_amount'], 0, ',', '.') . '₫'
             ]
         ],
-        'message' => "Đã xóa {$cartItem['name']} khỏi giỏ hàng"
+        'message' => "Đã xóa gói \"{$cartItem['package_name']}\" khỏi giỏ hàng"
     ];
     
     echo json_encode($response, JSON_UNESCAPED_UNICODE);

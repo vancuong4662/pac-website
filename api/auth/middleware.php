@@ -123,6 +123,88 @@ function requireAuth($conn, $allowedRoles = []) {
 }
 
 /**
+ * Verify session (alias for checkAuthentication with global connection)
+ * @return array|false Returns user data if authenticated, false otherwise
+ */
+function verifySession() {
+    // Get global database connection (PDO)
+    global $pdo;
+    
+    // If PDO not available, try to get MySQL connection
+    if (!$pdo) {
+        global $conn;
+        return checkAuthentication($conn);
+    }
+    
+    // Start session if not started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Get session token from cookie or session
+    $sessionToken = $_COOKIE['pac_session_token'] ?? $_SESSION['session_token'] ?? null;
+    
+    if (!$sessionToken) {
+        return false;
+    }
+    
+    try {
+        // Verify session in database using PDO
+        $query = "SELECT s.*, u.id, u.fullname, u.email, u.username, u.role, u.status 
+                  FROM sessions s 
+                  INNER JOIN users u ON s.user_id = u.id 
+                  WHERE s.session_token = ? AND s.expires_at > NOW() AND u.status = 'active'";
+        
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$sessionToken]);
+        $sessionData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$sessionData) {
+            // Clean up invalid session
+            session_unset();
+            session_destroy();
+            
+            // Clear cookies
+            setcookie('pac_session_token', '', [
+                'expires' => time() - 3600,
+                'path' => '/',
+                'domain' => '',
+                'secure' => false,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+            
+            return false;
+        }
+        
+        // Update session variables
+        $_SESSION['user_id'] = $sessionData['id'];
+        $_SESSION['username'] = $sessionData['username'];
+        $_SESSION['fullname'] = $sessionData['fullname'];
+        $_SESSION['role'] = $sessionData['role'];
+        $_SESSION['session_token'] = $sessionToken;
+        $_SESSION['logged_in'] = true;
+        
+        // Update last activity
+        $updateQuery = "UPDATE sessions SET updated_at = CURRENT_TIMESTAMP WHERE session_token = ?";
+        $updateStmt = $pdo->prepare($updateQuery);
+        $updateStmt->execute([$sessionToken]);
+        
+        return [
+            'id' => $sessionData['id'],
+            'username' => $sessionData['username'],
+            'fullname' => $sessionData['fullname'],
+            'email' => $sessionData['email'],
+            'role' => $sessionData['role']
+        ];
+        
+    } catch (Exception $e) {
+        error_log("verifySession error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Clean up expired sessions (should be called periodically)
  */
 function cleanupExpiredSessions($conn) {

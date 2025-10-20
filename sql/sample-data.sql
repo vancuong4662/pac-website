@@ -27,11 +27,11 @@ ALTER TABLE orders AUTO_INCREMENT = 1;
 
 -- Tài khoản admin
 INSERT INTO users (fullname, email, username, password, phone, status, role, email_verified) VALUES
-('Admin PAC', 'admin@pac.edu.vn', 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0966013663', 'active', 'admin', 1);
+('Admin PAC', 'admin@pac.edu.vn', 'admin', '123456', '0966013663', 'active', 'admin', 1);
 
 -- Tài khoản khách hàng demo
 INSERT INTO users (fullname, email, username, password, phone, status, role, email_verified) VALUES
-('Nguyễn Văn A', 'customer@example.com', 'customer', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '0901234567', 'active', 'user', 1);
+('Nguyễn Văn A', 'customer@example.com', 'customer', '123456', '0901234567', 'active', 'user', 1);
 
 -- =====================================================
 -- PHẦN 2: TẠO SẢN PHẨM VÀ CÁC GÓI

@@ -27,17 +27,19 @@ class AuthChecker {
 
     /**
      * Get current authentication status without redirects (for UI updates)
+     * Note: This is a quick local check. For critical operations, use checkAuthStatus()
      * @returns {Object} Current auth status and user info
      */
     getCurrentAuthStatus() {
         const userInfo = this.getUserInfo();
-        const sessionToken = this.getSessionToken();
-        
-        const isAuthenticated = !!(userInfo && userInfo.id && sessionToken);
+        // Note: We can't read pac_session_token as it's httpOnly
+        // So we only check if user info exists locally
+        const hasUserInfo = !!(userInfo && userInfo.id);
         
         return {
-            isAuthenticated,
-            user: isAuthenticated ? userInfo : null
+            isAuthenticated: hasUserInfo,
+            user: hasUserInfo ? userInfo : null,
+            note: 'Local check only - use checkAuthStatus() for server verification'
         };
     }
 
@@ -200,13 +202,14 @@ class AuthChecker {
 
     /**
      * Check authentication status (comprehensive check)
+     * @param {boolean} forceServerCheck - Force server verification even if no local data
      * @returns {Promise<Object>} Authentication status result
      */
-    async checkAuthStatus() {
+    async checkAuthStatus(forceServerCheck = false) {
         // Quick local check first (only check user info since token is httpOnly)
         const hasUserInfo = this.isAuthenticatedLocally();
         
-        if (!hasUserInfo) {
+        if (!hasUserInfo && !forceServerCheck) {
             return {
                 authenticated: false,
                 message: 'No local user data found'
@@ -221,6 +224,29 @@ class AuthChecker {
             user: verification.user || null,
             message: verification.message
         };
+    }
+
+    /**
+     * Quick authentication check for cart operations
+     * Uses both local check and server verification for security
+     * @returns {Promise<Object>} Authentication result with user data
+     */
+    async quickAuthCheck() {
+        // First do local check
+        const localStatus = this.getCurrentAuthStatus();
+        
+        if (!localStatus.isAuthenticated) {
+            return {
+                authenticated: false,
+                user: null,
+                message: 'No local authentication data'
+            };
+        }
+        
+        // Then verify with server for security-critical operations
+        const serverCheck = await this.checkAuthStatus(true);
+        
+        return serverCheck;
     }
 
     /**

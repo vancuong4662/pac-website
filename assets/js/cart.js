@@ -28,6 +28,47 @@ function setupEventListeners() {
             loadCartData();
         }
     });
+    
+    // Setup cart-specific button event listeners
+    setupCartButtonListeners();
+}
+
+// Setup cart button event listeners
+function setupCartButtonListeners() {
+    // Refresh cart button
+    const refreshBtn = document.getElementById('refresh-cart-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            loadCartData();
+        });
+    }
+    
+    // Clear cart button
+    const clearBtn = document.getElementById('clear-cart-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            clearCart();
+        });
+    }
+    
+    // Apply promo code button
+    const promoBtn = document.getElementById('applyPromoBtn');
+    if (promoBtn) {
+        promoBtn.addEventListener('click', function() {
+            applyPromoCode();
+        });
+    }
+    
+    // Checkout button - will be handled by onclick or href
+    // Promo code input - apply on Enter key
+    const promoInput = document.getElementById('promoCodeInput');
+    if (promoInput) {
+        promoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyPromoCode();
+            }
+        });
+    }
 }
 
 // Load cart data from API
@@ -35,18 +76,48 @@ async function loadCartData() {
     try {
         showLoading(true);
         
-        const response = await fetch('api/cart/get.php');
+        // Check authentication before making API call
+        if (typeof authChecker !== 'undefined') {
+            const authResult = await authChecker.quickAuthCheck();
+            if (!authResult.authenticated) {
+                console.warn('[Cart] User not authenticated, redirecting to login');
+                authChecker.redirectToLogin('Vui lòng đăng nhập để xem giỏ hàng');
+                return;
+            }
+        }
+        
+        const response = await fetch('api/cart/get.php', {
+            method: 'GET',
+            credentials: 'include', // Include cookies for session
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         const data = await response.json();
         
         if (data.success) {
             cartData = data.data;
             displayCart();
         } else {
+            // Check if error is related to authentication
+            if (data.message && (data.message.includes('đăng nhập') || data.message.includes('authentication'))) {
+                if (typeof authChecker !== 'undefined') {
+                    authChecker.redirectToLogin('Phiên đăng nhập đã hết hạn');
+                    return;
+                }
+            }
             showError('Không thể tải giỏ hàng: ' + (data.message || 'Lỗi không xác định'));
         }
     } catch (error) {
-        console.error('Error loading cart:', error);
-        showError('Có lỗi xảy ra khi tải giỏ hàng');
+        console.error('[Cart] Error loading cart:', error);
+        
+        // Check if it's a network error that might indicate auth issues
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            showError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+        } else {
+            showError('Có lỗi xảy ra khi tải giỏ hàng');
+        }
     } finally {
         showLoading(false);
     }
@@ -55,10 +126,10 @@ async function loadCartData() {
 // Display cart content
 function displayCart() {
     const cartContainer = document.getElementById('cartContainer');
-    const cartCount = document.getElementById('cartCount');
+    const cartCount = document.getElementById('cartItemsCount');
     const cartItems = document.getElementById('cartItems');
     const cartSummaryDetails = document.getElementById('cartSummaryDetails');
-    const clearCartBtn = document.getElementById('clearCartBtn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
     const checkoutBtn = document.getElementById('checkoutBtn');
     
     if (!cartContainer || !cartItems || !cartSummaryDetails) return;
@@ -68,109 +139,120 @@ function displayCart() {
     
     // Update cart count
     if (cartCount) {
-        const totalItems = cartData && cartData.items ? cartData.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
-        cartCount.textContent = `${totalItems} sản phẩm`;
+        const totalItems = cartData && cartData.summary ? cartData.summary.item_count || 0 : 0;
+        const totalPackages = cartData && cartData.summary ? cartData.summary.total_items || 0 : 0;
+        cartCount.textContent = `${totalItems} gói dịch vụ (${totalPackages} loại)`;
     }
     
     // Display cart items
     if (!cartData || !cartData.items || cartData.items.length === 0) {
-        displayEmptyCart(cartItems);
+        // Show empty cart state
+        cartItems.style.display = 'none';
+        document.getElementById('emptyCartState').style.display = 'block';
         displayEmptySummary(cartSummaryDetails);
         
         if (clearCartBtn) clearCartBtn.style.display = 'none';
         if (checkoutBtn) checkoutBtn.style.display = 'none';
     } else {
+        // Show cart items
+        cartItems.style.display = 'block';
+        document.getElementById('emptyCartState').style.display = 'none';
         displayCartItems(cartItems, cartData.items);
         displayCartSummary(cartSummaryDetails, cartData);
         
-        if (clearCartBtn) clearCartBtn.style.display = 'flex';
-        if (checkoutBtn) checkoutBtn.style.display = 'flex';
+        if (clearCartBtn) clearCartBtn.style.display = 'inline-flex';
+        if (checkoutBtn) checkoutBtn.style.display = 'inline-flex';
     }
 }
 
-// Display empty cart
+// Display empty cart (not used in table view, handled by cart.html)
 function displayEmptyCart(container) {
-    container.innerHTML = `
-        <div class="empty-cart-item">
-            <i class="fas fa-shopping-cart"></i>
-            <h3>Giỏ hàng trống</h3>
-            <p>Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá các sản phẩm của chúng tôi!</p>
-            <a href="products" class="btn">
-                <i class="fas fa-shopping-bag"></i>
-                Mua sắm ngay
-            </a>
-        </div>
-    `;
+    // Empty cart state is handled in cart.html template
+    container.innerHTML = '';
 }
 
-// Display cart items
+// Display cart items as table
 function displayCartItems(container, items) {
-    let itemsHTML = '';
+    let tableHTML = `
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Gói dịch vụ</th>
+                                <th>Loại</th>
+                                <th>Giá</th>
+                                <th>Thời gian thêm</th>
+                                <th class="text-center pe-4">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    `;
     
     items.forEach(item => {
-        itemsHTML += generateCartItemHTML(item);
+        tableHTML += generateCartItemHTML(item);
     });
     
-    container.innerHTML = itemsHTML;
-}
-
-// Generate cart item HTML
-function generateCartItemHTML(item) {
-    const typeMap = {
-        'course': 'Khóa học',
-        'online_test': 'Trắc nghiệm',
-        'consultation': 'Tư vấn'
-    };
-    
-    const packageMap = {
-        'basic': 'Gói cơ bản',
-        'premium': 'Gói cao cấp'
-    };
-    
-    return `
-        <div class="cart-item" data-item-id="${item.id}" data-aos="fade-up">
-            <div class="cart-item-content">
-                <div class="cart-item-image">
-                    <img src="${item.product_image || '/pac-new/assets/img/pic/default-product.svg'}" 
-                         alt="${item.product_name}"
-                         onerror="this.src='/pac-new/assets/img/pic/default-product.svg'">
-                </div>
-                
-                <div class="cart-item-info">
-                    <h3 class="cart-item-title">${item.product_name}</h3>
-                    <p class="cart-item-description">${item.product_description || 'Không có mô tả'}</p>
-                    
-                    <div class="cart-item-meta">
-                        <span class="cart-item-type ${item.product_type}">${typeMap[item.product_type] || item.product_type}</span>
-                        ${item.package_type ? `<span class="cart-item-package ${item.package_type}">${packageMap[item.package_type]}</span>` : ''}
-                    </div>
-                    
-                    <div class="cart-item-price">${formatPrice(item.price)} VNĐ</div>
-                </div>
-                
-                <div class="cart-item-actions">
-                    <div class="quantity-controls">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <div class="quantity-display">${item.quantity}</div>
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    
-                    <button class="remove-btn" onclick="removeFromCart(${item.id})">
-                        <i class="fas fa-trash"></i>
-                        Xóa
-                    </button>
-                </div>
-                
-                <div class="cart-item-subtotal">
-                    <div class="subtotal-label">Thành tiền</div>
-                    <div class="subtotal-amount">${formatPrice(item.price * item.quantity)} VNĐ</div>
+    tableHTML += `
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+    `;
+    
+    container.innerHTML = tableHTML;
+}
+
+// Generate cart item HTML as table row
+function generateCartItemHTML(item) {
+    // Build price display with discount and free package handling
+    let priceHTML = '';
+    
+    if (item.is_free == 1) {
+        // Free package
+        priceHTML = `<span class="fw-bold text-success">MIỄN PHÍ</span>`;
+    } else if (item.has_discount && item.original_price_formatted) {
+        // Discounted package
+        priceHTML = `
+            <span class="fw-bold text-danger">${item.current_price_formatted}</span><br>
+            <small class="text-muted text-decoration-line-through">${item.original_price_formatted}</small>
+        `;
+    } else {
+        // Regular package
+        priceHTML = `<span class="fw-bold">${item.current_price_formatted}</span>`;
+    }
+    
+    // Format added time
+    const addedDate = new Date(item.added_at);
+    const formattedDate = addedDate.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    return `
+        <tr data-item-id="${item.cart_id}">
+            <td>
+                <div class="fw-bold text-primary">${item.package_name}</div>
+                <small class="text-muted">${item.product_name}</small>
+            </td>
+            <td>
+                <span class="badge bg-primary">${item.type_label}</span>
+            </td>
+            <td>${priceHTML}</td>
+            <td>
+                <small class="text-muted">${formattedDate}</small>
+            </td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.cart_id})" title="Xóa">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
     `;
 }
 
@@ -178,89 +260,61 @@ function generateCartItemHTML(item) {
 function displayEmptySummary(container) {
     container.innerHTML = `
         <div class="summary-row">
-            <span class="summary-label">Tạm tính:</span>
-            <span class="summary-value">0 VNĐ</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Phí vận chuyển:</span>
-            <span class="summary-value">Miễn phí</span>
+            <span class="summary-label">Số lượng sản phẩm dịch vụ:</span>
+            <span class="summary-value">0 gói</span>
         </div>
         <div class="summary-row">
             <span class="summary-label">Tổng cộng:</span>
-            <span class="summary-value summary-total">0 VNĐ</span>
+            <span class="summary-value summary-total">0₫</span>
         </div>
     `;
 }
 
 // Display cart summary
 function displayCartSummary(container, data) {
-    const subtotal = data.total_amount || 0;
-    const shipping = 0; // Free shipping
-    const discount = 0; // No discount for now
-    const total = subtotal - discount + shipping;
+    const summary = data.summary || {};
+    const subtotal = summary.subtotal || 0;
+    const discount = summary.discount || 0;
+    const total = summary.total_amount || 0;
+    const shipping = 0; // Free shipping for digital products
     
     container.innerHTML = `
         <div class="summary-row">
-            <span class="summary-label">Tạm tính (${data.items.length} sản phẩm):</span>
-            <span class="summary-value">${formatPrice(subtotal)} VNĐ</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Phí vận chuyển:</span>
-            <span class="summary-value">Miễn phí</span>
+            <span class="summary-label">Số lượng sản phẩm dịch vụ:</span>
+            <span class="summary-value">${data.items.length} gói</span>
         </div>
         ${discount > 0 ? `
         <div class="summary-row">
             <span class="summary-label">Giảm giá:</span>
-            <span class="summary-value text-success">-${formatPrice(discount)} VNĐ</span>
+            <span class="summary-value text-success">-${summary.discount_formatted || formatPrice(discount) + '₫'}</span>
         </div>
         ` : ''}
         <div class="summary-row">
             <span class="summary-label">Tổng cộng:</span>
-            <span class="summary-value summary-total">${formatPrice(total)} VNĐ</span>
+            <span class="summary-value summary-total">${summary.total_formatted || formatPrice(total) + '₫'}</span>
         </div>
     `;
 }
 
-// Update item quantity
+// Update item quantity (disabled - each package quantity is always 1)
 async function updateQuantity(itemId, newQuantity) {
-    if (isUpdating || newQuantity < 1) return;
-    
-    try {
-        isUpdating = true;
-        setItemLoading(itemId, true);
-        
-        const response = await fetch('api/cart/update.php', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                item_id: itemId,
-                quantity: newQuantity
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Đã cập nhật số lượng', 'success');
-            loadCartData(); // Reload cart data
-            notifyCartUpdate();
-        } else {
-            showToast(data.message || 'Có lỗi xảy ra khi cập nhật', 'error');
-        }
-    } catch (error) {
-        console.error('Error updating quantity:', error);
-        showToast('Có lỗi xảy ra khi cập nhật số lượng', 'error');
-    } finally {
-        isUpdating = false;
-        setItemLoading(itemId, false);
-    }
+    // Quantity update disabled for packages
+    showToast('Mỗi gói dịch vụ chỉ có thể mua 1 lần', 'info');
+    return;
 }
 
 // Remove item from cart
 async function removeFromCart(itemId) {
     if (isUpdating) return;
+    
+    // Check authentication before operation
+    if (typeof authChecker !== 'undefined') {
+        const authResult = await authChecker.quickAuthCheck();
+        if (!authResult.authenticated) {
+            authChecker.redirectToLogin('Vui lòng đăng nhập để xóa sản phẩm');
+            return;
+        }
+    }
     
     // Confirm before removing
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
@@ -273,6 +327,7 @@ async function removeFromCart(itemId) {
         
         const response = await fetch('api/cart/remove.php', {
             method: 'DELETE',
+            credentials: 'include', // Include cookies for session
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -284,7 +339,8 @@ async function removeFromCart(itemId) {
         const data = await response.json();
         
         if (data.success) {
-            showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'success');
+            const message = data.message || 'Đã xóa gói dịch vụ khỏi giỏ hàng';
+            showToast(message, 'success');
             loadCartData(); // Reload cart data
             notifyCartUpdate();
         } else {
@@ -303,6 +359,15 @@ async function removeFromCart(itemId) {
 async function clearCart() {
     if (isUpdating) return;
     
+    // Check authentication before operation
+    if (typeof authChecker !== 'undefined') {
+        const authResult = await authChecker.quickAuthCheck();
+        if (!authResult.authenticated) {
+            authChecker.redirectToLogin('Vui lòng đăng nhập để xóa giỏ hàng');
+            return;
+        }
+    }
+    
     // Confirm before clearing
     if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?')) {
         return;
@@ -313,7 +378,8 @@ async function clearCart() {
         showLoading(true);
         
         const response = await fetch('api/cart/clear.php', {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include' // Include cookies for session
         });
         
         const data = await response.json();
@@ -335,8 +401,17 @@ async function clearCart() {
 }
 
 // Apply promo code (placeholder)
-function applyPromoCode() {
-    const promoCode = document.getElementById('promoCode').value.trim();
+async function applyPromoCode() {
+    // Check authentication before operation
+    if (typeof authChecker !== 'undefined') {
+        const authResult = await authChecker.quickAuthCheck();
+        if (!authResult.authenticated) {
+            authChecker.redirectToLogin('Vui lòng đăng nhập để sử dụng mã giảm giá');
+            return;
+        }
+    }
+    
+    const promoCode = document.getElementById('promoCodeInput').value.trim();
     
     if (!promoCode) {
         showToast('Vui lòng nhập mã giảm giá', 'error');
@@ -351,10 +426,22 @@ function applyPromoCode() {
 function setItemLoading(itemId, loading) {
     const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
     if (itemElement) {
+        const deleteBtn = itemElement.querySelector('button[onclick*="removeFromCart"]');
+        
         if (loading) {
             itemElement.classList.add('loading');
+            itemElement.style.opacity = '0.6';
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            }
         } else {
             itemElement.classList.remove('loading');
+            itemElement.style.opacity = '1';
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            }
         }
     }
 }
@@ -399,23 +486,14 @@ function showError(message) {
 
 // Show toast notification
 function showToast(message, type = 'info') {
-    const toastElement = document.getElementById('toast');
-    const toastBody = document.getElementById('toastBody');
-    
-    if (!toastElement || !toastBody) return;
-    
-    toastBody.textContent = message;
-    
-    // Update toast icon based on type
-    const toastHeader = toastElement.querySelector('.toast-header i');
-    if (toastHeader) {
-        toastHeader.className = `fas ${type === 'success' ? 'fa-check-circle text-success' : 
-                                      type === 'error' ? 'fa-exclamation-circle text-danger' : 
-                                      'fa-info-circle text-primary'} me-2`;
+    // Use Toastbar if available (from toastbar.js)
+    if (typeof Toastbar !== 'undefined') {
+        Toastbar.show(message, type);
+        return;
     }
     
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
+    // Fallback to console if Toastbar not available
+    console.log(`[${type.toUpperCase()}] ${message}`);
 }
 
 // Notify other tabs about cart update
@@ -430,15 +508,26 @@ function formatPrice(price) {
 }
 
 // Add to cart (for integration with other pages)
-async function addToCart(productId, quantity = 1) {
+async function addToCart(productPackageId, quantity = 1) {
     try {
+        // Check authentication before making API call
+        if (typeof authChecker !== 'undefined') {
+            const authStatus = authChecker.getCurrentAuthStatus();
+            if (!authStatus.isAuthenticated) {
+                console.warn('[Cart] User not authenticated, redirecting to login');
+                authChecker.redirectToLogin('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
+                return false;
+            }
+        }
+        
         const response = await fetch('api/cart/add.php', {
             method: 'POST',
+            credentials: 'include', // Include cookies for session
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                product_id: productId,
+                product_package_id: productPackageId,
                 quantity: quantity
             })
         });
@@ -446,19 +535,30 @@ async function addToCart(productId, quantity = 1) {
         const data = await response.json();
         
         if (data.success) {
-            showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+            const message = data.message || 'Đã thêm sản phẩm vào giỏ hàng!';
+            showToast('Thành công', message, 'success');
+            
             if (window.location.pathname.includes('cart.html')) {
                 loadCartData(); // Reload if on cart page
             }
             notifyCartUpdate();
             return true;
         } else {
-            showToast(data.message || 'Có lỗi xảy ra', 'error');
+            // Check if error is related to authentication
+            if (data.error && (data.error.includes('Unauthorized') || data.error.includes('authentication'))) {
+                if (typeof authChecker !== 'undefined') {
+                    authChecker.redirectToLogin('Phiên đăng nhập đã hết hạn');
+                    return false;
+                }
+            }
+            
+            const errorMessage = data.error || 'Có lỗi xảy ra';
+            showToast('Lỗi', errorMessage, 'error');
             return false;
         }
     } catch (error) {
         console.error('Error adding to cart:', error);
-        showToast('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
+        showToast('Lỗi', 'Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
         return false;
     }
 }
