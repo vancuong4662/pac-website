@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Kết quả thanh toán - PAC Group</title>
+  <meta name="description" content="PAC Group - Kết quả thanh toán đơn hàng">
+  <meta name="keywords" content="PAC Group, thanh toán, kết quả, đơn hàng">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts - Montserrat for PAC Group -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  
+  <!-- Toastbar CSS for notifications -->
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+  
+  <!-- Custom CSS for Payment Result Page -->
+  <style>
+    /* Payment Result Page specific styles using CSS variables from main.css */
+    .payment-result-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-light) 0%, var(--surface-color) 100%);
+      padding: 120px 0 80px;
+    }
+
+    .payment-result-page .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .payment-result-page .page-header h1 {
+      color: var(--heading-color);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Result Cards */
+    .result-card {
+      background: var(--surface-color);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(150, 75, 223, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Success State */
+    .result-success {
+      border-top: 5px solid #28a745;
+    }
+
+    .result-success .result-icon {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      font-size: 3rem;
+      animation: successPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes successPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .result-success .result-title {
+      color: #28a745;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .result-success .result-message {
+      color: var(--default-color);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Failed State */
+    .result-failed {
+      border-top: 5px solid #dc3545;
+    }
+
+    .result-failed .result-icon {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      font-size: 3rem;
+      animation: failedShake 0.8s ease-in-out;
+    }
+
+    @keyframes failedShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .result-failed .result-title {
+      color: #dc3545;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .result-failed .result-message {
+      color: var(--default-color);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Error State */
+    .result-error {
+      border-top: 5px solid #ffc107;
+    }
+
+    .result-error .result-icon {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: white;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      font-size: 3rem;
+    }
+
+    .result-error .result-title {
+      color: #ffc107;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .result-error .result-message {
+      color: var(--default-color);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Payment Details */
+    .payment-details {
+      background: var(--bg-light);
+      border-radius: 15px;
+      padding: 2rem;
+      margin: 2rem 0;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .payment-details h4 {
+      color: var(--accent-color);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(150, 75, 223, 0.1);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--neutral-gray);
+      font-weight: 500;
+    }
+
+    .detail-value {
+      color: var(--heading-color);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .detail-value.amount {
+      color: var(--accent-color);
+      font-size: 1.1rem;
+    }
+
+    /* Action Buttons */
+    .result-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary-custom:hover {
+      background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--accent-color) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
+      color: white;
+    }
+
+    .btn-secondary-custom {
+      background: transparent;
+      color: var(--neutral-gray);
+      border: 2px solid #e5e7eb;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary-custom:hover {
+      background: var(--bg-light);
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+
+    .btn-retry {
+      background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-retry:hover {
+      background: linear-gradient(135deg, #e0a800 0%, #ffc107 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
+      color: white;
+    }
+
+    /* Loading State */
+    .loading-container {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--neutral-gray);
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 2rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .payment-result-page {
+        padding: 100px 0 60px;
+      }
+
+      .result-card {
+        padding: 2rem 1rem;
+        margin: 0 1rem 2rem;
+      }
+
+      .result-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn-primary-custom,
+      .btn-secondary-custom,
+      .btn-retry {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .detail-value {
+        text-align: left;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="payment-result-page">
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Header Section Container -->
+  <div id="header-section">
+    <!-- Header component will be loaded here -->
+  </div>
+
+  <main class="main">
+    <!-- Page Header -->
+    <div class="page-header" data-aos="fade-up">
+      <div class="container">
+        <h1>Kết quả thanh toán</h1>
+        <p class="text-muted">Thông tin chi tiết về giao dịch của bạn</p>
+      </div>
+    </div>
+
+    <!-- Payment Result Content -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            
+            <!-- Loading State -->
+            <div id="loadingState" class="result-card">
+              <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <h3>Đang xử lý thông tin thanh toán...</h3>
+                <p>Vui lòng đợi trong giây lát</p>
+              </div>
+            </div>
+
+            <!-- Payment Result Card -->
+            <div id="resultCard" class="result-card" style="display: none;">
+              <!-- Content will be loaded dynamically -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Section Container -->
+  <div id="footer-section">
+    <!-- Footer component will be loaded here -->
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Component Loader -->
+  <script src="assets/js/component-loader.js?v=1.1"></script>
+
+  <!-- Toastbar for notifications -->
+  <script src="assets/js/toastbar.js"></script>
+
+  <!-- Payment Result JS -->
+  <script>
+    // Payment result handling
+    // If VNPay return parameters are present we defer rendering to the
+    // external verifier script (assets/js/payment-result.js) which will
+    // call the server to verify and then render the correct UI.
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const vnpResponseCode = urlParams.get('vnp_ResponseCode');
+        const vnpTxnRef = urlParams.get('vnp_TxnRef');
+
+        // If this request came from VNPay, do nothing here and let the
+        // verifier script handle hiding the loading state and rendering
+        // the result. Otherwise fall back to the legacy 'status' handling.
+        if (vnpResponseCode && vnpTxnRef) {
+          // keep loading visible briefly; external script will hide it
+          return;
+        }
+
+        // Non-VNPay flow (legacy query param 'status')
+        processPaymentResult();
+      }, 1000); // Short delay to show loading state
+    });
+
+    function processPaymentResult() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get('status');
+
+      const loadingState = document.getElementById('loadingState');
+      const resultCard = document.getElementById('resultCard');
+
+      if (loadingState) loadingState.style.display = 'none';
+      if (resultCard) resultCard.style.display = 'block';
+
+      switch (status) {
+        case 'success':
+          showSuccessResult(urlParams);
+          break;
+        case 'failed':
+          showFailedResult(urlParams);
+          break;
+        case 'error':
+          showErrorResult(urlParams);
+          break;
+        default:
+          showErrorResult(new URLSearchParams([['message', 'Không xác định được trạng thái thanh toán']]));
+      }
+    }
+
+    function showSuccessResult(params) {
+      const orderCode = params.get('order_code') || 'N/A';
+      const amount = params.get('amount') || '0';
+      const txnRef = params.get('txn_ref') || '';
+      const bankCode = params.get('bank_code') || '';
+      const transactionNo = params.get('transaction_no') || '';
+      const payDate = params.get('pay_date') || '';
+      
+      const resultCard = document.getElementById('resultCard');
+      resultCard.className = 'result-card result-success';
+      resultCard.innerHTML = `
+        <div class="result-icon" data-aos="zoom-in">
+          <i class="fas fa-check"></i>
+        </div>
+        <h2 class="result-title" data-aos="fade-up">Thanh toán thành công!</h2>
+        <p class="result-message" data-aos="fade-up" data-aos-delay="100">
+          Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đã được xử lý thành công.
+        </p>
+        
+        <div class="payment-details" data-aos="fade-up" data-aos-delay="200">
+          <h4><i class="fas fa-receipt"></i>Chi tiết giao dịch</h4>
+          <div class="detail-row">
+            <span class="detail-label">Mã đơn hàng:</span>
+            <span class="detail-value">#${orderCode}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Số tiền:</span>
+            <span class="detail-value amount">${amount}₫</span>
+          </div>
+          ${txnRef ? `
+          <div class="detail-row">
+            <span class="detail-label">Mã giao dịch:</span>
+            <span class="detail-value">${txnRef}</span>
+          </div>` : ''}
+          ${transactionNo ? `
+          <div class="detail-row">
+            <span class="detail-label">Mã giao dịch VNPay:</span>
+            <span class="detail-value">${transactionNo}</span>
+          </div>` : ''}
+          ${bankCode ? `
+          <div class="detail-row">
+            <span class="detail-label">Ngân hàng:</span>
+            <span class="detail-value">${getBankName(bankCode)}</span>
+          </div>` : ''}
+          ${payDate ? `
+          <div class="detail-row">
+            <span class="detail-label">Thời gian thanh toán:</span>
+            <span class="detail-value">${formatPayDate(payDate)}</span>
+          </div>` : ''}
+          <div class="detail-row">
+            <span class="detail-label">Trạng thái:</span>
+            <span class="detail-value" style="color: #28a745;">Thành công</span>
+          </div>
+        </div>
+        
+        <div class="result-actions" data-aos="fade-up" data-aos-delay="300">
+          <a href="my-purchases" class="btn-primary-custom">
+            <i class="fas fa-shopping-bag"></i>
+            Xem sản phẩm đã mua
+          </a>
+          <a href="khoahoc" class="btn-secondary-custom">
+            <i class="fas fa-plus"></i>
+            Mua thêm sản phẩm
+          </a>
+        </div>
+      `;
+    }
+
+    function showFailedResult(params) {
+      const orderCode = params.get('order_code') || 'N/A';
+      const errorCode = params.get('error_code') || '';
+      const errorMessage = params.get('error_message') || 'Giao dịch không thành công';
+      const txnRef = params.get('txn_ref') || '';
+      
+      const resultCard = document.getElementById('resultCard');
+      resultCard.className = 'result-card result-failed';
+      resultCard.innerHTML = `
+        <div class="result-icon" data-aos="zoom-in">
+          <i class="fas fa-times"></i>
+        </div>
+        <h2 class="result-title" data-aos="fade-up">Thanh toán không thành công</h2>
+        <p class="result-message" data-aos="fade-up" data-aos-delay="100">
+          ${errorMessage}
+        </p>
+        
+        <div class="payment-details" data-aos="fade-up" data-aos-delay="200">
+          <h4><i class="fas fa-exclamation-triangle"></i>Thông tin giao dịch</h4>
+          <div class="detail-row">
+            <span class="detail-label">Mã đơn hàng:</span>
+            <span class="detail-value">#${orderCode}</span>
+          </div>
+          ${errorCode ? `
+          <div class="detail-row">
+            <span class="detail-label">Mã lỗi:</span>
+            <span class="detail-value">${errorCode}</span>
+          </div>` : ''}
+          ${txnRef ? `
+          <div class="detail-row">
+            <span class="detail-label">Mã giao dịch:</span>
+            <span class="detail-value">${txnRef}</span>
+          </div>` : ''}
+          <div class="detail-row">
+            <span class="detail-label">Trạng thái:</span>
+            <span class="detail-value" style="color: #dc3545;">Thất bại</span>
+          </div>
+        </div>
+        
+        <div class="result-actions" data-aos="fade-up" data-aos-delay="300">
+          <a href="cart" class="btn-retry">
+            <i class="fas fa-redo"></i>
+            Thử lại thanh toán
+          </a>
+          <a href="/" class="btn-secondary-custom">
+            <i class="fas fa-home"></i>
+            Về trang chủ
+          </a>
+        </div>
+      `;
+    }
+
+    function showErrorResult(params) {
+      const message = params.get('message') || 'Có lỗi xảy ra trong quá trình xử lý thanh toán';
+      
+      const resultCard = document.getElementById('resultCard');
+      resultCard.className = 'result-card result-error';
+      resultCard.innerHTML = `
+        <div class="result-icon" data-aos="zoom-in">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2 class="result-title" data-aos="fade-up">Có lỗi xảy ra</h2>
+        <p class="result-message" data-aos="fade-up" data-aos-delay="100">
+          ${message}
+        </p>
+        
+        <div class="result-actions" data-aos="fade-up" data-aos-delay="200">
+          <a href="cart" class="btn-retry">
+            <i class="fas fa-redo"></i>
+            Thử lại
+          </a>
+          <a href="/" class="btn-secondary-custom">
+            <i class="fas fa-home"></i>
+            Về trang chủ
+          </a>
+        </div>
+      `;
+    }
+
+    function getBankName(bankCode) {
+      const bankNames = {
+        'VIETCOMBANK': 'Vietcombank',
+        'VIETINBANK': 'VietinBank',
+        'BIDV': 'BIDV',
+        'AGRIBANK': 'Agribank',
+        'TCB': 'Techcombank',
+        'ACB': 'ACB',
+        'MB': 'MB Bank',
+        'SACOMBANK': 'Sacombank',
+        'VNPAYQR': 'VNPay QR',
+        'VNBANK': 'Ngân hàng nội địa',
+        'INTCARD': 'Thẻ quốc tế'
+      };
+      return bankNames[bankCode] || bankCode;
+    }
+
+    function formatPayDate(payDate) {
+      if (!payDate || payDate.length !== 14) return payDate;
+      
+      // Format: YYYYMMDDHHmmss -> DD/MM/YYYY HH:mm:ss
+      const year = payDate.substring(0, 4);
+      const month = payDate.substring(4, 6);
+      const day = payDate.substring(6, 8);
+      const hour = payDate.substring(8, 10);
+      const minute = payDate.substring(10, 12);
+      const second = payDate.substring(12, 14);
+      
+      return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+    }
+  </script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js?v=1.1"></script>
+  <script src="assets/js/payment-result.js?v=1.2"></script>
+
+</body>
+
+</html>

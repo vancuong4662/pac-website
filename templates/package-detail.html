@@ -597,9 +597,9 @@
                                 <div class="action-buttons">
                                     <a href="#" class="btn-pac-primary" id="add-to-cart-btn" onclick="addToCartFromDetail()">
                                         <i class="fas fa-shopping-cart"></i>
-                                        Thêm vào giỏ hàng
+                                        Đăng ký dịch vụ
                                     </a>
-                                    <a href="#" class="btn-pac-outline" id="contact-btn">
+                                    <a href="tel:0965013663" class="btn-pac-outline" id="contact-btn">
                                         <i class="fas fa-phone"></i>
                                         Liên hệ tư vấn
                                     </a>
@@ -1064,7 +1064,7 @@
                 // Only reset if not in success state
                 if (!button.classList.contains('success')) {
                     button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng';
+                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
                 }
                 button.classList.remove('loading');
             }
@@ -1082,7 +1082,7 @@
             setTimeout(() => {
                 button.disabled = false;
                 button.classList.remove('success');
-                button.innerHTML = '<i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng';
+                button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
                 button.style.background = '';
                 
                 // Redirect to cart page

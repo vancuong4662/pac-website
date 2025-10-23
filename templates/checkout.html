@@ -145,6 +145,7 @@
             position: sticky;
             top: 140px;
             height: fit-content;
+            margin-top: 40px;
         }
         
         .summary-header {
@@ -251,8 +252,28 @@
             background: rgba(79, 185, 169, 0.05);
         }
         
+        .payment-method.selected .payment-method-name {
+            color: var(--accent-color);
+        }
+        
         .payment-method input[type="radio"] {
             margin-right: 15px;
+        }
+        
+        #vnpayBankSelection {
+            background: rgba(79, 185, 169, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        #vnpayBankSelection label {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        #vnpayBankSelection select {
+            margin-top: 8px;
         }
         
         .payment-method-info {
@@ -353,6 +374,7 @@
             .checkout-summary {
                 position: static;
                 order: -1;
+                margin-top: 20px;
             }
             
             .form-row {
@@ -457,37 +479,51 @@
                                 <h3><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán</h3>
                                 
                                 <div class="payment-methods">
-                                    <div class="payment-method selected" onclick="selectPaymentMethod('bank_transfer')">
-                                        <input type="radio" name="paymentMethod" value="bank_transfer" checked>
+                                    <div class="payment-method selected" onclick="selectPaymentMethod('vnpay')">
+                                        <input type="radio" name="paymentMethod" value="vnpay" checked>
                                         <div class="payment-method-info">
-                                            <div class="payment-method-name">Chuyển khoản ngân hàng</div>
-                                            <div class="payment-method-desc">Thanh toán qua chuyển khoản ngân hàng</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="payment-method" onclick="selectPaymentMethod('momo')">
-                                        <input type="radio" name="paymentMethod" value="momo">
-                                        <div class="payment-method-info">
-                                            <div class="payment-method-name">Ví MoMo</div>
-                                            <div class="payment-method-desc">Thanh toán qua ví điện tử MoMo</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="payment-method" onclick="selectPaymentMethod('vnpay')">
-                                        <input type="radio" name="paymentMethod" value="vnpay">
-                                        <div class="payment-method-info">
-                                            <div class="payment-method-name">VNPay</div>
-                                            <div class="payment-method-desc">Thanh toán qua VNPay (thẻ ATM, Visa, MasterCard)</div>
+                                            <div class="payment-method-name">
+                                                <i class="fas fa-credit-card me-2"></i>VNPay
+                                            </div>
+                                            <div class="payment-method-desc">Thanh toán qua VNPay (thẻ ATM, Visa, MasterCard, QR Pay)</div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Notes -->
-                            <div class="form-section">
-                                <h3><i class="fas fa-sticky-note me-2"></i>Ghi chú đặt hàng</h3>
-                                <div class="form-group">
-                                    <textarea id="orderNotes" name="orderNotes" class="form-control" rows="4" placeholder="Ghi chú về đơn hàng (tùy chọn)"></textarea>
+                                
+                                <!-- VNPay Bank Selection (shown when VNPay is selected) -->
+                                <div id="vnpayBankSelection" class="mt-3" style="display: block;">
+                                    <label class="form-label fw-semibold">Chọn ngân hàng (tùy chọn)</label>
+                                    <select class="form-control" id="vnpayBankCode" name="vnpayBankCode">
+                                        <option value="">Tất cả các phương thức thanh toán</option>
+                                        <option value="VNPAYQR">Thanh toán qua QR Code</option>
+                                        <option value="VNBANK">Ngân hàng nội địa</option>
+                                        <option value="INTCARD">Thẻ quốc tế</option>
+                                        <option value="NCB" selected>NCB - National Citizen Bank (Test Card)</option>
+                                        <option value="VIETCOMBANK">Vietcombank</option>
+                                        <option value="VIETINBANK">VietinBank</option>
+                                        <option value="BIDV">BIDV</option>
+                                        <option value="AGRIBANK">Agribank</option>
+                                        <option value="TCB">Techcombank</option>
+                                        <option value="ACB">ACB</option>
+                                        <option value="MB">MB Bank</option>
+                                        <option value="SACOMBANK">Sacombank</option>
+                                        <option value="EXIMBANK">Eximbank</option>
+                                        <option value="MSBANK">MSB</option>
+                                        <option value="NAMABANK">Nam A Bank</option>
+                                        <option value="VNMART">VnMart</option>
+                                        <option value="VIETCAPITALBANK">Ban Viet Capital</option>
+                                        <option value="SCB">SCB</option>
+                                        <option value="DONGABANK">Dong A Bank</option>
+                                        <option value="TPBANK">TPBank</option>
+                                        <option value="OJB">OceanBank</option>
+                                        <option value="SEABANK">SeABank</option>
+                                        <option value="UOB">UOB</option>
+                                        <option value="STANDARDCHARTERED">Standard Chartered</option>
+                                        <option value="PUBLICBANK">Public Bank</option>
+                                        <option value="HSBC">HSBC</option>
+                                        <option value="SHINHAN">Shinhan Bank</option>
+                                        <option value="ANBBANK">ANB Bank</option>
+                                    </select>
                                 </div>
                             </div>
                         </form>
@@ -539,9 +575,9 @@
     <script src="assets/vendor/aos/aos.js"></script>
 
     <!-- Main JS Files -->
-    <script src="assets/js/main.js"></script>
+    <script src="assets/js/main.js?v=1.3"></script>
     <script src="assets/js/component-loader.js"></script>
     <script src="assets/js/authen.js"></script>
-    <script src="assets/js/checkout.js"></script>
+    <script src="assets/js/checkout.js?v=1.3"></script>
 </body>
 </html>

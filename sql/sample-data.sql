@@ -3,10 +3,11 @@
 -- Dựa trên tài liệu thực tế của PAC
 -- =====================================================
 
--- Xóa dữ liệu cũ (nếu có)
-DELETE FROM consultation_bookings;
-DELETE FROM purchased_tests;
-DELETE FROM purchased_courses;
+-- Xóa dữ liệu cũ (nếu có) - theo thứ tự tránh foreign key constraint
+SET FOREIGN_KEY_CHECKS = 0;
+
+DELETE FROM vnpay_transactions;
+DELETE FROM purchased_packages;
 DELETE FROM order_items;
 DELETE FROM orders;
 DELETE FROM cart;
@@ -15,11 +16,16 @@ DELETE FROM products;
 DELETE FROM sessions;
 DELETE FROM users;
 
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- Reset AUTO_INCREMENT
 ALTER TABLE users AUTO_INCREMENT = 1;
 ALTER TABLE products AUTO_INCREMENT = 1;
 ALTER TABLE product_packages AUTO_INCREMENT = 1;
 ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE order_items AUTO_INCREMENT = 1;
+ALTER TABLE purchased_packages AUTO_INCREMENT = 1;
+ALTER TABLE vnpay_transactions AUTO_INCREMENT = 1;
 
 -- =====================================================
 -- PHẦN 1: TẠO TÀI KHOẢN DEMO
@@ -706,8 +712,8 @@ INSERT INTO product_packages (
 -- THÔNG BÁO HOÀN THÀNH
 -- =====================================================
 SELECT 
-    'Sample data updated with new PAC career guidance packages!' as message,
+    'Sample data created successfully!' as message,
     (SELECT COUNT(*) FROM products) as total_products,
     (SELECT COUNT(*) FROM product_packages) as total_packages,
-    'Products: Test Hướng nghiệp + 3 Courses + CV/Interview + Career Expert Consultation' as products_summary,
-    'Ready for testing!' as status;
+    'Products: Test Hướng nghiệp + 4 Courses + Career Expert Consultation' as products_summary,
+    'Database ready for live testing!' as status;

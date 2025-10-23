@@ -152,7 +152,10 @@ function displayCart() {
         displayEmptySummary(cartSummaryDetails);
         
         if (clearCartBtn) clearCartBtn.style.display = 'none';
-        if (checkoutBtn) checkoutBtn.style.display = 'none';
+        if (checkoutBtn) {
+            checkoutBtn.style.display = 'none';
+            checkoutBtn.disabled = true;
+        }
     } else {
         // Show cart items
         cartItems.style.display = 'block';
@@ -161,7 +164,10 @@ function displayCart() {
         displayCartSummary(cartSummaryDetails, cartData);
         
         if (clearCartBtn) clearCartBtn.style.display = 'inline-flex';
-        if (checkoutBtn) checkoutBtn.style.display = 'inline-flex';
+        if (checkoutBtn) {
+            checkoutBtn.style.display = 'flex';
+            checkoutBtn.disabled = false;
+        }
     }
 }
 
@@ -571,3 +577,40 @@ window.clearCart = clearCart;
 window.applyPromoCode = applyPromoCode;
 window.addToCart = addToCart;
 window.loadCartData = loadCartData;
+window.proceedToCheckout = proceedToCheckout;
+
+// Proceed to checkout - save total amount to localStorage
+function proceedToCheckout() {
+    // Check if cart has items
+    if (!cartData || !cartData.items || cartData.items.length === 0) {
+        showToast('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán!', 'error');
+        return;
+    }
+    
+    // Check authentication before proceeding
+    if (typeof authChecker !== 'undefined') {
+        const authResult = authChecker.getCurrentAuthStatus();
+        if (!authResult.isAuthenticated) {
+            authChecker.redirectToLogin('Vui lòng đăng nhập để tiến hành thanh toán');
+            return;
+        }
+    }
+    
+    // Get total amount from cart summary
+    const totalAmount = cartData.summary?.total_amount || 0;
+    
+    if (totalAmount <= 0) {
+        showToast('Tổng số tiền không hợp lệ', 'error');
+        return;
+    }
+    
+    // Save total amount to localStorage
+    localStorage.setItem('checkout_total_amount', totalAmount.toString());
+    
+    // Show success message and redirect
+    showToast('Chuyển hướng đến trang thanh toán...', 'success');
+    
+    setTimeout(() => {
+        window.location.href = 'checkout';
+    }, 500);
+}

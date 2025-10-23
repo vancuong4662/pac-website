@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VNPay Integration Test - PAC Group</title>
+    <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .test-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .test-result {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid #007bff;
+        }
+        .test-result.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        .test-result.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .btn-test {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-card">
+            <h1 class="mb-4">
+                <i class="fas fa-credit-card text-primary"></i>
+                VNPay Integration Test
+            </h1>
+            <p class="text-muted">Test các API VNPay đã tích hợp vào PAC Group website</p>
+            
+            <!-- Authentication Test -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-user"></i> 1. Authentication Test</h5>
+                </div>
+                <div class="card-body">
+                    <p>Kiểm tra trạng thái đăng nhập</p>
+                    <button class="btn btn-primary btn-test" onclick="testAuth()">
+                        <i class="fas fa-check"></i> Test Authentication
+                    </button>
+                    <div id="authResult"></div>
+                </div>
+            </div>
+
+            <!-- Cart Test -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-shopping-cart"></i> 2. Cart Test</h5>
+                </div>
+                <div class="card-body">
+                    <p>Kiểm tra giỏ hàng và tạo đơn hàng test</p>
+                    <button class="btn btn-primary btn-test" onclick="testCart()">
+                        <i class="fas fa-shopping-cart"></i> Test Cart
+                    </button>
+                    <button class="btn btn-success btn-test" onclick="createTestOrder()">
+                        <i class="fas fa-plus"></i> Create Test Order
+                    </button>
+                    <div id="cartResult"></div>
+                </div>
+            </div>
+
+            <!-- VNPay Test -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-credit-card"></i> 3. VNPay Payment Test</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Order ID để test:</label>
+                            <input type="number" id="testOrderId" class="form-control" placeholder="Nhập Order ID">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bank Code (tùy chọn):</label>
+                            <select id="testBankCode" class="form-control">
+                                <option value="">Tất cả phương thức</option>
+                                <option value="VNPAYQR">VNPay QR</option>
+                                <option value="VNBANK">Ngân hàng nội địa</option>
+                                <option value="VIETCOMBANK">Vietcombank</option>
+                                <option value="TCB">Techcombank</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-success btn-test" onclick="testVNPayCreate()">
+                            <i class="fas fa-link"></i> Test Create VNPay URL
+                        </button>
+                        <button class="btn btn-info btn-test" onclick="testVNPayReturn()">
+                            <i class="fas fa-arrow-left"></i> Test Return Handler
+                        </button>
+                    </div>
+                    <div id="vnpayResult"></div>
+                </div>
+            </div>
+
+            <!-- Configuration Test -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-cog"></i> 4. Configuration Test</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-warning btn-test" onclick="testConfig()">
+                        <i class="fas fa-info"></i> Test VNPay Config
+                    </button>
+                    <div id="configResult"></div>
+                </div>
+            </div>
+
+            <!-- Test Information -->
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> Thông tin test VNPay Sandbox:</h6>
+                <ul class="mb-0">
+                    <li><strong>Bank:</strong> NCB</li>
+                    <li><strong>Card Number:</strong> 9704198526191432198</li>
+                    <li><strong>Card Holder:</strong> NGUYEN VAN A</li>
+                    <li><strong>Expire Date:</strong> 07/15</li>
+                    <li><strong>OTP:</strong> 123456</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Test Authentication
+        async function testAuth() {
+            const resultDiv = document.getElementById('authResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Testing...';
+            
+            try {
+                const response = await fetch('../api/auth/verify-session.php');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>Status:</strong> ${data.success ? 'Authenticated' : 'Not authenticated'}<br>
+                        ${data.data ? `<strong>User:</strong> ${data.data.fullname || data.data.username}` : ''}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test Cart
+        async function testCart() {
+            const resultDiv = document.getElementById('cartResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Testing...';
+            
+            try {
+                const response = await fetch('../api/cart/get.php');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>Cart Status:</strong> ${data.success ? 'OK' : 'Error'}<br>
+                        ${data.data ? `<strong>Items:</strong> ${data.data.items?.length || 0}` : ''}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Create Test Order
+        async function createTestOrder() {
+            const resultDiv = document.getElementById('cartResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Creating test order...';
+            
+            try {
+                const orderData = {
+                    customer_info: {
+                        first_name: 'Nguyen',
+                        last_name: 'Van Test',
+                        email: 'test@example.com',
+                        phone: '0123456789',
+                        address: '123 Test Street',
+                        city: 'Ho Chi Minh',
+                        district: 'District 1'
+                    },
+                    payment_method: 'vnpay',
+                    notes: 'Test order for VNPay integration'
+                };
+
+                const response = await fetch('../api/orders/create.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('testOrderId').value = data.data.order_id;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>Order Creation:</strong> ${data.success ? 'Success' : 'Failed'}<br>
+                        ${data.data ? `<strong>Order ID:</strong> ${data.data.order_id}` : ''}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test VNPay Create
+        async function testVNPayCreate() {
+            const resultDiv = document.getElementById('vnpayResult');
+            const orderId = document.getElementById('testOrderId').value;
+            const bankCode = document.getElementById('testBankCode').value;
+            
+            if (!orderId) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> Please enter Order ID first
+                    </div>
+                `;
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Creating VNPay URL...';
+            
+            try {
+                const vnpayData = {
+                    order_id: parseInt(orderId),
+                    order_info: `Test payment for order #${orderId}`,
+                    bank_code: bankCode
+                };
+
+                const response = await fetch('../api/orders/vnpay-create.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(vnpayData)
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${data.success ? 'success' : 'error'}">
+                        <strong>VNPay URL Creation:</strong> ${data.success ? 'Success' : 'Failed'}<br>
+                        ${data.data ? `
+                            <strong>Transaction Ref:</strong> ${data.data.txn_ref}<br>
+                            <strong>Amount:</strong> ${data.data.amount_formatted}<br>
+                            <a href="${data.data.payment_url}" target="_blank" class="btn btn-sm btn-success mt-2">
+                                <i class="fas fa-external-link-alt"></i> Open VNPay URL
+                            </a>
+                        ` : ''}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test VNPay Return
+        async function testVNPayReturn() {
+            const resultDiv = document.getElementById('vnpayResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Testing VNPay Return...';
+            
+            // Simulate VNPay return parameters for flat route testing
+            const testParams = new URLSearchParams({
+                vnp_Amount: '50000000', // 500,000 VND * 100
+                vnp_BankCode: 'NCB',
+                vnp_BankTranNo: 'VNP14176244',
+                vnp_CardType: 'ATM',
+                vnp_OrderInfo: 'Thanh toan don hang PAC Group',
+                vnp_PayDate: '20241023143000',
+                vnp_ResponseCode: '00',
+                vnp_TmnCode: 'UNLOCKY1',
+                vnp_TransactionNo: '14176244',
+                vnp_TransactionStatus: '00',
+                vnp_TxnRef: 'TEST_' + Date.now(),
+                vnp_SecureHashType: 'SHA256',
+                vnp_SecureHash: 'test_hash'
+            });
+            
+            try {
+                const response = await fetch(`../api/orders/vnpay-return.php?${testParams.toString()}`);
+                
+                if (response.redirected) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            <strong>VNPay Return:</strong> Redirected successfully to flat route<br>
+                            <strong>Redirect URL:</strong> ${response.url}<br>
+                            <a href="${response.url}" target="_blank" class="btn btn-sm btn-info mt-2">
+                                <i class="fas fa-external-link-alt"></i> View Result Page
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    const data = await response.text();
+                    resultDiv.innerHTML = `
+                        <div class="test-result error">
+                            <strong>VNPay Return:</strong> No redirect (possible error)<br>
+                            <pre>${data}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test Configuration
+        async function testConfig() {
+            const resultDiv = document.getElementById('configResult');
+            resultDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Testing configuration...';
+            
+            try {
+                // Test if vnpay-config.php is accessible (indirectly)
+                const testData = {
+                    order_id: 999999, // Non-existent order
+                    order_info: 'Config test',
+                    bank_code: ''
+                };
+
+                const response = await fetch('../api/orders/vnpay-create.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                
+                // Check if we get a proper error (means config is loaded)
+                const configStatus = data.error && data.error.includes('Order not found') ? 'OK' : 'Possible Issue';
+                
+                resultDiv.innerHTML = `
+                    <div class="test-result ${configStatus === 'OK' ? 'success' : 'error'}">
+                        <strong>VNPay Config:</strong> ${configStatus}<br>
+                        <strong>Note:</strong> ${configStatus === 'OK' ? 'Configuration files are loaded correctly' : 'There might be issues with configuration'}<br>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run auth test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            testAuth();
+        });
+    </script>
+</body>
+</html>

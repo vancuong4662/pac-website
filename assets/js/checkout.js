@@ -171,6 +171,12 @@ function togglePaymentFields(method) {
         section.style.display = 'none';
     });
     
+    // Show/hide VNPay bank selection
+    const vnpayBankSelection = document.getElementById('vnpayBankSelection');
+    if (vnpayBankSelection) {
+        vnpayBankSelection.style.display = method === 'vnpay' ? 'block' : 'none';
+    }
+    
     // Show relevant section
     const relevantSection = document.getElementById(`${method}-details`);
     if (relevantSection) {
@@ -209,24 +215,29 @@ function fillFormField(fieldId, value) {
     }
 }
 
-// Load checkout data (cart items)
+// Load checkout data (total amount from localStorage)
 async function loadCheckoutData() {
     try {
         showCheckoutLoading(true);
         
-        const response = await fetch('api/cart/get.php');
-        const data = await response.json();
+        // Get total amount from localStorage (set by cart page)
+        const totalAmount = localStorage.getItem('checkout_total_amount');
         
-        if (data.success && data.data && data.data.items && data.data.items.length > 0) {
-            orderData = data.data;
-            displayOrderSummary(data.data);
-        } else {
-            // Redirect to cart if empty
-            showToast('Giỏ hàng trống. Chuyển hướng về giỏ hàng...', 'warning');
+        if (!totalAmount || parseFloat(totalAmount) <= 0) {
+            // Redirect to cart if no total amount
+            showToast('Không có thông tin đơn hàng. Chuyển hướng về giỏ hàng...', 'warning');
             setTimeout(() => {
                 window.location.href = 'cart';
             }, 2000);
+            return;
         }
+        
+        // Create simplified order data
+        orderData = {
+            total_amount: parseFloat(totalAmount)
+        };
+        
+        displayOrderSummary(orderData);
     } catch (error) {
         console.error('Error loading checkout data:', error);
         showToast('Có lỗi xảy ra khi tải dữ liệu đơn hàng', 'error');
@@ -235,41 +246,38 @@ async function loadCheckoutData() {
     }
 }
 
-// Display order summary
-function displayOrderSummary(cartData) {
+// Display order summary (simplified version)
+function displayOrderSummary(orderData) {
     const summaryContainer = document.getElementById('orderSummary');
     const totalsContainer = document.getElementById('orderTotals');
     
     if (!summaryContainer || !totalsContainer) return;
     
-    // Display items
-    let itemsHTML = '';
-    cartData.items.forEach(item => {
-        itemsHTML += generateOrderItemHTML(item);
-    });
-    summaryContainer.innerHTML = itemsHTML;
+    // Show simple message for order items
+    summaryContainer.innerHTML = `
+        <div class="summary-item" data-aos="fade-up">
+            <div class="summary-item-info">
+                <div class="summary-item-name">Sản phẩm đã chọn</div>
+                <div class="summary-item-details">Chi tiết đơn hàng từ giỏ hàng</div>
+                <div class="summary-item-price">${formatPrice(orderData.total_amount)} VNĐ</div>
+            </div>
+        </div>
+    `;
     
     // Display totals
-    const subtotal = cartData.total_amount || 0;
+    const total = orderData.total_amount;
     const shipping = 0; // Free shipping
-    const tax = 0; // No tax for now
-    const total = subtotal + shipping + tax;
+    const tax = 0; // No tax
     
     totalsContainer.innerHTML = `
         <div class="total-row">
-            <span>Tạm tính (${cartData.items.length} sản phẩm):</span>
-            <span>${formatPrice(subtotal)} VNĐ</span>
+            <span>Tạm tính:</span>
+            <span>${formatPrice(total)} VNĐ</span>
         </div>
         <div class="total-row">
             <span>Phí vận chuyển:</span>
             <span>Miễn phí</span>
         </div>
-        ${tax > 0 ? `
-        <div class="total-row">
-            <span>Thuế:</span>
-            <span>${formatPrice(tax)} VNĐ</span>
-        </div>
-        ` : ''}
         <div class="total-row final">
             <span>Tổng cộng:</span>
             <span>${formatPrice(total)} VNĐ</span>
@@ -283,37 +291,96 @@ function displayOrderSummary(cartData) {
     }
 }
 
-// Generate order item HTML
-function generateOrderItemHTML(item) {
-    const typeMap = {
-        'course': 'Khóa học',
-        'online_test': 'Trắc nghiệm',
-        'consultation': 'Tư vấn'
-    };
+// Place order
+async function placeOrder() {
+    if (isProcessing) return;
     
-    const packageMap = {
-        'basic': 'Gói cơ bản',
-        'premium': 'Gói cao cấp'
-    };
+    const form = document.getElementById('checkoutForm');
+    if (!form) return;
     
-    return `
-        <div class="summary-item" data-aos="fade-up">
-            <div class="summary-item-image">
-                <img src="${item.product_image || '/pac-new/assets/img/pic/default-product.svg'}" 
-                     alt="${item.product_name}"
-                     onerror="this.src='/pac-new/assets/img/pic/default-product.svg'">
-            </div>
-            <div class="summary-item-info">
-                <div class="summary-item-name">${item.product_name}</div>
-                <div class="summary-item-details">
-                    ${typeMap[item.product_type] || item.product_type}
-                    ${item.package_type ? ` - ${packageMap[item.package_type]}` : ''}
-                </div>
-                <div class="summary-item-details">Số lượng: ${item.quantity}</div>
-                <div class="summary-item-price">${formatPrice(item.price * item.quantity)} VNĐ</div>
-            </div>
-        </div>
-    `;
+    // Validate form
+    if (!validateForm(form)) {
+        showToast('Vui lòng kiểm tra lại thông tin đã nhập', 'error');
+        return;
+    }
+    
+    if (!orderData || !orderData.total_amount || orderData.total_amount <= 0) {
+        showToast('Không có thông tin đơn hàng', 'error');
+        return;
+    }
+    
+    try {
+        isProcessing = true;
+        showOrderProcessing(true);
+        
+        const formData = new FormData(form);
+        
+        // Prepare order data with total amount from localStorage
+        const orderRequestData = {
+            customer_info: {
+                first_name: formData.get('firstName'),
+                last_name: formData.get('lastName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                city: formData.get('city'),
+                district: formData.get('district')
+            },
+            payment_method: formData.get('paymentMethod') || 'vnpay',
+            total_amount: orderData.total_amount
+        };
+        
+        const response = await fetch('api/orders/create.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderRequestData)
+        });
+        
+        // Log response text for debugging
+        const responseText = await response.text();
+        console.log('API Response Text:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON Parse Error:', parseError);
+            console.error('Response was:', responseText);
+            throw new Error('Invalid JSON response from server');
+        }
+        
+        if (data.success) {
+            const orderId = data.data.order_id;
+            const paymentMethod = formData.get('paymentMethod') || 'vnpay';
+            
+            // Handle VNPay payment
+            if (paymentMethod === 'vnpay') {
+                await handleVNPayPayment(orderId, formData);
+            } else {
+                // Other payment methods
+                showToast('Đặt hàng thành công!', 'success');
+                
+                // Clear form and saved data
+                form.reset();
+                clearSavedFormData();
+                
+                // Redirect to order confirmation
+                setTimeout(() => {
+                    window.location.href = `order-confirmation?id=${orderId}`;
+                }, 1500);
+            }
+        } else {
+            throw new Error(data.message || 'Có lỗi xảy ra khi đặt hàng');
+        }
+    } catch (error) {
+        console.error('Error placing order:', error);
+        showToast(error.message || 'Có lỗi xảy ra khi đặt hàng', 'error');
+    } finally {
+        isProcessing = false;
+        showOrderProcessing(false);
+    }
 }
 
 // Setup form submission
@@ -333,77 +400,6 @@ function setupFormSubmission() {
 function handleFormSubmit(event) {
     event.preventDefault();
     placeOrder();
-}
-
-// Place order
-async function placeOrder() {
-    if (isProcessing) return;
-    
-    const form = document.getElementById('checkoutForm');
-    if (!form) return;
-    
-    // Validate form
-    if (!validateForm(form)) {
-        showToast('Vui lòng kiểm tra lại thông tin đã nhập', 'error');
-        return;
-    }
-    
-    if (!orderData || !orderData.items || orderData.items.length === 0) {
-        showToast('Giỏ hàng trống', 'error');
-        return;
-    }
-    
-    try {
-        isProcessing = true;
-        showOrderProcessing(true);
-        
-        const formData = new FormData(form);
-        
-        // Prepare order data
-        const orderRequestData = {
-            customer_info: {
-                first_name: formData.get('firstName'),
-                last_name: formData.get('lastName'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                city: formData.get('city'),
-                district: formData.get('district')
-            },
-            payment_method: formData.get('paymentMethod') || 'bank_transfer',
-            notes: formData.get('orderNotes') || ''
-        };
-        
-        const response = await fetch('api/orders/create.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderRequestData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Đặt hàng thành công!', 'success');
-            
-            // Clear form
-            form.reset();
-            
-            // Redirect to order confirmation
-            setTimeout(() => {
-                window.location.href = `order-confirmation?id=${data.data.order_id}`;
-            }, 1500);
-        } else {
-            throw new Error(data.message || 'Có lỗi xảy ra khi đặt hàng');
-        }
-    } catch (error) {
-        console.error('Error placing order:', error);
-        showToast(error.message || 'Có lỗi xảy ra khi đặt hàng', 'error');
-    } finally {
-        isProcessing = false;
-        showOrderProcessing(false);
-    }
 }
 
 // Validate entire form
@@ -569,6 +565,92 @@ function debounce(func, wait) {
     };
 }
 
+// Handle VNPay payment
+async function handleVNPayPayment(orderId, formData) {
+    try {
+        // Show processing message for VNPay
+        showToast('Đang tạo liên kết thanh toán VNPay...', 'info');
+        
+        // Get bank code if selected
+        const bankCode = document.getElementById('vnpayBankCode').value;
+        
+        // Create VNPay payment URL
+        const vnpayData = {
+            order_id: orderId,
+            order_info: `Thanh toan don hang PAC Group #${orderId}`,
+            bank_code: bankCode || ''
+        };
+        
+        const response = await fetch('api/orders/vnpay-create.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(vnpayData)
+        });
+        
+        // Debug response
+        const responseText = await response.text();
+        console.log('VNPay API Response Text:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('VNPay JSON Parse Error:', parseError);
+            console.error('VNPay Response was:', responseText);
+            throw new Error('Invalid JSON response from VNPay API');
+        }
+        
+        if (data.success) {
+            // Clear form and saved data before redirect
+            const form = document.getElementById('checkoutForm');
+            if (form) {
+                form.reset();
+            }
+            clearSavedFormData();
+            
+            showToast('Chuyển hướng đến VNPay...', 'success');
+            
+            // Store order info for return handling
+            localStorage.setItem('vnpay_order_info', JSON.stringify({
+                order_id: orderId,
+                txn_ref: data.data.txn_ref,
+                amount: data.data.amount,
+                timestamp: Date.now()
+            }));
+            
+            // Redirect to VNPay
+            setTimeout(() => {
+                window.location.href = data.data.payment_url;
+            }, 1000);
+            
+        } else {
+            throw new Error(data.error || 'Không thể tạo liên kết thanh toán VNPay');
+        }
+        
+    } catch (error) {
+        console.error('VNPay payment error:', error);
+        showToast('Lỗi khi tạo thanh toán VNPay: ' + error.message, 'error');
+        
+        // Reset processing state
+        isProcessing = false;
+        showOrderProcessing(false);
+    }
+}
+
+// Check VNPay return status on page load
+function checkVNPayReturn() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const vnpResponseCode = urlParams.get('vnp_ResponseCode');
+    const vnpTxnRef = urlParams.get('vnp_TxnRef');
+    
+    if (vnpResponseCode && vnpTxnRef) {
+        // This is a VNPay return, redirect to payment result page using flat route
+        window.location.href = '/0/pac-new/payment-result' + window.location.search;
+    }
+}
+
 // Export functions for global use
 window.initializeCheckout = initializeCheckout;
 window.selectPaymentMethod = selectPaymentMethod;
@@ -576,6 +658,10 @@ window.placeOrder = placeOrder;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if this is a VNPay return first
+    checkVNPayReturn();
+    
+    // Then initialize checkout normally
     initializeCheckout();
     setupAutoSave();
 });

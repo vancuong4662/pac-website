@@ -205,6 +205,30 @@ function verifySession() {
 }
 
 /**
+ * Get current user ID from session
+ * @return int|null Returns user ID if authenticated, null otherwise
+ */
+function getCurrentUserId() {
+    // Start session if not started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Try to get user ID from session first
+    if (isset($_SESSION['user_id']) && $_SESSION['logged_in']) {
+        return (int)$_SESSION['user_id'];
+    }
+    
+    // If not in session, verify session and get user ID
+    $user = verifySession();
+    if ($user && isset($user['id'])) {
+        return (int)$user['id'];
+    }
+    
+    return null;
+}
+
+/**
  * Clean up expired sessions (should be called periodically)
  */
 function cleanupExpiredSessions($conn) {

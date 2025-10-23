@@ -284,6 +284,8 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      width: 100%;
     }
 
     .btn-checkout:hover {
@@ -291,6 +293,13 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
       color: white;
+    }
+
+    .btn-checkout:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     .btn-continue-shopping {
@@ -572,10 +581,10 @@
 
                 <!-- Checkout Actions -->
                 <div class="checkout-actions">
-                  <a href="checkout" class="btn-checkout" id="checkoutBtn">
+                  <button class="btn-checkout" id="checkoutBtn" onclick="proceedToCheckout()">
                     <i class="fas fa-credit-card"></i>
                     Tiến hành thanh toán
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
