@@ -13,23 +13,22 @@ Database PAC Shopping Cart được thiết kế để hỗ trợ hệ thống b
 
 ## Cấu trúc tổng quan
 
-Database gồm **10 bảng chính** được chia thành 3 nhóm chức năng:
+Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ### 1. Nhóm Authentication & Users (2 bảng)
 - `users` - Quản lý tài khoản người dùng
 - `sessions` - Quản lý phiên đăng nhập
 
-### 2. Nhóm Products & Shopping (4 bảng)
+### 2. Nhóm Products & Shopping (5 bảng)
 - `products` - Sản phẩm chính (tests, courses, consultations)
 - `product_packages` - Các gói giá cho mỗi sản phẩm
 - `cart` - Giỏ hàng người dùng
 - `orders` - Đơn hàng và thanh toán
 - `order_items` - Chi tiết sản phẩm trong đơn hàng
 
-### 3. Nhóm Purchased Services (3 bảng)
-- `purchased_courses` - Khóa học đã mua
-- `purchased_tests` - Trắc nghiệm đã mua
-- `consultation_bookings` - Buổi tư vấn đã đặt
+### 3. Nhóm Payment & Purchased Services (2 bảng)
+- `vnpay_transactions` - Giao dịch VNPay
+- `purchased_packages` - Tất cả packages đã mua (unified table)
 
 ---
 
@@ -128,21 +127,24 @@ Database gồm **10 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 5. Bảng `cart` - Giỏ hàng
+### 5. Bảng `shopping_cart` - Giỏ hàng
 
 **Mục đích**: Lưu trữ sản phẩm người dùng đã thêm vào giỏ hàng.
 
 | Trường | Kiểu dữ liệu | Mô tả |
 |--------|--------------|-------|
 | `id` | INT AUTO_INCREMENT | Khóa chính |
-| `user_id` | INT | FK đến users.id |
+| `user_id` | INT | FK đến users.id (NULL cho guest) |
+| `session_id` | VARCHAR(100) | Session ID cho guest users |
 | `product_id` | INT | FK đến products.id |
 | `package_id` | INT | FK đến product_packages.id |
-| `quantity` | INT | Số lượng |
+| `quantity` | INT DEFAULT 1 | Số lượng (thường là 1) |
+| `added_at` | TIMESTAMP | Thời gian thêm vào cart |
 
 **Tính năng**:
-- Unique constraint: 1 user không thể thêm cùng 1 package 2 lần
-- Cascade delete khi xóa user/product/package
+- Hỗ trợ cả user đã đăng nhập và guest
+- Auto-cleanup old cart items
+- Integration với API để update giỏ hàng
 
 ---
 
@@ -182,108 +184,121 @@ Database gồm **10 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 8. Bảng `purchased_courses` - Khóa học đã mua
+### 8. Bảng `vnpay_transactions` - Giao dịch VNPay
 
-**Mục đích**: Quản lý khóa học sau khi khách hàng đã thanh toán thành công.
-
-| Trường | Kiểu dữ liệu | Mô tả |
-|--------|--------------|-------|
-| `id` | INT AUTO_INCREMENT | Khóa chính |
-| `user_id` | INT | FK đến users.id |
-| `order_id` | INT | FK đến orders.id |
-| `product_id` | INT | FK đến products.id |
-| `package_id` | INT | FK đến product_packages.id |
-| `course_code` | VARCHAR(50) UNIQUE | Mã khóa học duy nhất |
-| `package_name` | VARCHAR(100) | Tên gói đã mua |
-| `group_size` | VARCHAR(50) | Quy mô nhóm |
-| `status` | ENUM | 'pending', 'active', 'completed', 'expired', 'cancelled' |
-| `expires_at` | TIMESTAMP | Thời hạn sử dụng |
-| `staff_notes` | TEXT | Ghi chú của nhân viên PAC |
-
-**Quy trình**: Tự động tạo record khi đơn hàng có status = 'completed' và payment_status = 'paid'.
-
----
-
-### 9. Bảng `purchased_tests` - Trắc nghiệm đã mua
-
-**Mục đích**: Quản lý bài test sau khi khách hàng đã thanh toán.
+**Mục đích**: Lưu trữ thông tin giao dịch thanh toán qua VNPay, bao gồm request và response data.
 
 | Trường | Kiểu dữ liệu | Mô tả |
 |--------|--------------|-------|
-| `id` | INT AUTO_INCREMENT | Khóa chính |
-| `user_id` | INT | FK đến users.id |
-| `order_id` | INT | FK đến orders.id |
-| `product_id` | INT | FK đến products.id |
-| `package_id` | INT | FK đến product_packages.id |
-| `test_token` | VARCHAR(100) UNIQUE | Token để truy cập test |
-| `package_name` | VARCHAR(100) | Tên gói đã mua |
-| `question_count` | INT | Số câu hỏi |
-| `report_pages` | INT | Số trang báo cáo |
-| `attempts_left` | INT | Số lần làm bài còn lại |
-| `status` | ENUM | 'active', 'completed', 'expired' |
-| `test_result` | JSON | Kết quả test |
-| `completed_at` | TIMESTAMP | Thời gian hoàn thành |
+| `id` | INT(11) AUTO_INCREMENT | Khóa chính |
+| `order_id` | INT(11) | FK đến orders.id |
+| `txn_ref` | VARCHAR(255) UNIQUE | Mã giao dịch từ VNPay |
+| `amount` | BIGINT | Số tiền (tính bằng xu - VND x 100) |
+| `order_info` | TEXT | Thông tin đơn hàng |
+| `create_date` | VARCHAR(14) | Ngày tạo (YmdHis format) |
+| `ip_addr` | VARCHAR(45) | IP address của khách hàng |
+| `vnp_response_code` | VARCHAR(10) | Mã phản hồi từ VNPay |
+| `vnp_transaction_no` | VARCHAR(50) | Mã giao dịch tại VNPay |
+| `vnp_bank_code` | VARCHAR(20) | Mã ngân hàng |
+| `vnp_pay_date` | VARCHAR(14) | Thời gian thanh toán |
+| `status` | ENUM | 'pending', 'success', 'failed', 'cancelled', 'expired' |
 
 **Tính năng đặc biệt**:
-- Test token để bảo mật
-- Lưu kết quả dạng JSON
-- Kiểm soát số lần làm bài
+- Tự động cập nhật order status khi giao dịch thành công
+- Lưu trữ đầy đủ thông tin VNPay response để audit
+- Trigger validation để tránh tạo giao dịch trùng
 
 ---
 
-### 10. Bảng `consultation_bookings` - Đặt lịch tư vấn
+### 9. Bảng `purchased_packages` - Packages đã mua (Unified Table)
 
-**Mục đích**: Quản lý buổi tư vấn 1:1 sau khi khách hàng đã thanh toán.
+**Mục đích**: Quản lý TẤT CẢ các loại packages đã mua (courses, tests, consultations) trong một bảng thống nhất.
 
 | Trường | Kiểu dữ liệu | Mô tả |
 |--------|--------------|-------|
 | `id` | INT AUTO_INCREMENT | Khóa chính |
 | `user_id` | INT | FK đến users.id |
 | `order_id` | INT | FK đến orders.id |
-| `product_id` | INT | FK đến products.id |
 | `package_id` | INT | FK đến product_packages.id |
-| `consultation_code` | VARCHAR(50) UNIQUE | Mã tư vấn |
-| `package_name` | VARCHAR(100) | Tên gói đã mua |
-| `status` | ENUM | 'pending', 'contacted', 'scheduled', 'completed', 'cancelled' |
-| `scheduled_at` | TIMESTAMP | Lịch hẹn |
-| `client_notes` | TEXT | Ghi chú từ khách hàng |
-| `staff_notes` | TEXT | Ghi chú của nhân viên |
+| `access_code` | VARCHAR(100) UNIQUE | Mã truy cập duy nhất |
+| `package_name` | VARCHAR(100) | Snapshot tên package |
+| `product_name` | VARCHAR(255) | Snapshot tên sản phẩm |
+| `product_type` | ENUM | 'career_test', 'course', 'consultation' |
+| `package_price` | DECIMAL(10,2) | Giá package khi mua |
+| `package_features` | JSON | Các tính năng của package |
+| `package_metadata` | JSON | Thông tin bổ sung (question_count, duration, etc.) |
+| `status` | ENUM | 'pending', 'active', 'completed', 'expired', 'cancelled' |
+| `access_starts_at` | TIMESTAMP | Thời gian bắt đầu có thể sử dụng |
+| `expires_at` | TIMESTAMP | Thời hạn sử dụng |
+| `first_accessed_at` | TIMESTAMP | Lần đầu truy cập |
+| `last_accessed_at` | TIMESTAMP | Lần cuối truy cập |
+| `access_count` | INT | Số lần truy cập |
+| `usage_data` | JSON | Dữ liệu sử dụng (progress, results, etc.) |
+| `support_status` | ENUM | 'none', 'contacted', 'scheduled', 'in_progress', 'resolved' |
+| `scheduled_at` | TIMESTAMP | Lịch hẹn (cho consultation) |
 
-**Quy trình**: 
-1. Tự động tạo với status = 'pending'
-2. Nhân viên PAC liên hệ → 'contacted' 
-3. Đặt lịch → 'scheduled'
-4. Hoàn thành → 'completed'
+**Lợi ích của unified approach**:
+- Đơn giản hóa cấu trúc database
+- Dễ dàng quản lý và query cross-product analytics
+- Flexible JSON fields cho metadata riêng của từng loại
+- Consistent access tracking across all product types
+
+**Auto-generated access codes**:
+- Tests: `TST_{user_id}_{timestamp}_{package_id}`
+- Courses: `CRS_{user_id}_{timestamp}_{package_id}`
+- Consultations: `CON_{user_id}_{timestamp}_{package_id}`
+
+---
+
+### Views để backward compatibility
+
+Database cung cấp các views để hỗ trợ code cũ:
+
+#### `purchased_courses_view`
+```sql
+-- Emulates old purchased_courses table
+SELECT pp.*, pp.access_code as course_code, ...
+FROM purchased_packages pp
+WHERE pp.product_type = 'course';
+```
+
+#### `purchased_tests_view`
+```sql
+-- Emulates old purchased_tests table  
+SELECT pp.*, pp.access_code as test_token, ...
+FROM purchased_packages pp
+WHERE pp.product_type = 'career_test';
+```
+
+#### `consultation_bookings_view`
+```sql
+-- Emulates old consultation_bookings table
+SELECT pp.*, pp.access_code as consultation_code, ...
+FROM purchased_packages pp
+WHERE pp.product_type = 'consultation';
+```
 
 ---
 
 ## Mối quan hệ giữa các bảng
 
 ```
-users (1) ──── (n) sessions
-users (1) ──── (n) cart
+users (1) ──── (n) user_sessions
+users (1) ──── (n) shopping_cart
 users (1) ──── (n) orders
-users (1) ──── (n) purchased_courses
-users (1) ──── (n) purchased_tests  
-users (1) ──── (n) consultation_bookings
+users (1) ──── (n) purchased_packages
 
 products (1) ──── (n) product_packages
-products (1) ──── (n) cart
+products (1) ──── (n) shopping_cart
 products (1) ──── (n) order_items
-products (1) ──── (n) purchased_courses
-products (1) ──── (n) purchased_tests
-products (1) ──── (n) consultation_bookings
 
 orders (1) ──── (n) order_items
-orders (1) ──── (n) purchased_courses  
-orders (1) ──── (n) purchased_tests
-orders (1) ──── (n) consultation_bookings
+orders (1) ──── (n) vnpay_transactions
+orders (1) ──── (n) purchased_packages
 
-product_packages (1) ──── (n) cart
+product_packages (1) ──── (n) shopping_cart
 product_packages (1) ──── (n) order_items
-product_packages (1) ──── (n) purchased_courses
-product_packages (1) ──── (n) purchased_tests
-product_packages (1) ──── (n) consultation_bookings
+product_packages (1) ──── (n) purchased_packages
 ```
 
 ---
@@ -294,16 +309,17 @@ product_packages (1) ──── (n) consultation_bookings
 ```
 1. User browse products → products table
 2. User select package → product_packages table  
-3. Add to cart → cart table
+3. Add to cart → shopping_cart table
 4. Checkout → orders table + order_items table
-5. Payment success → purchased_* tables
+5. VNPay payment → vnpay_transactions table
+6. Payment success → purchased_packages table (unified)
 ```
 
-### 2. Luồng sử dụng dịch vụ
+### 2. Luồng sử dụng dịch vụ (thông qua purchased_packages)
 ```
-purchased_courses → Nhân viên PAC liên hệ sắp xếp lịch học
-purchased_tests → User làm bài test online với test_token
-consultation_bookings → Nhân viên PAC liên hệ đặt lịch tư vấn
+Course packages → Nhân viên PAC liên hệ sắp xếp lịch học
+Test packages → User làm bài test online với access_code
+Consultation packages → Nhân viên PAC liên hệ đặt lịch tư vấn
 ```
 
 ---
@@ -311,19 +327,20 @@ consultation_bookings → Nhân viên PAC liên hệ đặt lịch tư vấn
 ## Tính năng bảo mật
 
 ### 1. Authentication
-- Session-based authentication với token
+- Session-based authentication với user_sessions table
 - Password hashing (bcrypt)
 - Email verification
 
 ### 2. Data Protection  
 - Foreign key constraints với CASCADE DELETE
-- Unique constraints cho email, username, tokens
+- Unique constraints cho email, username, access_codes
 - Input validation qua ENUM fields
 
 ### 3. Business Logic Protection
 - Snapshot giá trong order_items
-- Test token để bảo mật truy cập
-- Status tracking cho tất cả purchased services
+- Access codes để bảo mật truy cập các purchased packages
+- Status tracking cho tất cả purchased packages
+- VNPay transaction audit trail
 
 ---
 
@@ -332,11 +349,12 @@ consultation_bookings → Nhân viên PAC liên hệ đặt lịch tư vấn
 Database được tối ưu với các indexes:
 
 - **Users**: status, role, email_verified
-- **Sessions**: expires_at, user_id
+- **User Sessions**: expires_at, user_id
 - **Products**: type, category, status, slug, sort_order
 - **Product Packages**: product_id, status, is_free, sort_order
 - **Orders**: order_code, user_id, status, payment_status
-- **Purchased Services**: user_id, status, unique codes
+- **VNPay Transactions**: txn_ref, order_id, status
+- **Purchased Packages**: user_id, status, access_code, product_type
 
 ---
 
