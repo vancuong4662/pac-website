@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toastbar Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/toastbar.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f3f4f6;
+            padding: 2rem;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-error {
+            background-color: #ef4444;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        .btn-info {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Toast Notification Test</h1>
+    <p>Click các nút bên dưới để test các loại toast notification:</p>
+    
+    <div class="test-buttons">
+        <button class="test-btn btn-success" onclick="showToast('Success!', 'Thao tác đã thực hiện thành công', 'success', 5000)">
+            Success Toast
+        </button>
+        
+        <button class="test-btn btn-error" onclick="showToast('Error!', 'Đã xảy ra lỗi trong quá trình xử lý', 'error', 8000)">
+            Error Toast
+        </button>
+        
+        <button class="test-btn btn-warning" onclick="showToast('Watch Out!', 'It\'s all about to go wrong', 'warning', 6000)">
+            Warning Toast
+        </button>
+        
+        <button class="test-btn btn-info" onclick="showToast('Information', 'Đây là thông tin quan trọng bạn cần biết', 'info', 4000)">
+            Info Toast
+        </button>
+    </div>
+
+    <script src="../assets/js/toastbar.js"></script>
+</body>
+</html>

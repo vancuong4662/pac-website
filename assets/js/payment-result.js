@@ -66,13 +66,13 @@ class PaymentResultHandler {
                 throw new Error('Invalid JSON response from server');
             }
             
-            setTimeout(() => {
+            setTimeout(async () => {
                 this.hideLoading();
                 
                 if (data.success && data.payment_success) {
+                    // Complete purchase process: create purchased_packages and clear cart
+                    await this.completePurchase(data.data.order_id);
                     this.showSuccess(data.data);
-                    // Clear cart after successful payment
-                    this.clearCart();
                 } else {
                     this.showError(data.message || 'Giao dịch không thành công', data.data || {});
                 }
@@ -84,6 +84,54 @@ class PaymentResultHandler {
                 this.hideLoading();
                 this.showError('Lỗi khi xác minh thanh toán: ' + error.message, {});
             }, 2000);
+        }
+    }
+
+    async completePurchase(orderId) {
+        try {
+            console.log('Completing purchase for order ID:', orderId);
+            
+            const response = await fetch('api/orders/complete-purchase.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId
+                })
+            });
+
+            const data = await response.json();
+            console.log('Complete purchase response:', data);
+
+            if (data.success) {
+                console.log('Purchase completed successfully:', data.data);
+                // Clear cart after successful purchase completion
+                await this.clearCart();
+                
+                // Show toast notification
+                if (typeof showToast !== 'undefined') {
+                    showToast('Đơn hàng đã được xử lý thành công!', 'success');
+                }
+            } else {
+                console.warn('Failed to complete purchase:', data.message);
+                // Still clear cart as payment was successful
+                await this.clearCart();
+                
+                // Show warning toast
+                if (typeof showToast !== 'undefined') {
+                    showToast('Thanh toán thành công nhưng có lỗi xử lý đơn hàng. Vui lòng liên hệ hỗ trợ.', 'warning');
+                }
+            }
+        } catch (error) {
+            console.error('Error completing purchase:', error);
+            // Still clear cart as payment was successful
+            await this.clearCart();
+            
+            // Show warning toast
+            if (typeof showToast !== 'undefined') {
+                showToast('Thanh toán thành công nhưng có lỗi xử lý đơn hàng. Vui lòng liên hệ hỗ trợ.', 'warning');
+            }
         }
     }
 

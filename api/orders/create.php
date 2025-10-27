@@ -94,6 +94,58 @@ try {
         
         $order_id = $pdo->lastInsertId();
         
+        // Get cart items to create order_items
+        $cart_stmt = $pdo->prepare("
+            SELECT 
+                c.*,
+                p.name as product_name,
+                p.type as product_type,
+                pkg.package_name,
+                COALESCE(pkg.sale_price, pkg.original_price) as unit_price
+            FROM cart c
+            JOIN products p ON c.product_id = p.id
+            JOIN product_packages pkg ON c.package_id = pkg.id
+            WHERE c.user_id = ? AND p.status = 'active' AND pkg.status = 'active'
+        ");
+        $cart_stmt->execute([$user_id]);
+        $cart_items = $cart_stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (empty($cart_items)) {
+            throw new Exception('Giỏ hàng trống, không thể tạo đơn hàng');
+        }
+        
+        // Calculate total from cart items to verify
+        $calculated_total = 0;
+        
+        // Create order_items
+        foreach ($cart_items as $item) {
+            $item_total = $item['quantity'] * $item['unit_price'];
+            $calculated_total += $item_total;
+            
+            $order_item_stmt = $pdo->prepare("
+                INSERT INTO order_items (
+                    order_id, product_id, package_id, quantity,
+                    unit_price, total_price, product_name, package_name
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            
+            $order_item_stmt->execute([
+                $order_id,
+                $item['product_id'],
+                $item['package_id'],
+                $item['quantity'],
+                $item['unit_price'],
+                $item_total,
+                $item['product_name'],
+                $item['package_name']
+            ]);
+        }
+        
+        // Verify total amount matches
+        if (abs($calculated_total - $total_amount) > 0.01) {
+            throw new Exception("Tổng tiền không khớp. Tính toán: $calculated_total, Gửi lên: $total_amount");
+        }
+        
         // Store customer info in session for VNPay processing
         $_SESSION['order_customer_info'] = [
             'order_id' => $order_id,
@@ -106,8 +158,19 @@ try {
             'district' => $customer_info['district'] ?? ''
         ];
         
-        // Note: Order items will be populated later when integrating with actual cart system
-        // For now, we create a simplified order for VNPay payment testing
+        // Return order items info as well
+        $order_items_info = [];
+        foreach ($cart_items as $item) {
+            $order_items_info[] = [
+                'product_name' => $item['product_name'],
+                'package_name' => $item['package_name'],
+                'quantity' => (int)$item['quantity'],
+                'unit_price' => (float)$item['unit_price'],
+                'total_price' => (float)($item['quantity'] * $item['unit_price'])
+            ];
+        }
+        
+        // Note: Cart will be cleared after successful payment processing
         
         // Commit transaction
         $pdo->commit();
@@ -120,7 +183,9 @@ try {
                 'order_id' => $order_id,
                 'order_code' => $order_code,
                 'total_amount' => $total_amount,
-                'payment_method' => $payment_method
+                'payment_method' => $payment_method,
+                'items_count' => count($cart_items),
+                'order_items' => $order_items_info
             ]
         ]);
         

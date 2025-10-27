@@ -26,11 +26,12 @@ try {
     $stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_items,
-            SUM(quantity) as total_quantity,
-            SUM(quantity * p.price) as total_amount
+            SUM(c.quantity) as total_quantity,
+            SUM(c.quantity * COALESCE(pkg.sale_price, pkg.original_price)) as total_amount
         FROM cart c
         JOIN products p ON c.product_id = p.id
-        WHERE c.user_id = ? AND p.status = 'active'
+        JOIN product_packages pkg ON c.package_id = pkg.id
+        WHERE c.user_id = ? AND p.status = 'active' AND pkg.status = 'active'
     ");
     $stmt->execute([$user['id']]);
     $cartSummaryBefore = $stmt->fetch();

@@ -24,7 +24,7 @@ function showToast(title, message, type = "info", lifeSpan = 3000) {
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
         </div>
-        <button type="button" class="btn-close" onclick="removeToastInstant('${toast.id}')"></button>
+        <button type="button" class="btn-close" onclick="removeToastInstant('${toast.id}')">×</button>
     `;
 
     toastbarZone.appendChild(toast);
