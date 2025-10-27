@@ -34,6 +34,11 @@ Khi tạo trang mới, cần:
 - ❌ **Không tự động tạo doc** cho features đơn giản
 - ❌ Tránh over-documentation
 
+### 📋 **Khi nào tạo file test:**
+- ✅ **Chỉ tạo khi được yêu cầu explicitly hoặc đã sửa một lỗi rất nhiều nhưng không được**
+- ✅ Cho các tính năng phức tạp hoặc có integration đặc biệt
+- ❌ **Không tự động tạo test** cho features đơn giản
+
 ### 📁 **Documentation Structure:**
 ```
 docs/

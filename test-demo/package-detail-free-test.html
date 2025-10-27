@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Package Detail Free Access</title>
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Test Package Detail Free Access</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Test Cases</h3>
+                <ul>
+                    <li><strong>Gói miễn phí (ID: 1)</strong> - "Gói Khởi động"
+                        <br><a href="goihuongnghiep-1" target="_blank" class="btn btn-primary btn-sm">Test</a>
+                        <br><small>Kết quả mong đợi: Hiển thị nút "Bắt đầu làm test" với icon play</small>
+                    </li>
+                    <li><strong>Gói có phí (ID: 2)</strong> - "Gói Tăng tốc"
+                        <br><a href="goihuongnghiep-2" target="_blank" class="btn btn-primary btn-sm">Test</a>
+                        <br><small>Kết quả mong đợi: Hiển thị nút "Đăng ký dịch vụ" với icon cart</small>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>API Test</h3>
+                <div class="mb-3">
+                    <label class="form-label">Package ID:</label>
+                    <input type="number" id="packageId" class="form-control" value="1" placeholder="Enter package ID">
+                </div>
+                <button onclick="testAPI()" class="btn btn-success">Test Create Free Access API</button>
+                <div id="apiResult" class="mt-3"></div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Features Implemented</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        Phát hiện gói miễn phí và hiển thị nút "Bắt đầu làm test"
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        API tạo access_code cho gói miễn phí (mô phỏng trigger database)
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        Kiểm tra user đã đăng nhập trước khi tạo access
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        Kiểm tra user đã có quyền truy cập trước khi tạo mới
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        Redirect đến trang test với access_code parameter
+                    </li>
+                    <li class="list-group-item">
+                        <i class="fas fa-check text-success"></i>
+                        Tạo order dummy cho gói miễn phí (foreign key requirement)
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    
+    <script>
+        async function testAPI() {
+            const packageId = document.getElementById('packageId').value;
+            const resultDiv = document.getElementById('apiResult');
+            
+            if (!packageId) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Vui lòng nhập Package ID</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="alert alert-info">Đang test API...</div>';
+            
+            try {
+                const response = await fetch('api/services/create-free-access.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        package_id: parseInt(packageId)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5>✅ API Success!</h5>
+                            <p><strong>Access Code:</strong> ${data.data.access_code}</p>
+                            <p><strong>Package:</strong> ${data.data.package_name}</p>
+                            <p><strong>Product Type:</strong> ${data.data.product_type}</p>
+                            <p><strong>Test URL:</strong> <a href="test?access_code=${data.data.access_code}" target="_blank">test?access_code=${data.data.access_code}</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5>❌ API Error</h5>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('API Test Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>❌ Network Error</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

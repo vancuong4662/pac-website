@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Làm Bài Test - PAC Website</title>
+    <meta name="description" content="Thực hiện bài kiểm tra trắc nghiệm với hệ thống đánh giá chuyên nghiệp của PAC Group.">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/toastbar.css" rel="stylesheet">
+    
+    <style>
+        .test-page {
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+        
+        .quiz-hero {
+            background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
+            color: var(--contrast-color);
+            padding: 140px 0 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quiz-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/banner/banner-1024x507.png') center/cover;
+            opacity: 0.1;
+            z-index: 1;
+        }
+        
+        .quiz-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            font-family: var(--heading-font);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-family: var(--default-font);
+        }
+        
+        .test-info-cards {
+            margin-top: 40px;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            height: 100%;
+        }
+        
+        .info-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+        
+        .info-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        
+        .info-number {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: var(--heading-font);
+            margin-bottom: 5px;
+        }
+        
+        .info-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        
+        .timer-card {
+            background: rgba(255, 242, 0, 0.15);
+            border-color: rgba(255, 242, 0, 0.3);
+        }
+        
+        .timer-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        
+        .timer-warning {
+            background: rgba(255, 193, 7, 0.2) !important;
+            border-color: rgba(255, 193, 7, 0.4) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .timer-danger {
+            background: rgba(220, 53, 69, 0.2) !important;
+            border-color: rgba(220, 53, 69, 0.4) !important;
+            animation: flash 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+        
+        .test-container {
+            max-width: 1400px;
+            margin: 24px auto;
+            padding: 0 15px;
+        }
+        
+        .test-content {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        .test-sidebar {
+            width: 350px;
+            flex-shrink: 0;
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.08);
+            position: sticky;
+            top: 140px;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .question-minimap {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .minimap-question {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #e5e7eb;
+            background: var(--surface-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .minimap-question:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.2);
+        }
+        
+        .minimap-question.current {
+            background: var(--brand-primary);
+            border-color: var(--brand-primary);
+            color: var(--contrast-color);
+            transform: scale(1.1);
+        }
+        
+        .minimap-question.answered {
+            background: var(--brand-secondary);
+            border-color: var(--brand-secondary);
+            color: var(--contrast-color);
+        }
+        
+        .minimap-question.answered::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #28a745;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-section {
+            margin-bottom: 25px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--default-color);
+        }
+        
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .test-stats {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .stat-label {
+            color: var(--default-color);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--heading-color);
+        }
+        
+        .test-main {
+            flex: 1;
+            background: var(--surface-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.08);
+            min-height: 500px;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f1f3f4;
+        }
+        
+        .question-number {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .question-type {
+            background: rgba(var(--brand-accent-rgb), 0.1);
+            color: var(--brand-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .question-content {
+            margin-bottom: 30px;
+        }
+        
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .question-description {
+            color: var(--default-color);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .answers-section {
+            margin-bottom: 40px;
+        }
+        
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-option:hover {
+            border-color: var(--brand-primary);
+            background: rgba(var(--brand-primary-rgb), 0.05);
+            transform: translateX(5px);
+        }
+        
+        .answer-option.selected {
+            border-color: var(--brand-primary);
+            background: rgba(var(--brand-primary-rgb), 0.1);
+            box-shadow: 0 4px 15px rgba(var(--brand-primary-rgb), 0.15);
+        }
+        
+        .answer-option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: transparent;
+            transition: background 0.3s ease;
+        }
+        
+        .answer-option.selected::before {
+            background: var(--brand-primary);
+        }
+        
+        .answer-radio {
+            display: none;
+        }
+        
+        .answer-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .answer-marker {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-color);
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-option.selected .answer-marker {
+            border-color: var(--brand-primary);
+            background: var(--brand-primary);
+        }
+        
+        .answer-option.selected .answer-marker::after {
+            content: '✓';
+            color: var(--contrast-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .answer-text {
+            flex: 1;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--default-color);
+        }
+        
+        .question-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #f1f3f4;
+        }
+        
+        .btn-nav {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-prev {
+            background: #6c757d;
+            color: var(--contrast-color);
+        }
+        
+        .btn-prev:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-next {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+        }
+        
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--brand-primary-rgb), 0.3);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: var(--contrast-color);
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .test-complete {
+            text-align: center;
+            padding: 60px 40px;
+        }
+        
+        .test-complete i {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 25px;
+        }
+        
+        .test-complete h2 {
+            color: var(--heading-color);
+            margin-bottom: 20px;
+        }
+        
+        .test-complete p {
+            color: var(--default-color);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .quiz-hero {
+                padding: 120px 0 60px 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .test-content {
+                flex-direction: column;
+            }
+            
+            .test-sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+                order: -1;
+            }
+            
+            .question-minimap {
+                grid-template-columns: repeat(10, 1fr);
+            }
+            
+            .minimap-question {
+                width: 40px;
+                height: 40px;
+                font-size: 0.8rem;
+            }
+            
+            .test-main {
+                padding: 25px;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .answer-text {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .quiz-hero {
+                padding: 100px 0 50px 0;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .info-card {
+                padding: 15px 10px;
+            }
+            
+            .info-number, .timer-display {
+                font-size: 1.5rem;
+            }
+            
+            .test-main {
+                padding: 20px;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .question-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .question-actions > *,
+            .question-actions > div {
+                width: 100%;
+            }
+            
+            .btn-nav {
+                width: 100% !important;
+                justify-content: center;
+                min-height: 50px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .question-minimap {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .minimap-question {
+                width: 35px;
+                height: 35px;
+                font-size: 0.75rem;
+            }
+            
+            .info-number, .timer-display {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body class="test-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Quiz Hero Section -->
+    <section class="quiz-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Bài Kiểm Tra Định Hướng Nghề Nghiệp
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Khám phá tiềm năng và định hướng nghề nghiệp phù hợp với bạn thông qua bài kiểm tra 
+                        được thiết kế dựa trên các nghiên cứu khoa học về tâm lý học nghề nghiệp.
+                    </p>
+                    
+                    <!-- Test Info Cards -->
+                    <div class="test-info-cards" data-aos="fade-up" data-aos-delay="200">
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <div class="info-card">
+                                    <div class="info-icon">
+                                        <i class="fas fa-question-circle"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-number" id="totalQuestions">20</div>
+                                        <div class="info-label">Câu hỏi</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <div class="info-card">
+                                    <div class="info-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-number" id="testDuration">30</div>
+                                        <div class="info-label">Phút</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <div class="info-card">
+                                    <div class="info-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="info-name" id="candidateName">Người dùng</div>
+                                        <div class="info-label">Thí sinh</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-6">
+                                <div class="info-card timer-card">
+                                    <div class="info-icon">
+                                        <i class="fas fa-hourglass-half"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <div class="timer-display" id="timerDisplay">
+                                            <span id="timeRemaining">30:00</span>
+                                        </div>
+                                        <div class="info-label">Thời gian còn lại</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Test Container -->
+    <div class="test-container">
+        <div class="test-content">
+            <!-- Sidebar with Minimap -->
+            <div class="test-sidebar" data-aos="fade-right">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-map"></i>
+                    Tổng quan bài thi
+                </h3>
+                
+                <!-- Question Minimap -->
+                <div class="question-minimap" id="questionMinimap">
+                    <!-- Minimap items will be generated by JavaScript -->
+                </div>
+                
+                <!-- Progress Section -->
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Tiến độ</span>
+                        <span id="progressText">0/20</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Test Stats -->
+                <div class="test-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Đã trả lời:</span>
+                        <span class="stat-value" id="answeredCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Còn lại:</span>
+                        <span class="stat-value" id="remainingCount">20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Thời gian đã dùng:</span>
+                        <span class="stat-value" id="timeUsed">00:00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Test Area -->
+            <div class="test-main" data-aos="fade-left">
+                <div id="questionContainer">
+                    <!-- Questions will be loaded here by JavaScript -->
+                </div>
+                
+                <!-- Test Complete Screen -->
+                <div id="testCompleteScreen" class="test-complete" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Hoàn thành bài kiểm tra!</h2>
+                    <p>Bạn đã hoàn thành tất cả câu hỏi. Kết quả sẽ được xử lý và gửi về cho bạn sớm nhất.</p>
+                    <button class="btn btn-submit" onclick="submitTest()">
+                        <i class="fas fa-paper-plane"></i>
+                        Nộp bài kiểm tra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        // Configure components for this page - must be defined before component-loader.js
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+    </script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/js/toastbar.js"></script>
+    <script src="assets/js/component-loader.js"></script>
+    
+    <script>
+        // Test Manager Class
+        class TestManager {
+            constructor() {
+                this.questions = [];
+                this.currentQuestionIndex = 0;
+                this.answers = {};
+                this.timeLimit = 30 * 60; // 30 minutes in seconds
+                this.timeRemaining = this.timeLimit;
+                this.timer = null;
+                this.startTime = new Date();
+                
+                this.initializeTest();
+            }
+            
+            async initializeTest() {
+                try {
+                    // Load sample questions for demo
+                    this.loadSampleQuestions();
+                    
+                    // Setup UI
+                    this.renderMinimap();
+                    this.renderQuestion();
+                    this.startTimer();
+                    this.updateStats();
+                    
+                    console.log('✅ Test initialized successfully');
+                } catch (error) {
+                    console.error('❌ Error initializing test:', error);
+                    showToast('Lỗi', 'Không thể tải bài kiểm tra. Vui lòng thử lại.', 'error');
+                }
+            }
+            
+            loadSampleQuestions() {
+                // Sample 20 questions for demo
+                this.questions = [
+                    {
+                        id: 1,
+                        text: "Bạn thích làm việc trong môi trường nào nhất?",
+                        description: "Hãy chọn môi trường làm việc mà bạn cảm thấy thoải mái và hiệu quả nhất.",
+                        type: "Tính cách",
+                        options: [
+                            "Văn phòng yên tĩnh, làm việc độc lập",
+                            "Môi trường năng động, nhiều hoạt động nhóm",
+                            "Ngoài trời, tiếp xúc với thiên nhiên",
+                            "Phòng lab, nghiên cứu và thí nghiệm"
+                        ]
+                    },
+                    {
+                        id: 2,
+                        text: "Khi giải quyết vấn đề, bạn thường?",
+                        description: "Phong cách tiếp cận vấn đề của bạn có thể phản ánh điểm mạnh nghề nghiệp.",
+                        type: "Tư duy",
+                        options: [
+                            "Phân tích kỹ lưỡng từng chi tiết",
+                            "Tìm cách sáng tạo và đột phá",
+                            "Hỏi ý kiến nhiều người khác",
+                            "Dựa vào kinh nghiệm thực tế"
+                        ]
+                    },
+                    {
+                        id: 3,
+                        text: "Điều gì thúc đẩy bạn làm việc hiệu quả nhất?",
+                        description: "Động lực làm việc sẽ giúp xác định loại nghề nghiệp phù hợp với bạn.",
+                        type: "Động lực",
+                        options: [
+                            "Mức lương cao và ổn định",
+                            "Được công nhận và tôn trọng",
+                            "Cơ hội học hỏi và phát triển",
+                            "Góp phần giúp đỡ cộng đồng"
+                        ]
+                    },
+                    {
+                        id: 4,
+                        text: "Trong một dự án nhóm, bạn thường đảm nhận vai trò nào?",
+                        description: "Vai trò trong nhóm phản ánh khả năng lãnh đạo và phong cách làm việc.",
+                        type: "Kỹ năng xã hội",
+                        options: [
+                            "Người lãnh đạo, điều phối",
+                            "Người đưa ra ý tưởng sáng tạo",
+                            "Người thực hiện chi tiết",
+                            "Người hỗ trợ và động viên"
+                        ]
+                    },
+                    {
+                        id: 5,
+                        text: "Bạn học tập hiệu quả nhất qua phương pháp nào?",
+                        description: "Phong cách học tập có thể dự đoán môi trường làm việc phù hợp.",
+                        type: "Học tập",
+                        options: [
+                            "Đọc sách và nghiên cứu lý thuyết",
+                            "Thực hành trực tiếp",
+                            "Thảo luận nhóm",
+                            "Quan sát và bắt chước"
+                        ]
+                    },
+                    {
+                        id: 6,
+                        text: "Khi phải đưa ra quyết định quan trọng, bạn dựa vào?",
+                        description: "Cách đưa ra quyết định phản ánh phong cách tư duy nghề nghiệp.",
+                        type: "Ra quyết định",
+                        options: [
+                            "Dữ liệu và phân tích logic",
+                            "Trực giác và cảm xúc",
+                            "Ý kiến của chuyên gia",
+                            "Kinh nghiệm từng trải"
+                        ]
+                    },
+                    {
+                        id: 7,
+                        text: "Môn học nào bạn từng thích nhất ở trường?",
+                        description: "Sở thích học tập có thể gợi ý về ngành nghề phù hợp.",
+                        type: "Học thuật",
+                        options: [
+                            "Toán học, Vật lý",
+                            "Văn học, Lịch sử",
+                            "Sinh học, Hóa học",
+                            "Thể dục, Nghệ thuật"
+                        ]
+                    },
+                    {
+                        id: 8,
+                        text: "Hoạt động nào sau đây bạn thích làm trong thời gian rảnh?",
+                        description: "Sở thích cá nhân có thể phản ánh nghề nghiệp lý tưởng.",
+                        type: "Sở thích",
+                        options: [
+                            "Đọc sách, nghiên cứu",
+                            "Chơi thể thao, du lịch",
+                            "Vẽ, viết, sáng tác",
+                            "Làm đồ thủ công, sửa chữa"
+                        ]
+                    },
+                    {
+                        id: 9,
+                        text: "Bạn muốn công việc của mình có tác động như thế nào?",
+                        description: "Mục tiêu tác động xã hội sẽ định hướng lựa chọn nghề nghiệp.",
+                        type: "Giá trị",
+                        options: [
+                            "Tạo ra sản phẩm hữu ích",
+                            "Giúp đỡ mọi người",
+                            "Khám phá kiến thức mới",
+                            "Bảo vệ môi trường"
+                        ]
+                    },
+                    {
+                        id: 10,
+                        text: "Khi gặp thất bại, bạn thường phản ứng như thế nào?",
+                        description: "Cách đối phó với thất bại phản ánh khả năng phục hồi nghề nghiệp.",
+                        type: "Khả năng phục hồi",
+                        options: [
+                            "Phân tích nguyên nhân và cải thiện",
+                            "Tìm cách khác sáng tạo hơn",
+                            "Xin lời khuyên từ người khác",
+                            "Nghỉ ngơi rồi thử lại"
+                        ]
+                    },
+                    {
+                        id: 11,
+                        text: "Bạn thích làm việc với thông tin theo cách nào?",
+                        description: "Cách xử lý thông tin ảnh hưởng đến lựa chọn ngành nghề.",
+                        type: "Xử lý thông tin",
+                        options: [
+                            "Phân tích số liệu chi tiết",
+                            "Tạo biểu đồ và hình ảnh",
+                            "Thuyết trình và chia sẻ",
+                            "Ứng dụng thực tế"
+                        ]
+                    },
+                    {
+                        id: 12,
+                        text: "Môi trường làm việc lý tưởng của bạn có đặc điểm gì?",
+                        description: "Môi trường làm việc ưa thích sẽ ảnh hưởng đến hiệu suất.",
+                        type: "Môi trường",
+                        options: [
+                            "Có cấu trúc rõ ràng, ổn định",
+                            "Linh hoạt, thay đổi thường xuyên",
+                            "Cạnh tranh, thử thách cao",
+                            "Hợp tác, hỗ trợ lẫn nhau"
+                        ]
+                    },
+                    {
+                        id: 13,
+                        text: "Khi làm việc nhóm, điều gì khiến bạn khó chịu nhất?",
+                        description: "Hiểu rõ điểm yếu giúp lựa chọn môi trường làm việc phù hợp.",
+                        type: "Thách thức",
+                        options: [
+                            "Thiếu tổ chức và kế hoạch",
+                            "Không có sự sáng tạo",
+                            "Ít giao tiếp và phản hồi",
+                            "Thiếu thời gian thực hiện"
+                        ]
+                    },
+                    {
+                        id: 14,
+                        text: "Bạn thích học những kỹ năng mới theo cách nào?",
+                        description: "Phương pháp học kỹ năng mới phản ánh phong cách phát triển nghề nghiệp.",
+                        type: "Phát triển",
+                        options: [
+                            "Khóa học có hệ thống",
+                            "Tự nghiên cứu và thực hành",
+                            "Học từ đồng nghiệp",
+                            "Thử nghiệm trực tiếp"
+                        ]
+                    },
+                    {
+                        id: 15,
+                        text: "Điều gì quan trọng nhất đối với bạn trong công việc?",
+                        description: "Giá trị cốt lõi sẽ định hướng lựa chọn nghề nghiệp dài hạn.",
+                        type: "Giá trị cốt lõi",
+                        options: [
+                            "Sự ổn định và an toàn",
+                            "Cơ hội thăng tiến",
+                            "Sự cân bằng cuộc sống",
+                            "Ý nghĩa xã hội"
+                        ]
+                    },
+                    {
+                        id: 16,
+                        text: "Bạn xử lý áp lực công việc như thế nào?",
+                        description: "Khả năng quản lý stress ảnh hưởng đến lựa chọn ngành nghề.",
+                        type: "Quản lý stress",
+                        options: [
+                            "Lập kế hoạch chi tiết",
+                            "Tìm cách thư giãn",
+                            "Chia sẻ với đồng nghiệp",
+                            "Tập trung vào giải pháp"
+                        ]
+                    },
+                    {
+                        id: 17,
+                        text: "Loại thành tựu nào khiến bạn tự hào nhất?",
+                        description: "Định nghĩa thành công cá nhân định hướng mục tiêu nghề nghiệp.",
+                        type: "Thành tựu",
+                        options: [
+                            "Hoàn thành dự án đúng hạn",
+                            "Tạo ra ý tưởng mới",
+                            "Giúp người khác thành công",
+                            "Vượt qua thử thách khó"
+                        ]
+                    },
+                    {
+                        id: 18,
+                        text: "Bạn thích giao tiếp với người khác bằng cách nào?",
+                        description: "Phong cách giao tiếp ảnh hưởng đến lựa chọn vai trò nghề nghiệp.",
+                        type: "Giao tiếp",
+                        options: [
+                            "Văn bản và email",
+                            "Trực tiếp, mặt đối mặt",
+                            "Thuyết trình công khai",
+                            "Thảo luận nhóm nhỏ"
+                        ]
+                    },
+                    {
+                        id: 19,
+                        text: "Khi bắt đầu một nhiệm vụ mới, bạn thường?",
+                        description: "Cách tiếp cận nhiệm vụ mới phản ánh phong cách làm việc.",
+                        type: "Khởi đầu",
+                        options: [
+                            "Nghiên cứu kỹ trước khi bắt đầu",
+                            "Bắt tay vào làm ngay lập tức",
+                            "Hỏi ý kiến người có kinh nghiệm",
+                            "Thử nhiều cách tiếp cận"
+                        ]
+                    },
+                    {
+                        id: 20,
+                        text: "Trong 5-10 năm tới, bạn muốn đạt được điều gì?",
+                        description: "Tầm nhìn dài hạn sẽ định hướng kế hoạch nghề nghiệp.",
+                        type: "Tầm nhìn",
+                        options: [
+                            "Trở thành chuyên gia trong lĩnh vực",
+                            "Khởi nghiệp kinh doanh riêng",
+                            "Có tác động tích cực đến xã hội",
+                            "Cân bằng giữa công việc và cuộc sống"
+                        ]
+                    }
+                ];
+            }
+            
+            renderMinimap() {
+                const minimap = document.getElementById('questionMinimap');
+                minimap.innerHTML = '';
+                
+                for (let i = 0; i < this.questions.length; i++) {
+                    const questionBtn = document.createElement('div');
+                    questionBtn.className = 'minimap-question';
+                    questionBtn.textContent = i + 1;
+                    questionBtn.onclick = () => this.goToQuestion(i);
+                    
+                    // Add appropriate classes
+                    if (i === this.currentQuestionIndex) {
+                        questionBtn.classList.add('current');
+                    }
+                    if (this.answers[i] !== undefined) {
+                        questionBtn.classList.add('answered');
+                    }
+                    
+                    minimap.appendChild(questionBtn);
+                }
+            }
+            
+            renderQuestion() {
+                const container = document.getElementById('questionContainer');
+                const question = this.questions[this.currentQuestionIndex];
+                
+                if (!question) return;
+                
+                container.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">Câu hỏi ${this.currentQuestionIndex + 1}</div>
+                        <div class="question-type">${question.type}</div>
+                    </div>
+                    
+                    <div class="question-content">
+                        <h3 class="question-text">${question.text}</h3>
+                        <p class="question-description">${question.description}</p>
+                    </div>
+                    
+                    <div class="answers-section">
+                        ${question.options.map((option, index) => `
+                            <div class="answer-option ${this.answers[this.currentQuestionIndex] === index ? 'selected' : ''}" 
+                                 onclick="testManager.selectAnswer(${index})">
+                                <label class="answer-label">
+                                    <input type="radio" name="question${question.id}" value="${index}" class="answer-radio" 
+                                           ${this.answers[this.currentQuestionIndex] === index ? 'checked' : ''}>
+                                    <div class="answer-marker"></div>
+                                    <div class="answer-text">${option}</div>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="question-actions">
+                        <button class="btn-nav btn-prev" onclick="testManager.previousQuestion()" 
+                                ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-chevron-left"></i>
+                            Câu trước
+                        </button>
+                        
+                        <div>
+                            ${this.currentQuestionIndex === this.questions.length - 1 ? `
+                                <button class="btn-nav btn-submit" onclick="testManager.finishTest()">
+                                    <i class="fas fa-check"></i>
+                                    Hoàn thành
+                                </button>
+                            ` : `
+                                <button class="btn-nav btn-next" onclick="testManager.nextQuestion()">
+                                    Câu tiếp
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            selectAnswer(answerIndex) {
+                this.answers[this.currentQuestionIndex] = answerIndex;
+                this.renderQuestion();
+                this.renderMinimap();
+                this.updateStats();
+            }
+            
+            goToQuestion(index) {
+                if (index >= 0 && index < this.questions.length) {
+                    this.currentQuestionIndex = index;
+                    this.renderQuestion();
+                    this.renderMinimap();
+                }
+            }
+            
+            nextQuestion() {
+                if (this.currentQuestionIndex < this.questions.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.renderQuestion();
+                    this.renderMinimap();
+                }
+            }
+            
+            previousQuestion() {
+                if (this.currentQuestionIndex > 0) {
+                    this.currentQuestionIndex--;
+                    this.renderQuestion();
+                    this.renderMinimap();
+                }
+            }
+            
+            updateStats() {
+                const answeredCount = Object.keys(this.answers).length;
+                const remainingCount = this.questions.length - answeredCount;
+                const progressPercent = (answeredCount / this.questions.length) * 100;
+                
+                document.getElementById('answeredCount').textContent = answeredCount;
+                document.getElementById('remainingCount').textContent = remainingCount;
+                document.getElementById('progressText').textContent = `${answeredCount}/${this.questions.length}`;
+                document.getElementById('progressBar').style.width = `${progressPercent}%`;
+                
+                // Calculate time used
+                const timeUsed = Math.floor((new Date() - this.startTime) / 1000);
+                const minutes = Math.floor(timeUsed / 60);
+                const seconds = timeUsed % 60;
+                document.getElementById('timeUsed').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            startTimer() {
+                this.timer = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateTimerDisplay();
+                    
+                    if (this.timeRemaining <= 0) {
+                        this.timeUp();
+                    }
+                }, 1000);
+            }
+            
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timeRemaining / 60);
+                const seconds = this.timeRemaining % 60;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('timeRemaining').textContent = timeString;
+                
+                const timerCard = document.querySelector('.timer-card');
+                
+                // Warning states
+                if (this.timeRemaining <= 300) { // 5 minutes
+                    timerCard?.classList.add('timer-warning');
+                }
+                if (this.timeRemaining <= 60) { // 1 minute
+                    timerCard?.classList.remove('timer-warning');
+                    timerCard?.classList.add('timer-danger');
+                }
+            }
+            
+            timeUp() {
+                clearInterval(this.timer);
+                showToast('Hết giờ!', 'Thời gian làm bài đã kết thúc. Bài thi sẽ được nộp tự động.', 'warning', 5000);
+                setTimeout(() => {
+                    this.submitTest();
+                }, 2000);
+            }
+            
+            finishTest() {
+                const answeredCount = Object.keys(this.answers).length;
+                const unansweredCount = this.questions.length - answeredCount;
+                
+                if (unansweredCount > 0) {
+                    const confirmMessage = `Bạn còn ${unansweredCount} câu chưa trả lời. Bạn có chắc chắn muốn hoàn thành bài thi?`;
+                    if (!confirm(confirmMessage)) {
+                        return;
+                    }
+                }
+                
+                // Show completion screen
+                document.getElementById('questionContainer').style.display = 'none';
+                document.getElementById('testCompleteScreen').style.display = 'block';
+                
+                clearInterval(this.timer);
+            }
+            
+            async submitTest() {
+                try {
+                    showToast('Đang nộp bài...', 'Vui lòng chờ trong giây lát', 'info');
+                    
+                    // Here you would normally send answers to the server
+                    // For demo, we'll just simulate the submission
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    showToast('Thành công!', 'Bài thi đã được nộp thành công. Kết quả sẽ được gửi về email của bạn.', 'success', 5000);
+                    
+                    // Redirect after successful submission
+                    setTimeout(() => {
+                        window.location.href = 'test-results';
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('❌ Error submitting test:', error);
+                    showToast('Lỗi', 'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.', 'error');
+                }
+            }
+        }
+        
+        // Initialize test when DOM is loaded
+        let testManager;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+            
+            // Initialize test after components are loaded
+            setTimeout(() => {
+                testManager = new TestManager();
+            }, 1000);
+            
+            // Prevent accidental page refresh during test
+            window.addEventListener('beforeunload', function (e) {
+                if (testManager && testManager.timer) {
+                    e.preventDefault();
+                    e.returnValue = 'Bạn có chắc chắn muốn rời khỏi trang? Tiến độ làm bài sẽ bị mất.';
+                    return e.returnValue;
+                }
+            });
+        });
+        
+        // Global function for submit button
+        function submitTest() {
+            if (testManager) {
+                testManager.submitTest();
+            }
+        }
+    </script>
+</body>
+</html>

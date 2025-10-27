@@ -77,6 +77,7 @@ RewriteRule ^dangnhap/?$ templates/login.html [L]
 RewriteRule ^dangky/?$ templates/register.html [L]
 RewriteRule ^profile/?$ templates/profile.html [L]
 RewriteRule ^payment-history/?$ templates/payment-history.html [L]
+RewriteRule ^test-quiz/?$ templates/quiz.html [L]
 RewriteRule ^test-results/?$ templates/test-results.html [L]
 
 # E-commerce and Shopping Cart pages
@@ -106,15 +107,13 @@ RewriteRule ^my-consultations/?$ templates/my-consultations.html [L]
 RewriteRule ^course-detail/?$ templates/course-detail.html [L]
 RewriteRule ^course-player/?$ templates/course-player.html [L]
 
-# Test related pages  
-RewriteRule ^test/?$ templates/test.html [L]
-RewriteRule ^test-details/?$ templates/test-details.html [L]
-
 # Consultation related pages
 RewriteRule ^consultation-details/?$ templates/consultation-details.html [L]
 
 # Test route page (for development)
 RewriteRule ^test-routes/?$ test-routes.html [L]
+RewriteRule ^test-package-detail/?$ test/package-detail-free-test.html [L]
+RewriteRule ^test-api-debug/?$ test-api-debug.html [L]
 
 # Admin pages (with authentication check) - All at root level
 RewriteRule ^admin/?$ templates/admin/login.html [L]

@@ -595,9 +595,9 @@
                                 <div class="package-meta-inline" id="package-meta-inline"></div>
                                 
                                 <div class="action-buttons">
-                                    <a href="#" class="btn-pac-primary" id="add-to-cart-btn" onclick="addToCartFromDetail()">
+                                    <a href="#" class="btn-pac-primary" id="primary-action-btn">
                                         <i class="fas fa-shopping-cart"></i>
-                                        Đăng ký dịch vụ
+                                        <span id="primary-btn-text">Đăng ký dịch vụ</span>
                                     </a>
                                     <a href="tel:0965013663" class="btn-pac-outline" id="contact-btn">
                                         <i class="fas fa-phone"></i>
@@ -777,9 +777,100 @@
                 // Package features
                 this.renderFeatures(pkg);
 
+                // Set up action button based on package type
+                this.setupActionButton(pkg);
+
                 // Show main content
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
+            }
+
+            setupActionButton(pkg) {
+                const primaryBtn = document.getElementById('primary-action-btn');
+                const btnText = document.getElementById('primary-btn-text');
+                const btnIcon = primaryBtn.querySelector('i');
+                
+                if (pkg.is_free) {
+                    // Free package - show "Bắt đầu làm test" button
+                    btnText.textContent = 'Bắt đầu làm test';
+                    btnIcon.className = 'fas fa-play';
+                    primaryBtn.onclick = () => this.startFreeTest(pkg);
+                } else {
+                    // Paid package - show "Đăng ký dịch vụ" button
+                    btnText.textContent = 'Đăng ký dịch vụ';
+                    btnIcon.className = 'fas fa-shopping-cart';
+                    primaryBtn.onclick = addToCartFromDetail;
+                }
+            }
+
+            async startFreeTest(pkg) {
+                console.log('🆓 Starting free test for package:', pkg.package_name);
+                
+                try {
+                    // Check if user is logged in
+                    const authCheck = await fetch('api/auth/verify-session.php');
+                    const authData = await authCheck.json();
+                    
+                    if (!authData.success) {
+                        // User not logged in, redirect to login
+                        showToast('Vui lòng đăng nhập để sử dụng dịch vụ', 'warning');
+                        window.location.href = 'dangnhap?redirect=' + encodeURIComponent(window.location.pathname);
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const primaryBtn = document.getElementById('primary-action-btn');
+                    setButtonLoading(primaryBtn, true, 'test');
+                    
+                    // Call API to create free access
+                    console.log('📞 Calling create-free-access API...');
+                    const response = await fetch('api/services/create-free-access.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            package_id: pkg.package_id
+                        })
+                    });
+                    
+                    console.log('📨 API Response status:', response.status);
+                    console.log('📨 API Response headers:', response.headers);
+                    
+                    const responseText = await response.text();
+                    console.log('📨 Raw API response:', responseText);
+                    
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                        console.log('🔄 Parsed API response:', data);
+                    } catch (parseError) {
+                        console.error('❌ JSON Parse Error:', parseError);
+                        console.error('❌ Raw response was:', responseText);
+                        throw new Error('Server trả về dữ liệu không hợp lệ: ' + responseText.substring(0, 200));
+                    }
+                    
+                    if (data.success) {
+                        showToast(`Bắt đầu ${data.data.package_name}!`, 'success');
+                        
+                        // Show success state
+                        setButtonSuccess(primaryBtn, 'test');
+                        
+                        // Redirect to test page with access code
+                        const testUrl = `test-quiz?access_code=${data.data.access_code}`;
+                        window.location.href = testUrl;
+                    } else {
+                        throw new Error(data.message || 'Có lỗi xảy ra khi tạo quyền truy cập');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error starting free test:', error);
+                    showToast(error.message || 'Có lỗi xảy ra. Vui lòng thử lại sau.', 'error');
+                    
+                    // Restore button state
+                    const primaryBtn = document.getElementById('primary-action-btn');
+                    setButtonLoading(primaryBtn, false, 'test');
+                }
             }
 
             renderMainPrice(pkg) {
@@ -930,7 +1021,7 @@
             new PackageDetailManager();
         });
 
-        // Add to cart functionality (based on course-detail.html pattern)
+        // Add to cart functionality (only for paid packages)
         async function addToCartFromDetail() {
             console.log('🛒 Add to cart clicked');
             
@@ -942,11 +1033,18 @@
             }
 
             const packageData = manager.packageData.package;
+            
+            // Check if this is a free package
+            if (packageData.is_free) {
+                console.log('🆓 This is a free package, should not call addToCart');
+                return;
+            }
+            
             const packageId = packageData.package_id;
             const packageName = packageData.package_name;
-            const price = packageData.is_free ? 0 : (packageData.sale_price || packageData.original_price);
+            const price = packageData.sale_price || packageData.original_price;
             
-            console.log('� Adding to cart - Package details:', { packageId, packageName, price });
+            console.log('📦 Adding to cart - Package details:', { packageId, packageName, price });
             
             // Validate packageId
             if (!packageId || packageId === 'undefined') {
@@ -980,13 +1078,13 @@
                 return;
             }
 
-            const button = document.getElementById('add-to-cart-btn');
+            const button = document.getElementById('primary-action-btn');
             
             try {
                 // Set loading state
-                setButtonLoading(button, true);
+                setButtonLoading(button, true, 'cart');
                 
-                console.log('� Making API call to add.php...');
+                console.log('📞 Making API call to add.php...');
                 console.log('📦 Request body:', { product_package_id: packageId, quantity: 1 });
                 
                 const response = await fetch('api/cart/add.php', {
@@ -1025,7 +1123,7 @@
                     showToast('Thành công', message, 'success');
                     
                     // Success visual feedback
-                    setButtonSuccess(button);
+                    setButtonSuccess(button, 'cart');
                     
                 } else {
                     console.error('❌ API Error:', data.error);
@@ -1048,47 +1146,62 @@
                 showToast('Lỗi kết nối', 'Lỗi kết nối. Vui lòng thử lại.', 'error');
             } finally {
                 // Reset button state
-                setButtonLoading(button, false);
+                setButtonLoading(button, false, 'cart');
             }
         }
 
         // Button state management functions
-        function setButtonLoading(button, loading) {
+        function setButtonLoading(button, loading, type = 'cart') {
             if (!button) return;
             
             if (loading) {
                 button.disabled = true;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+                if (type === 'test') {
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                } else {
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang thêm...';
+                }
                 button.classList.add('loading');
             } else {
                 // Only reset if not in success state
                 if (!button.classList.contains('success')) {
                     button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
+                    if (type === 'test') {
+                        button.innerHTML = '<i class="fas fa-play"></i> Bắt đầu làm test';
+                    } else {
+                        button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
+                    }
                 }
                 button.classList.remove('loading');
             }
         }
 
-        function setButtonSuccess(button) {
+        function setButtonSuccess(button, type = 'cart') {
             if (!button) return;
             
             // Keep button disabled during success state
             button.disabled = true;
             button.classList.add('success');
-            button.innerHTML = '<i class="fas fa-check"></i> Đã thêm thành công!';
-            button.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
             
-            setTimeout(() => {
-                button.disabled = false;
-                button.classList.remove('success');
-                button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
-                button.style.background = '';
+            if (type === 'test') {
+                button.innerHTML = '<i class="fas fa-check"></i> Đang chuyển hướng...';
+                button.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+                // For test, redirect happens immediately, no timeout needed
+            } else {
+                button.innerHTML = '<i class="fas fa-check"></i> Đã thêm thành công!';
+                button.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
                 
-                // Redirect to cart page
-                console.log('🛒 Redirecting to cart page...');
-                window.location.href = 'cart';
-            }, 2000);
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.classList.remove('success');
+                    button.innerHTML = '<i class="fas fa-shopping-cart"></i> Đăng ký dịch vụ';
+                    button.style.background = '';
+                    
+                    // Redirect to cart page
+                    console.log('🛒 Redirecting to cart page...');
+                    window.location.href = 'cart';
+                }, 2000);
+            }
         }
     </script>
 </body>
