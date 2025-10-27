@@ -158,7 +158,7 @@ try {
     $vnp_Bill_State = '';
     
     // Client IP - ensure valid format and force IPv4
-    $vnp_IpAddr = '127.0.0.1'; // Default fallback
+    $vnp_IpAddr = $host_ip; // Default fallback
     
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $vnp_IpAddr = $_SERVER['HTTP_CLIENT_IP'];
@@ -171,7 +171,7 @@ try {
     
     // Validate IP address format and convert IPv6 localhost to IPv4
     if ($vnp_IpAddr === '::1' || !filter_var($vnp_IpAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        $vnp_IpAddr = '127.0.0.1';
+        $vnp_IpAddr = $host_ip;
     }
     
     // Tạo array input data
