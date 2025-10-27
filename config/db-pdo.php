@@ -1,9 +1,15 @@
 <?php
 // Thông tin kết nối MySQL sử dụng PDO
-$host = 'localhost';
-$dbname = 'pac_db';
-$username = 'adminCuong';
-$password = '123456';
+$host = '103.200.23.126';
+$dbname = 'unlockyo_pac';
+$username = 'unlockyo_admin';
+$password = '%r)wM(j&Y3k.@{;T';
+
+// LOCALHOST :
+// $host = 'localhost';
+// $dbname = 'pac_db';
+// $username = 'adminCuong';
+// $password = '123456';
 
 try {
     // Thiết lập kết nối PDO

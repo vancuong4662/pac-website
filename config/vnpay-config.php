@@ -25,8 +25,12 @@ $project_path = '/0/pac-new'; // Adjust if your path is different
 // For VNPay sandbox testing
 if (VNPAY_SANDBOX_MODE) {
     // Use your actual localhost URL with registered credentials
-    $host_ip = "127.0.0.1";
-    $base_url = 'http://127.0.0.1/0/pac-new';
+    $host_ip = "103.200.23.126";
+    $base_url = 'https://unlockyourcareer.vn';
+    // LOCALHOST :
+    // $host_ip = "127.0.0.1";
+    // $base_url = 'http://127.0.0.1/0/pac-new';
+
     $vnp_Returnurl = $base_url . "/payment-result";  // Your return URL
     $vnp_IpnUrl = $base_url . "/api/orders/vnpay-ipn";     // Your IPN URL - send this to VNPay
 } else {
