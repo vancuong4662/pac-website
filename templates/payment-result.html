@@ -297,16 +297,31 @@
       text-align: center;
       padding: 4rem 2rem;
       color: var(--neutral-gray);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    .loading-spinner {
+    .spinner-wrapper {
       width: 60px;
       height: 60px;
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid var(--accent-color);
-      border-radius: 50%;
+      margin-bottom: 2rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .payment-loading-spinner {
+      width: 60px !important;
+      height: 60px !important;
+      border: 6px solid #f3f3f3 !important;
+      border-top: 6px solid var(--accent-color) !important;
+      border-radius: 50% !important;
       animation: spin 1s linear infinite;
-      margin: 0 auto 2rem;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
     }
 
     @keyframes spin {
@@ -380,7 +395,9 @@
             <!-- Loading State -->
             <div id="loadingState" class="result-card">
               <div class="loading-container">
-                <div class="loading-spinner"></div>
+                <div class="spinner-wrapper">
+                  <div class="payment-loading-spinner"></div>
+                </div>
                 <h3>Đang xử lý thông tin thanh toán...</h3>
                 <p>Vui lòng đợi trong giây lát</p>
               </div>

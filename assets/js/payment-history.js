@@ -6,14 +6,11 @@
 class PaymentHistoryManager {
     constructor() {
         this.paymentData = [];
-        this.filteredData = [];
-        this.currentFilter = 'all';
         this.init();
     }
 
     init() {
         console.log('[Payment History] Initializing...');
-        this.bindEvents();
         this.loadPaymentData();
     }
 
@@ -30,13 +27,10 @@ class PaymentHistoryManager {
 
             if (data.success) {
                 this.paymentData = data.data.payments;
-                this.summary = data.data.summary;
-                this.filteredData = [...this.paymentData];
                 
                 console.log('[Payment History] Loaded:', this.paymentData.length, 'payments');
                 
                 this.renderPaymentHistory();
-                this.updateSummaryCards();
             } else {
                 throw new Error(data.message || 'Không thể tải lịch sử thanh toán');
             }
@@ -70,7 +64,7 @@ class PaymentHistoryManager {
                 <tr>
                     <td colspan="6" class="text-center py-5">
                         <div class="text-danger mb-3">
-                            <i class="fas fa-exclamation-triangle fa-3x"></i>
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i>
                         </div>
                         <h5 class="text-danger">Lỗi tải dữ liệu</h5>
                         <p class="text-muted">${message}</p>
@@ -83,54 +77,13 @@ class PaymentHistoryManager {
         }
     }
 
-    // Bind event handlers
-    bindEvents() {
-        // Filter dropdown
-        const filterItems = document.querySelectorAll('[data-filter]');
-        filterItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.handleFilter(e.target.dataset.filter);
-            });
-        });
-    }
-
-    // Handle filter
-    handleFilter(filterType) {
-        this.currentFilter = filterType;
-        
-        // Update dropdown button text
-        const filterButton = document.getElementById('filterDropdown');
-        const filterText = {
-            'all': 'Tất cả',
-            'course': 'Khóa học', 
-            'consultation': 'Tư vấn'
-        };
-        filterButton.innerHTML = `<i class="fas fa-filter me-1"></i>${filterText[filterType]}`;
-
-        // Filter data based on primary_type from API
-        if (filterType === 'all') {
-            this.filteredData = [...this.paymentData];
-        } else if (filterType === 'course') {
-            // Include both course and career_test under "Khóa học"
-            this.filteredData = this.paymentData.filter(item => 
-                item.primary_type === 'course' || item.primary_type === 'career_test'
-            );
-        } else {
-            this.filteredData = this.paymentData.filter(item => item.primary_type === filterType);
-        }
-
-        this.renderPaymentHistory();
-        this.updateSummaryCards();
-    }
-
     // Render payment history table
     renderPaymentHistory() {
         const tbody = document.getElementById('payment-history-tbody');
         const emptyState = document.getElementById('empty-state');
         const table = document.getElementById('payment-history-table').closest('.card');
 
-        if (this.filteredData.length === 0) {
+        if (this.paymentData.length === 0) {
             table.classList.add('d-none');
             emptyState.classList.remove('d-none');
             return;
@@ -139,103 +92,64 @@ class PaymentHistoryManager {
         table.classList.remove('d-none');
         emptyState.classList.add('d-none');
 
-        tbody.innerHTML = this.filteredData.map(payment => {
-            const statusInfo = this.getStatusInfo(payment.payment_status);
-            const primaryProduct = this.getPrimaryProductInfo(payment);
-
-            return `
-                <tr class="payment-row" data-id="${payment.id}">
-                    <td class="px-4 py-3" style="min-width: 300px;">
-                        <div class="d-flex flex-column">
-                            <span class="fw-medium">${primaryProduct.name}</span>
-                            <small class="text-muted">${this.getItemsSummary(payment)}</small>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3">
-                        <div class="fw-medium">${payment.order_code}</div>
-                        ${payment.vnp_transaction_no ? `<small class="text-muted">VNPay: ${payment.vnp_transaction_no}</small>` : ''}
-                    </td>
-                    <td class="px-4 py-3">
-                        <div class="fw-medium">${payment.pay_date || payment.created_at}</div>
-                    </td>
-                    <td class="px-4 py-3 text-end">
-                        <div class="fw-bold text-primary">${this.formatCurrency(payment.total_amount)}</div>
-                        ${payment.bank_name ? `<small class="text-muted">${payment.bank_name}</small>` : ''}
-                    </td>
-                    <td class="px-4 py-3">
-                        <span class="badge ${statusInfo.class} px-3 py-2">
-                            <i class="${statusInfo.icon} me-1"></i>
-                            ${statusInfo.label}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="paymentHistory.viewDetails(${payment.id})" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            ${payment.payment_status === 'paid' ? `
-                                <button type="button" class="btn btn-outline-success btn-sm" onclick="paymentHistory.downloadInvoice(${payment.id})" title="Tải hóa đơn">
-                                    <i class="fas fa-download"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    getPrimaryProductInfo(payment) {
-        if (payment.items.length === 0) {
-            return { name: 'Không có sản phẩm' };
-        }
-
-        if (payment.items.length === 1) {
-            const item = payment.items[0];
-            return {
-                name: item.product_name
-            };
-        }
-
-        // Multiple items
-        const firstItem = payment.items[0];
-        return {
-            name: `${firstItem.product_name} (+${payment.items.length - 1} sản phẩm khác)`
-        };
-    }
-
-    getItemsSummary(payment) {
-        const counts = [];
-        if (payment.course_count > 0) counts.push(`${payment.course_count} khóa học`);
-        if (payment.test_count > 0) counts.push(`${payment.test_count} bài test`);
-        if (payment.consultation_count > 0) counts.push(`${payment.consultation_count} tư vấn`);
+        // Tạo danh sách các package từ tất cả payments
+        const packageRows = [];
         
-        return counts.join(', ') || 'Không có sản phẩm';
-    }
+        this.paymentData.forEach(payment => {
+            const statusInfo = this.getStatusInfo(payment.payment_status);
+            
+            // Render mỗi item như một package riêng biệt
+            payment.items.forEach(item => {
+                const typeInfo = this.getTypeInfo(item.product_type);
+                
+                packageRows.push(`
+                    <tr class="payment-row" data-id="${payment.id}" data-package="${item.package_name}">
+                        <td class="px-4 py-3" style="min-width: 300px;">
+                            <div class="d-flex flex-column">
+                                <span class="fw-medium">${item.product_name}</span>
+                                <small class="text-muted">
+                                    <span class="badge ${typeInfo.class} me-1">
+                                        <i class="${typeInfo.icon} me-1"></i>${typeInfo.label}
+                                    </span>
+                                    ${item.package_name}
+                                </small>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="fw-medium">${payment.order_code}</div>
+                            ${payment.vnp_transaction_no ? `<small class="text-muted">VNPay: ${payment.vnp_transaction_no}</small>` : ''}
+                        </td>
+                        <td class="px-4 py-3">
+                            ${payment.pay_date ? `<div class="fw-medium">${payment.pay_date}</div>` : '<div class="text-muted">Chưa thanh toán</div>'}
+                        </td>
+                        <td class="px-4 py-3 text-end">
+                            <div class="fw-bold text-primary">${this.formatCurrency(item.total_price)}</div>
+                            ${payment.bank_name ? `<small class="text-muted">${payment.bank_name}</small>` : ''}
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="badge ${statusInfo.class} px-3 py-2">
+                                <i class="${statusInfo.icon} me-1"></i>
+                                ${statusInfo.label}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="paymentHistory.viewDetails(${payment.id})" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${payment.payment_status === 'paid' ? `
+                                    <button type="button" class="btn btn-outline-success btn-sm" onclick="paymentHistory.downloadInvoice(${payment.id})" title="Tải hóa đơn">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+        });
 
-    // Update summary cards
-    updateSummaryCards() {
-        if (this.summary) {
-            // Use summary from API
-            document.getElementById('total-paid').textContent = this.formatCurrency(this.summary.total_paid);
-            document.getElementById('total-courses').textContent = this.summary.total_courses + (this.summary.total_tests || 0);
-            document.getElementById('total-consultations').textContent = this.summary.total_consultations;
-        } else {
-            // Fallback: calculate from filtered data
-            const totalPaid = this.filteredData
-                .filter(payment => payment.payment_status === 'paid')
-                .reduce((sum, payment) => sum + payment.total_amount, 0);
-            const totalCourses = this.filteredData
-                .filter(payment => payment.primary_type === 'course' || payment.primary_type === 'career_test')
-                .reduce((sum, payment) => sum + payment.course_count + payment.test_count, 0);
-            const totalConsultations = this.filteredData
-                .filter(payment => payment.primary_type === 'consultation')
-                .reduce((sum, payment) => sum + payment.consultation_count, 0);
-
-            document.getElementById('total-paid').textContent = this.formatCurrency(totalPaid);
-            document.getElementById('total-courses').textContent = totalCourses;
-            document.getElementById('total-consultations').textContent = totalConsultations;
-        }
+        tbody.innerHTML = packageRows.join('');
     }
 
     // Format date
@@ -263,19 +177,14 @@ class PaymentHistoryManager {
                 icon: 'fas fa-graduation-cap'
             },
             'career_test': {
-                label: 'Test nghề nghiệp',
+                label: 'Tư vấn - bài test',
                 class: 'bg-info-subtle text-info',
                 icon: 'fas fa-clipboard-check'
             },
             'consultation': {
-                label: 'Tư vấn',
-                class: 'bg-warning-subtle text-warning',
+                label: 'Tư vấn - chuyên gia',
+                class: 'bg-info-subtle text-info',
                 icon: 'fas fa-handshake'
-            },
-            'mixed': {
-                label: 'Hỗn hợp',
-                class: 'bg-secondary-subtle text-secondary',
-                icon: 'fas fa-layer-group'
             }
         };
         return types[type] || types['mixed'];
@@ -371,36 +280,6 @@ class PaymentHistoryManager {
                         <tr><td>Thời gian thanh toán:</td><td>${payment.pay_date || 'Chưa thanh toán'}</td></tr>
                     </table>
                 </div>
-            </div>
-            
-            <hr>
-            
-            <h6>Sản phẩm đã mua</h6>
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Sản phẩm</th>
-                            <th>Gói</th>
-                            <th>Loại</th>
-                            <th class="text-end">Số lượng</th>
-                            <th class="text-end">Đơn giá</th>
-                            <th class="text-end">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${payment.items.map(item => `
-                            <tr>
-                                <td>${item.product_name}</td>
-                                <td>${item.package_name}</td>
-                                <td>${this.getTypeInfo(item.product_type).label}</td>
-                                <td class="text-end">${item.quantity}</td>
-                                <td class="text-end">${this.formatCurrency(item.unit_price)}</td>
-                                <td class="text-end"><strong>${this.formatCurrency(item.total_price)}</strong></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
             </div>
         `;
     }

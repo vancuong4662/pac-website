@@ -97,8 +97,7 @@ RewriteRule ^vnpay-return/?$ api/orders/vnpay-return.php [L]
 RewriteRule ^vnpay-ipn/?$ api/orders/vnpay-ipn.php [L]
 RewriteRule ^vnpay-test/?$ test/vnpay-test.html [L]
 
-# Purchase Management pages
-RewriteRule ^my-purchases/?$ templates/my-purchases.html [L]
+# Profile Management pages
 RewriteRule ^my-courses/?$ templates/my-courses.html [L]
 RewriteRule ^my-tests/?$ templates/my-tests.html [L]
 RewriteRule ^my-consultations/?$ templates/my-consultations.html [L]
