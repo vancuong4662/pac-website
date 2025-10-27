@@ -204,6 +204,50 @@ function setActiveNavLink() {
   const navLinks = document.querySelectorAll('.profile-nav .nav-link');
   const currentPath = window.location.pathname;
   
+  // Remove active class from all links first
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+  });
+  
+  // Map of current paths to their corresponding nav links
+  // Follow dev-note.md: NO /pac-new/ prefix, only relative paths
+  const pathMapping = {
+    '/profile': 'profile',
+    '/my-courses': 'my-courses', 
+    '/my-consultations': 'my-consultations',
+    '/my-tests': 'my-tests',
+    '/payment-history': 'payment-history',
+    '/settings': 'settings'
+  };
+  
+  // Determine which link should be active
+  let targetHref = null;
+  
+  // Check if current path matches any mapping
+  if (pathMapping[currentPath]) {
+    targetHref = pathMapping[currentPath];
+  }
+  // Check if path ends with any of our target pages (for cases like /pac-new/profile)
+  else {
+    for (const [path, href] of Object.entries(pathMapping)) {
+      if (currentPath.endsWith(path)) {
+        targetHref = href;
+        break;
+      }
+    }
+  }
+  
+  // Set active class on the matching link
+  if (targetHref) {
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === targetHref) {
+        link.classList.add('active');
+      }
+    });
+  }
+  
+  // Add click handlers for navigation
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       e.preventDefault();
@@ -222,14 +266,6 @@ function setActiveNavLink() {
         window.location.href = href;
       }
     });
-  });
-  
-  // Set active link based on current page
-  navLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if (href && currentPath.includes(href.replace(/\./g, ''))) {
-      link.classList.add('active');
-    }
   });
 }
 

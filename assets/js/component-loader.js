@@ -613,9 +613,12 @@ function setActiveNavigation() {
       
       // Match patterns for different pages
       if (
-        (currentPage.includes('payment-history') && href.includes('payment-history')) ||
-        (currentPage.includes('test-results') && href.includes('test-results')) ||
-        (currentPage.includes('profile') && !currentPage.includes('payment-history') && !currentPage.includes('test-results') && href.includes('profile') && !href.includes('payment-history') && !href.includes('test-results'))
+        (currentPath.includes('/payment-history') && href.includes('payment-history')) ||
+        (currentPath.includes('/my-courses') && href.includes('my-courses')) ||
+        (currentPath.includes('/my-consultations') && href.includes('my-consultations')) ||
+        (currentPath.includes('/my-tests') && href.includes('my-tests')) ||
+        (currentPath.includes('/test-results') && href.includes('test-results')) ||
+        (currentPath.includes('/profile') && !currentPath.includes('payment-history') && !currentPath.includes('my-courses') && !currentPath.includes('my-consultations') && !currentPath.includes('my-tests') && !currentPath.includes('test-results') && href.includes('profile') && !href.includes('payment-history') && !href.includes('my-courses') && !href.includes('my-consultations') && !href.includes('my-tests') && !href.includes('test-results'))
       ) {
         link.classList.add('active');
       }
