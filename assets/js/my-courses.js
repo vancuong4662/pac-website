@@ -1,602 +1,433 @@
 /**
  * My Courses JavaScript Module
- * Handles course management, progress tracking, and course interactions
+ * Quản lý trang khóa học của tôi
  */
 
-// Global variables
-let currentPage = 1;
-let currentFilters = {};
-let coursesData = {};
-let stats = { total: 0, active: 0, completed: 0, expired: 0 };
-
-// Initialize my courses page
-function initializeMyCourses() {
-    setupFilterHandlers();
-    loadCourses();
-    loadStatistics();
-}
-
-// Setup filter handlers
-function setupFilterHandlers() {
-    // Auto-apply filters on change
-    const filterControls = document.querySelectorAll('.filter-control');
-    filterControls.forEach(control => {
-        if (control.type === 'text') {
-            control.addEventListener('input', debounce(() => {
-                applyFilters();
-            }, 500));
-        } else {
-            control.addEventListener('change', () => {
-                applyFilters();
+class MyCoursesManager {
+    constructor() {
+        this.currentPage = 1;
+        this.itemsPerPage = 10;
+        this.currentFilters = {
+            status: '',
+            category: '',
+            search: ''
+        };
+        
+        this.init();
+    }
+    
+    init() {
+        console.log('[MyCoursesManager] Initializing...');
+        
+        // Bind events
+        this.bindEvents();
+        
+        // Load courses
+        this.loadCourses();
+    }
+    
+    bindEvents() {
+        // Search input với debounce
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            let debounceTimer;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    this.currentFilters.search = e.target.value;
+                    this.currentPage = 1;
+                    this.loadCourses();
+                }, 500);
             });
         }
-    });
-    
-    // Enter key to apply filters
-    document.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && e.target.classList.contains('filter-control')) {
-            applyFilters();
+        
+        // Filter dropdowns
+        const statusFilter = document.getElementById('statusFilter');
+        const categoryFilter = document.getElementById('categoryFilter');
+        
+        if (statusFilter) {
+            statusFilter.addEventListener('change', (e) => {
+                this.currentFilters.status = e.target.value;
+                this.currentPage = 1;
+                this.loadCourses();
+            });
         }
-    });
-}
-
-// Apply filters
-function applyFilters() {
-    const statusFilter = document.getElementById('statusFilter')?.value || '';
-    const categoryFilter = document.getElementById('categoryFilter')?.value || '';
-    const searchInput = document.getElementById('searchInput')?.value || '';
-    
-    currentFilters = {
-        status: statusFilter,
-        category: categoryFilter,
-        search: searchInput
-    };
-    
-    currentPage = 1;
-    loadCourses(currentFilters);
-}
-
-// Load courses data
-async function loadCourses(filters = {}, page = 1) {
-    try {
-        showLoading(true);
         
-        // Build query parameters
-        const params = new URLSearchParams({
-            page: page,
-            limit: 12,
-            ...filters
-        });
-        
-        const response = await fetch(`api/courses/my-courses.php?${params}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            coursesData = data.data;
-            displayCourses(data.data);
-            updatePagination(data.pagination);
-        } else {
-            showError(data.message || 'Không thể tải danh sách khóa học');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', (e) => {
+                this.currentFilters.category = e.target.value;
+                this.currentPage = 1;
+                this.loadCourses();
+            });
         }
-    } catch (error) {
-        console.error('Error loading courses:', error);
-        showError('Có lỗi xảy ra khi tải danh sách khóa học');
-    } finally {
-        showLoading(false);
     }
-}
-
-// Load statistics
-async function loadStatistics() {
-    try {
-        const response = await fetch('api/courses/my-courses-stats.php');
-        const data = await response.json();
+    
+    async loadCourses() {
+        console.log('[MyCoursesManager] Loading courses...');
         
-        if (data.success) {
-            stats = data.data;
-            updateStatistics(stats);
-        }
-    } catch (error) {
-        console.error('Error loading statistics:', error);
-    }
-}
-
-// Update statistics display
-function updateStatistics(stats) {
-    document.getElementById('totalCourses').textContent = stats.total || 0;
-    document.getElementById('activeCourses').textContent = stats.active || 0;
-    document.getElementById('completedCourses').textContent = stats.completed || 0;
-    document.getElementById('expiredCourses').textContent = stats.expired || 0;
-}
-
-// Display courses
-function displayCourses(data) {
-    const container = document.getElementById('coursesList');
-    if (!container) return;
-    
-    container.style.display = 'block';
-    
-    if (!data.items || data.items.length === 0) {
-        container.innerHTML = generateEmptyState();
-        return;
-    }
-    
-    let coursesHTML = '';
-    data.items.forEach(course => {
-        coursesHTML += generateCourseHTML(course);
-    });
-    
-    container.innerHTML = coursesHTML;
-    
-    // Trigger AOS refresh for new elements
-    if (typeof AOS !== 'undefined') {
-        AOS.refresh();
-    }
-}
-
-// Generate course HTML
-function generateCourseHTML(course) {
-    const progressPercentage = Math.round(course.progress_percentage || 0);
-    const status = determineCourseStatus(course);
-    const statusClass = getStatusClass(status);
-    const statusText = getStatusText(status);
-    
-    // Calculate time remaining
-    const timeRemaining = calculateTimeRemaining(course.expires_at);
-    
-    return `
-        <div class="course-card" data-aos="fade-up">
-            <div class="course-header">
-                <div class="status-badge ${statusClass}">
-                    ${statusText}
-                </div>
-                
-                <div class="course-progress">
-                    <div class="progress-circle">
-                        ${progressPercentage}%
-                    </div>
-                    <div class="progress-text">Hoàn thành</div>
-                </div>
-                
-                <div class="course-thumbnail">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                
-                <div class="course-title">${course.name}</div>
-                <div class="course-category">${getCategoryText(course.category)}</div>
-            </div>
+        try {
+            // Show loading
+            this.showLoading();
             
-            <div class="course-body">
-                <div class="course-meta">
-                    <div class="meta-item">
-                        <i class="fas fa-clock"></i>
-                        <span>${course.duration || 'Không giới hạn'}</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-play-circle"></i>
-                        <span>${course.total_lessons || 0} bài học</span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-calendar"></i>
-                        <span>Mua: ${formatDate(course.purchased_at)}</span>
-                    </div>
-                    ${timeRemaining ? `
-                    <div class="meta-item">
-                        <i class="fas fa-hourglass-half"></i>
-                        <span>${timeRemaining}</span>
-                    </div>
-                    ` : ''}
-                </div>
-                
-                <div class="progress-bar-container">
-                    <div class="progress-label">
-                        <span>Tiến độ học tập</span>
-                        <span>${course.completed_lessons || 0}/${course.total_lessons || 0} bài</span>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: ${progressPercentage}%"></div>
-                    </div>
-                </div>
-                
-                <div class="course-actions">
-                    ${generateCourseActionButtons(course, status)}
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Generate course action buttons
-function generateCourseActionButtons(course, status) {
-    let buttons = '';
-    
-    if (status === 'active') {
-        if (course.last_lesson_id) {
-            buttons += `
-                <a href="course-player?course=${course.id}&lesson=${course.last_lesson_id}" class="btn btn-continue">
-                    <i class="fas fa-play me-2"></i>Tiếp tục học
-                </a>
-            `;
-        } else {
-            buttons += `
-                <a href="course-player?course=${course.id}" class="btn btn-continue">
-                    <i class="fas fa-play me-2"></i>Bắt đầu học
-                </a>
-            `;
-        }
-        
-        buttons += `
-            <a href="course-detail?id=${course.id}" class="btn btn-outline-primary">
-                <i class="fas fa-info-circle me-2"></i>Chi tiết
-            </a>
-        `;
-        
-        if (course.has_certificate && course.progress_percentage >= 80) {
-            buttons += `
-                <button class="btn btn-outline-success" onclick="downloadCertificate('${course.id}')">
-                    <i class="fas fa-certificate me-2"></i>Tải chứng chỉ
-                </button>
-            `;
-        }
-    } else if (status === 'completed') {
-        buttons += `
-            <a href="course-player?course=${course.id}" class="btn btn-continue">
-                <i class="fas fa-redo me-2"></i>Xem lại
-            </a>
-            <a href="course-detail?id=${course.id}" class="btn btn-outline-primary">
-                <i class="fas fa-info-circle me-2"></i>Chi tiết
-            </a>
-        `;
-        
-        if (course.has_certificate) {
-            buttons += `
-                <button class="btn btn-outline-success" onclick="downloadCertificate('${course.id}')">
-                    <i class="fas fa-certificate me-2"></i>Tải chứng chỉ
-                </button>
-            `;
-        }
-        
-        if (course.can_review) {
-            buttons += `
-                <button class="btn btn-outline-warning" onclick="reviewCourse('${course.id}')">
-                    <i class="fas fa-star me-2"></i>Đánh giá
-                </button>
-            `;
-        }
-    } else if (status === 'expired') {
-        buttons += `
-            <a href="course-detail?id=${course.course_id}" class="btn btn-outline-primary">
-                <i class="fas fa-info-circle me-2"></i>Chi tiết khóa học
-            </a>
-            <button class="btn btn-continue" onclick="renewCourse('${course.id}')">
-                <i class="fas fa-refresh me-2"></i>Gia hạn
-            </button>
-        `;
-    }
-    
-    return buttons;
-}
-
-// Determine course status
-function determineCourseStatus(course) {
-    if (course.expires_at && new Date(course.expires_at) < new Date()) {
-        return 'expired';
-    }
-    
-    if (course.progress_percentage >= 100) {
-        return 'completed';
-    }
-    
-    return 'active';
-}
-
-// Get status class
-function getStatusClass(status) {
-    const classes = {
-        'active': 'status-active',
-        'completed': 'status-completed',
-        'expired': 'status-expired'
-    };
-    
-    return classes[status] || 'status-active';
-}
-
-// Get status text
-function getStatusText(status) {
-    const texts = {
-        'active': 'Đang học',
-        'completed': 'Hoàn thành',
-        'expired': 'Hết hạn'
-    };
-    
-    return texts[status] || status;
-}
-
-// Get category text
-function getCategoryText(category) {
-    const categories = {
-        'business': 'Kinh doanh',
-        'technology': 'Công nghệ',
-        'marketing': 'Marketing',
-        'design': 'Thiết kế',
-        'language': 'Ngoại ngữ'
-    };
-    
-    return categories[category] || category;
-}
-
-// Calculate time remaining
-function calculateTimeRemaining(expiresAt) {
-    if (!expiresAt) return null;
-    
-    const now = new Date();
-    const expiry = new Date(expiresAt);
-    const diff = expiry - now;
-    
-    if (diff <= 0) return 'Đã hết hạn';
-    
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
-    if (days > 30) {
-        const months = Math.floor(days / 30);
-        return `Còn ${months} tháng`;
-    } else if (days > 0) {
-        return `Còn ${days} ngày`;
-    } else {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        return `Còn ${hours} giờ`;
-    }
-}
-
-// Generate empty state
-function generateEmptyState() {
-    return `
-        <div class="empty-state">
-            <i class="fas fa-graduation-cap"></i>
-            <h3>Chưa có khóa học nào</h3>
-            <p>Bạn chưa mua khóa học nào. Khám phá các khóa học để phát triển sự nghiệp!</p>
-            <a href="products?type=course" class="btn btn-primary">
-                <i class="fas fa-shopping-bag me-2"></i>
-                Xem khóa học
-            </a>
-        </div>
-    `;
-}
-
-// Update pagination
-function updatePagination(paginationData) {
-    const wrapper = document.getElementById('paginationWrapper');
-    if (!wrapper || !paginationData) {
-        wrapper.style.display = 'none';
-        return;
-    }
-    
-    if (paginationData.total_pages <= 1) {
-        wrapper.style.display = 'none';
-        return;
-    }
-    
-    wrapper.style.display = 'flex';
-    
-    let paginationHTML = '<nav><ul class="pagination">';
-    
-    // Previous button
-    if (paginationData.current_page > 1) {
-        paginationHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadPage(${paginationData.current_page - 1})">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-            </li>
-        `;
-    }
-    
-    // Page numbers
-    const startPage = Math.max(1, paginationData.current_page - 2);
-    const endPage = Math.min(paginationData.total_pages, paginationData.current_page + 2);
-    
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHTML += `
-            <li class="page-item ${i === paginationData.current_page ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="loadPage(${i})">${i}</a>
-            </li>
-        `;
-    }
-    
-    // Next button
-    if (paginationData.current_page < paginationData.total_pages) {
-        paginationHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadPage(${paginationData.current_page + 1})">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </li>
-        `;
-    }
-    
-    paginationHTML += '</ul></nav>';
-    wrapper.innerHTML = paginationHTML;
-}
-
-// Load specific page
-function loadPage(page) {
-    currentPage = page;
-    loadCourses(currentFilters, page);
-}
-
-// Download certificate
-async function downloadCertificate(courseId) {
-    try {
-        showToast('Đang tạo chứng chỉ...', 'info');
-        
-        const response = await fetch(`api/courses/certificate.php?course_id=${courseId}`);
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `certificate-${courseId}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            // Build query parameters
+            const params = new URLSearchParams({
+                page: this.currentPage,
+                limit: this.itemsPerPage,
+                ...this.currentFilters
+            });
             
-            showToast('Tải chứng chỉ thành công!', 'success');
-        } else {
+            // Remove empty filters
+            Object.keys(this.currentFilters).forEach(key => {
+                if (!this.currentFilters[key]) {
+                    params.delete(key);
+                }
+            });
+            
+            const response = await fetch(`api/courses/my-courses.php?${params.toString()}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const data = await response.json();
-            showToast(data.message || 'Không thể tải chứng chỉ', 'error');
+            
+            if (data.success) {
+                console.log('[MyCoursesManager] Courses loaded:', data.data);
+                
+                // Update statistics (if needed - removed from UI but keep for potential future use)
+                this.updateStatistics(data.data.statistics);
+                
+                // Render courses
+                this.renderCourses(data.data.courses);
+                
+                // Render pagination
+                this.renderPagination(data.data.pagination);
+                
+                // Hide loading
+                this.hideLoading();
+                
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+            
+        } catch (error) {
+            console.error('[MyCoursesManager] Error loading courses:', error);
+            this.showError('Không thể tải danh sách khóa học. Vui lòng thử lại.');
+            this.hideLoading();
         }
-    } catch (error) {
-        console.error('Error downloading certificate:', error);
-        showToast('Có lỗi xảy ra khi tải chứng chỉ', 'error');
     }
-}
-
-// Review course
-async function reviewCourse(courseId) {
-    try {
-        // TODO: Implement course review modal
-        showToast('Tính năng đánh giá khóa học sẽ được cập nhật sớm', 'info');
-    } catch (error) {
-        console.error('Error reviewing course:', error);
-        showToast('Có lỗi xảy ra khi đánh giá khóa học', 'error');
+    
+    updateStatistics(stats) {
+        // Update statistics if elements exist (for future use)
+        const elements = {
+            totalCourses: document.getElementById('totalCourses'),
+            activeCourses: document.getElementById('activeCourses'),
+            completedCourses: document.getElementById('completedCourses'),
+            expiredCourses: document.getElementById('expiredCourses')
+        };
+        
+        if (elements.totalCourses) elements.totalCourses.textContent = stats.total_courses;
+        if (elements.activeCourses) elements.activeCourses.textContent = stats.active_courses;
+        if (elements.completedCourses) elements.completedCourses.textContent = stats.completed_courses;
+        if (elements.expiredCourses) elements.expiredCourses.textContent = stats.expired_courses;
     }
-}
-
-// Renew course
-async function renewCourse(courseId) {
-    try {
-        if (!confirm('Bạn có muốn gia hạn khóa học này không?')) {
+    
+    renderCourses(courses) {
+        const coursesContent = document.getElementById('coursesContent');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (!coursesContent) {
+            console.error('[MyCoursesManager] coursesContent element not found');
             return;
         }
         
-        showToast('Đang xử lý gia hạn...', 'info');
-        
-        const response = await fetch('api/courses/renew.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ course_id: courseId })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('Gia hạn khóa học thành công!', 'success');
-            loadCourses(currentFilters, currentPage);
-            loadStatistics();
-        } else {
-            showToast(data.message || 'Không thể gia hạn khóa học', 'error');
+        if (courses.length === 0) {
+            // Show empty state
+            coursesContent.style.display = 'none';
+            if (emptyState) {
+                emptyState.classList.remove('d-none');
+            }
+            return;
         }
-    } catch (error) {
-        console.error('Error renewing course:', error);
-        showToast('Có lỗi xảy ra khi gia hạn khóa học', 'error');
-    }
-}
-
-// Show loading state
-function showLoading(show) {
-    const loadingState = document.getElementById('loadingCourses');
-    const coursesList = document.getElementById('coursesList');
-    const paginationWrapper = document.getElementById('paginationWrapper');
-    
-    if (loadingState) {
-        loadingState.style.display = show ? 'block' : 'none';
+        
+        // Hide empty state
+        if (emptyState) {
+            emptyState.classList.add('d-none');
+        }
+        
+        // Build courses table
+        const tableHTML = this.buildCoursesTable(courses);
+        coursesContent.innerHTML = tableHTML;
+        coursesContent.style.display = 'block';
     }
     
-    if (coursesList) {
-        coursesList.style.display = show ? 'none' : 'block';
-    }
-    
-    if (paginationWrapper) {
-        paginationWrapper.style.display = show ? 'none' : 'flex';
-    }
-}
-
-// Show error
-function showError(message) {
-    const container = document.getElementById('coursesList');
-    if (container) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle text-danger"></i>
-                <h3>Có lỗi xảy ra</h3>
-                <p>${message}</p>
-                <button class="btn btn-primary" onclick="loadCourses(currentFilters, currentPage)">
-                    <i class="fas fa-redo me-2"></i>Thử lại
-                </button>
+    buildCoursesTable(courses) {
+        return `
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="px-4 py-3" style="min-width: 300px;">
+                                <i class="fas fa-graduation-cap me-2 text-brand-primary"></i>Khóa học
+                            </th>
+                            <th scope="col" class="px-4 py-3">
+                                <i class="fas fa-calendar me-2 text-brand-primary"></i>Thanh toán
+                            </th>
+                            <th scope="col" class="px-4 py-3" style="min-width: 140px;">
+                                <i class="fas fa-clock me-2 text-brand-primary"></i>Bắt đầu
+                            </th>
+                            <th scope="col" class="px-4 py-3">
+                                <i class="fas fa-chalkboard-teacher me-2 text-brand-primary"></i>Trạng thái lớp
+                            </th>
+                            <th scope="col" class="px-4 py-3" style="min-width: 120px;">
+                                <i class="fas fa-key me-2 text-brand-primary"></i>Mã khóa học
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${courses.map(course => this.buildCourseRow(course)).join('')}
+                    </tbody>
+                </table>
             </div>
         `;
-        container.style.display = 'block';
     }
-}
-
-// Show toast notification
-function showToast(message, type = 'info') {
-    const toastElement = document.getElementById('toast');
-    const toastBody = document.getElementById('toastBody');
     
-    if (!toastElement || !toastBody) return;
+    buildCourseRow(course) {
+        return `
+            <tr>
+                <td class="px-4 py-3">
+                    <div class="course-info">
+                        <h6 class="mb-1 fw-semibold text-brand-primary">${this.escapeHtml(course.product_name)}</h6>
+                        <div class="text-muted small mb-1">
+                            <i class="fas fa-box me-1"></i>
+                            ${this.escapeHtml(course.package_name)}
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-tag me-1"></i>
+                            ${course.category_label}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-money-bill-wave me-1"></i>
+                            ${course.package_price_formatted}
+                        </div>
+                    </div>
+                </td>
+                
+                <td class="px-4 py-3">
+                    <div class="text-muted small">
+                        <i class="fas fa-calendar-check me-1"></i>
+                        ${course.payment_completed_formatted}
+                    </div>
+                </td>
+                
+                <td class="px-4 py-3">
+                    <div class="text-muted small">
+                        <i class="fas fa-${course.scheduled_at ? 'calendar-alt' : 'clock'} me-1"></i>
+                        ${course.scheduled_at_display}
+                    </div>
+                </td>
+                
+                <td class="px-4 py-3">
+                    <span class="badge bg-${course.support_status_color} d-inline-flex align-items-center">
+                        <i class="${course.support_status_icon} me-1"></i>
+                        ${course.support_status_label}
+                    </span>
+                </td>
+                
+                <td class="px-4 py-3">
+                    <div class="course-code-cell">
+                        <code class="bg-light px-2 py-1 rounded small fw-bold text-brand-secondary">
+                            ${course.access_code}
+                        </code>
+                        <button class="btn btn-link btn-sm p-0 ms-2" 
+                                onclick="myCoursesManager.copyToClipboard('${course.access_code}')"
+                                title="Sao chép mã">
+                            <i class="fas fa-copy text-brand-primary"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
     
-    toastBody.textContent = message;
-    
-    // Update toast icon based on type
-    const toastHeader = toastElement.querySelector('.toast-header i');
-    if (toastHeader) {
-        const iconClasses = {
-            'success': 'fa-check-circle text-success',
-            'error': 'fa-exclamation-circle text-danger',
-            'warning': 'fa-exclamation-triangle text-warning',
-            'info': 'fa-info-circle text-primary'
-        };
+    renderPagination(pagination) {
+        // Add pagination container if not exists
+        let paginationContainer = document.querySelector('.pagination-container');
+        if (!paginationContainer) {
+            const cardBody = document.querySelector('#coursesContent').parentElement;
+            paginationContainer = document.createElement('div');
+            paginationContainer.className = 'pagination-container p-3 border-top';
+            cardBody.appendChild(paginationContainer);
+        }
         
-        toastHeader.className = `fas ${iconClasses[type] || iconClasses.info} me-2`;
+        if (pagination.total_pages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+        
+        let paginationHTML = '<nav aria-label="Courses pagination"><ul class="pagination justify-content-center mb-0">';
+        
+        // Previous button
+        if (pagination.has_prev) {
+            paginationHTML += `
+                <li class="page-item">
+                    <button class="page-link" onclick="myCoursesManager.goToPage(${pagination.prev_page})">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </li>
+            `;
+        }
+        
+        // Page numbers
+        const start = Math.max(1, pagination.current_page - 2);
+        const end = Math.min(pagination.total_pages, pagination.current_page + 2);
+        
+        for (let i = start; i <= end; i++) {
+            const isActive = i === pagination.current_page;
+            paginationHTML += `
+                <li class="page-item ${isActive ? 'active' : ''}">
+                    <button class="page-link" onclick="myCoursesManager.goToPage(${i})">${i}</button>
+                </li>
+            `;
+        }
+        
+        // Next button
+        if (pagination.has_next) {
+            paginationHTML += `
+                <li class="page-item">
+                    <button class="page-link" onclick="myCoursesManager.goToPage(${pagination.next_page})">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </li>
+            `;
+        }
+        
+        paginationHTML += '</ul></nav>';
+        paginationContainer.innerHTML = paginationHTML;
     }
     
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-}
-
-// Utility functions
-function formatDate(dateString) {
-    if (!dateString) return '';
+    goToPage(page) {
+        this.currentPage = page;
+        this.loadCourses();
+    }
     
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
+    applyFilters() {
+        console.log('[MyCoursesManager] Applying filters...');
+        this.currentPage = 1;
+        this.loadCourses();
+    }
+    
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            this.showToast('Đã sao chép mã khóa học: ' + text, 'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            this.showToast('Đã sao chép mã khóa học: ' + text, 'success');
         });
-    } catch (error) {
-        return dateString;
+    }
+    
+    viewCourseDetails(courseId) {
+        console.log('[MyCoursesManager] Viewing course details:', courseId);
+        // TODO: Implement course details modal or page
+        this.showToast('Tính năng xem chi tiết sẽ được triển khai soon!', 'info');
+    }
+    
+    accessCourse(accessCode) {
+        console.log('[MyCoursesManager] Accessing course:', accessCode);
+        // TODO: Implement course access logic
+        this.showToast('Tính năng truy cập khóa học sẽ được triển khai soon!', 'info');
+    }
+    
+    showLoading() {
+        const loadingElement = document.getElementById('loadingCourses');
+        const contentElement = document.getElementById('coursesContent');
+        
+        if (loadingElement) loadingElement.style.display = 'block';
+        if (contentElement) contentElement.style.display = 'none';
+    }
+    
+    hideLoading() {
+        const loadingElement = document.getElementById('loadingCourses');
+        
+        if (loadingElement) loadingElement.style.display = 'none';
+    }
+    
+    showError(message) {
+        console.error('[MyCoursesManager] Error:', message);
+        this.showToast(message, 'error');
+        
+        // Show empty state with error message
+        const coursesContent = document.getElementById('coursesContent');
+        if (coursesContent) {
+            coursesContent.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="text-danger mb-3">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <h5 class="text-danger">Có lỗi xảy ra</h5>
+                    <p class="text-muted">${message}</p>
+                    <button class="btn btn-pac-primary" onclick="myCoursesManager.loadCourses()">
+                        <i class="fas fa-sync-alt me-2"></i>Thử lại
+                    </button>
+                </div>
+            `;
+            coursesContent.style.display = 'block';
+        }
+    }
+    
+    showToast(message, type = 'success') {
+        // Use existing toast system if available
+        if (window.authChecker && window.authChecker.showToast) {
+            window.authChecker.showToast(message, type);
+        } else {
+            // Simple fallback
+            console.log(`[Toast ${type}]:`, message);
+            alert(message);
+        }
+    }
+    
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
     }
 }
 
-// Debounce function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
+// Global functions for template calls
+function applyFilters() {
+    if (window.myCoursesManager) {
+        window.myCoursesManager.applyFilters();
+    }
 }
 
-// Export functions for global use
-window.initializeMyCourses = initializeMyCourses;
-window.applyFilters = applyFilters;
-window.loadPage = loadPage;
-window.downloadCertificate = downloadCertificate;
-window.reviewCourse = reviewCourse;
-window.renewCourse = renewCourse;
+function refreshCourses() {
+    if (window.myCoursesManager) {
+        window.myCoursesManager.loadCourses();
+    }
+}
 
-// Initialize on DOM load
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    initializeMyCourses();
+    // Only initialize if we're on the my-courses page
+    if (document.body.classList.contains('my-courses-page')) {
+        console.log('[MyCoursesManager] DOM ready, initializing...');
+        
+        // Wait for authentication to complete first
+        setTimeout(() => {
+            window.myCoursesManager = new MyCoursesManager();
+        }, 500);
+    }
 });
+
+// Export for global access
+window.MyCoursesManager = MyCoursesManager;
