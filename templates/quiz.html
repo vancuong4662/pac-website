@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Làm Bài Test - PAC Website</title>
-    <meta name="description" content="Thực hiện bài kiểm tra trắc nghiệm với hệ thống đánh giá chuyên nghiệp của PAC Group.">
+    <title>Trắc Nghiệm</title>
+    <meta name="description" content="Thực hiện bài trắc nghiệm tính cách với hệ thống đánh giá chuyên nghiệp của PAC Group.">
     
     <!-- Favicons -->
     <link href="assets/img/favicon.png" rel="icon">
@@ -352,6 +352,27 @@
             margin-bottom: 40px;
         }
         
+        .question-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .question-group h4 {
+            font-size: 1.1rem;
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
         .answer-option {
             background: #f8f9fa;
             border: 2px solid #e5e7eb;
@@ -479,15 +500,31 @@
         }
         
         .btn-submit {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: var(--contrast-color);
-            padding: 15px 30px;
+            background: linear-gradient(135deg, #5d2e8b, #713ea3);
+            color: white;
+            padding: 25px 30px 9px 30px;
             font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit i {
+            color: white !important;
+            margin-right: 8px;
+            font-size: 1.2rem !important;
         }
         
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+        
+        .btn-submit:hover i {
+            color: white !important;
         }
         
         .btn-nav:disabled {
@@ -516,6 +553,92 @@
             color: var(--default-color);
             font-size: 1.1rem;
             margin-bottom: 30px;
+        }
+        
+        /* YouTube Video Player Styles */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+        
+        .video-status-message {
+            background: rgba(var(--brand-primary-rgb), 0.05);
+            border: 1px solid rgba(var(--brand-primary-rgb), 0.15);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        /* PAC Primary Button Styles */
+        .btn-pac-primary {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            border: none;
+            color: var(--contrast-color);
+            font-weight: 600;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-pac-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-pac-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--brand-primary-rgb), 0.4);
+            color: var(--contrast-color);
+        }
+        
+        .btn-pac-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-pac-primary:active {
+            transform: translateY(0);
+        }
+        
+        #videoPlayerContainer {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        #viewResultsContainer {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         /* Mobile Responsive */
@@ -632,6 +755,33 @@
             .info-number, .timer-display {
                 font-size: 1.3rem;
             }
+            
+            /* Mobile video player adjustments */
+            .video-wrapper {
+                border-radius: 8px;
+            }
+            
+            .video-wrapper iframe {
+                border-radius: 8px;
+            }
+            
+            #videoPlayerContainer p {
+                font-size: 0.9rem;
+                padding: 0 10px;
+            }
+            
+            .video-status-message {
+                padding: 15px;
+                margin-top: 15px !important;
+            }
+            
+            .video-status-message .fw-bold {
+                font-size: 0.9rem;
+            }
+            
+            .video-status-message small {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -650,10 +800,10 @@
             <div class="row align-items-center">
                 <div class="col-lg-8 mx-auto text-center">
                     <h1 class="hero-title" data-aos="fade-up">
-                        Bài Kiểm Tra Định Hướng Nghề Nghiệp
+                        Trắc Nghiệm Định Hướng Nghề Nghiệp
                     </h1>
                     <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
-                        Khám phá tiềm năng và định hướng nghề nghiệp phù hợp với bạn thông qua bài kiểm tra 
+                        Khám phá tiềm năng và định hướng nghề nghiệp phù hợp với bạn thông qua bài trắc nghiệm 
                         được thiết kế dựa trên các nghiên cứu khoa học về tâm lý học nghề nghiệp.
                     </p>
                     
@@ -720,7 +870,7 @@
             <div class="test-sidebar" data-aos="fade-right">
                 <h3 class="sidebar-title">
                     <i class="fas fa-map"></i>
-                    Tổng quan bài thi
+                    Tổng quan trắc nghiệm
                 </h3>
                 
                 <!-- Question Minimap -->
@@ -764,13 +914,50 @@
                 
                 <!-- Test Complete Screen -->
                 <div id="testCompleteScreen" class="test-complete" style="display: none;">
-                    <i class="fas fa-check-circle"></i>
-                    <h2>Hoàn thành bài kiểm tra!</h2>
-                    <p>Bạn đã hoàn thành tất cả câu hỏi. Kết quả sẽ được xử lý và gửi về cho bạn sớm nhất.</p>
-                    <button class="btn btn-submit" onclick="submitTest()">
-                        <i class="fas fa-paper-plane"></i>
-                        Nộp bài kiểm tra
-                    </button>
+                    <!-- Initial completion message -->
+                    <div id="completionMessage">
+                        <i class="fas fa-check-circle"></i>
+                        <h2>Hoàn thành trắc nghiệm!</h2>
+                        <p>Bạn đã hoàn thành tất cả câu hỏi. Kết quả sẽ được xử lý và gửi về cho bạn sớm nhất.</p>
+                        <button class="btn btn-submit" id="submitTestBtn" onclick="submitTest()">
+                            <i class="fas fa-paper-plane"></i>
+                            Nộp bài trắc nghiệm
+                        </button>
+                    </div>
+                    
+                    <!-- YouTube Video Player (Hidden by default) -->
+                    <div id="videoPlayerContainer" style="display: none; margin-top: 30px;">
+                        <div class="video-status-message mt-3">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="spinner-border spinner-border-sm text-primary me-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <!-- Waiting Message -->
+                                <div>
+                                    <div class="fw-bold text-primary">Đang xử lý kết quả...</div>
+                                    <small class="text-muted">Hãy xem video hướng dẫn trong lúc chờ đợi</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-wrapper">
+                            <iframe id="youtubePlayer" 
+                                    width="560" 
+                                    height="315" 
+                                    src="https://www.youtube.com/embed/hsI0Uoz8sXA?autoplay=1&mute=0&rel=0&showinfo=0&enablejsapi=1" 
+                                    title="PAC Group - Hướng dẫn đọc kết quả" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                    
+                    <!-- View Results Button (Hidden by default) -->
+                    <div id="viewResultsContainer" style="display: none; margin-top: 30px; text-align: center;">
+                        <button class="btn btn-pac-primary" onclick="window.location.href='my-tests'">
+                            Xem kết quả ngay
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -801,6 +988,8 @@
                 this.questions = [];
                 this.currentQuestionIndex = 0;
                 this.answers = {};
+                this.examId = null;
+                this.fixedChoices = [];
                 this.timeLimit = 30 * 60; // 30 minutes in seconds
                 this.timeRemaining = this.timeLimit;
                 this.timer = null;
@@ -811,8 +1000,15 @@
             
             async initializeTest() {
                 try {
-                    // Load sample questions for demo
-                    this.loadSampleQuestions();
+                    showToast('Đang tải trắc nghiệm...', 'Vui lòng chờ trong giây lát', 'info');
+                    
+                    // Create exam session (may include questions in response)
+                    await this.createExamSession();
+                    
+                    // Only call get-questions if questions weren't included in create-exam response
+                    if (!this.questions || this.questions.length === 0) {
+                        await this.loadQuestionsFromAPI();
+                    }
                     
                     // Setup UI
                     this.renderMinimap();
@@ -820,257 +1016,135 @@
                     this.startTimer();
                     this.updateStats();
                     
+                    showToast('Thành công!', 'Trắc nghiệm đã được tải thành công.', 'success');
                     console.log('✅ Test initialized successfully');
                 } catch (error) {
                     console.error('❌ Error initializing test:', error);
-                    showToast('Lỗi', 'Không thể tải bài kiểm tra. Vui lòng thử lại.', 'error');
+                    showToast('Lỗi', 'Không thể tải trắc nghiệm. Vui lòng thử lại.', 'error');
                 }
             }
             
-            loadSampleQuestions() {
-                // Sample 20 questions for demo
-                this.questions = [
-                    {
-                        id: 1,
-                        text: "Bạn thích làm việc trong môi trường nào nhất?",
-                        description: "Hãy chọn môi trường làm việc mà bạn cảm thấy thoải mái và hiệu quả nhất.",
-                        type: "Tính cách",
-                        options: [
-                            "Văn phòng yên tĩnh, làm việc độc lập",
-                            "Môi trường năng động, nhiều hoạt động nhóm",
-                            "Ngoài trời, tiếp xúc với thiên nhiên",
-                            "Phòng lab, nghiên cứu và thí nghiệm"
-                        ]
-                    },
-                    {
-                        id: 2,
-                        text: "Khi giải quyết vấn đề, bạn thường?",
-                        description: "Phong cách tiếp cận vấn đề của bạn có thể phản ánh điểm mạnh nghề nghiệp.",
-                        type: "Tư duy",
-                        options: [
-                            "Phân tích kỹ lưỡng từng chi tiết",
-                            "Tìm cách sáng tạo và đột phá",
-                            "Hỏi ý kiến nhiều người khác",
-                            "Dựa vào kinh nghiệm thực tế"
-                        ]
-                    },
-                    {
-                        id: 3,
-                        text: "Điều gì thúc đẩy bạn làm việc hiệu quả nhất?",
-                        description: "Động lực làm việc sẽ giúp xác định loại nghề nghiệp phù hợp với bạn.",
-                        type: "Động lực",
-                        options: [
-                            "Mức lương cao và ổn định",
-                            "Được công nhận và tôn trọng",
-                            "Cơ hội học hỏi và phát triển",
-                            "Góp phần giúp đỡ cộng đồng"
-                        ]
-                    },
-                    {
-                        id: 4,
-                        text: "Trong một dự án nhóm, bạn thường đảm nhận vai trò nào?",
-                        description: "Vai trò trong nhóm phản ánh khả năng lãnh đạo và phong cách làm việc.",
-                        type: "Kỹ năng xã hội",
-                        options: [
-                            "Người lãnh đạo, điều phối",
-                            "Người đưa ra ý tưởng sáng tạo",
-                            "Người thực hiện chi tiết",
-                            "Người hỗ trợ và động viên"
-                        ]
-                    },
-                    {
-                        id: 5,
-                        text: "Bạn học tập hiệu quả nhất qua phương pháp nào?",
-                        description: "Phong cách học tập có thể dự đoán môi trường làm việc phù hợp.",
-                        type: "Học tập",
-                        options: [
-                            "Đọc sách và nghiên cứu lý thuyết",
-                            "Thực hành trực tiếp",
-                            "Thảo luận nhóm",
-                            "Quan sát và bắt chước"
-                        ]
-                    },
-                    {
-                        id: 6,
-                        text: "Khi phải đưa ra quyết định quan trọng, bạn dựa vào?",
-                        description: "Cách đưa ra quyết định phản ánh phong cách tư duy nghề nghiệp.",
-                        type: "Ra quyết định",
-                        options: [
-                            "Dữ liệu và phân tích logic",
-                            "Trực giác và cảm xúc",
-                            "Ý kiến của chuyên gia",
-                            "Kinh nghiệm từng trải"
-                        ]
-                    },
-                    {
-                        id: 7,
-                        text: "Môn học nào bạn từng thích nhất ở trường?",
-                        description: "Sở thích học tập có thể gợi ý về ngành nghề phù hợp.",
-                        type: "Học thuật",
-                        options: [
-                            "Toán học, Vật lý",
-                            "Văn học, Lịch sử",
-                            "Sinh học, Hóa học",
-                            "Thể dục, Nghệ thuật"
-                        ]
-                    },
-                    {
-                        id: 8,
-                        text: "Hoạt động nào sau đây bạn thích làm trong thời gian rảnh?",
-                        description: "Sở thích cá nhân có thể phản ánh nghề nghiệp lý tưởng.",
-                        type: "Sở thích",
-                        options: [
-                            "Đọc sách, nghiên cứu",
-                            "Chơi thể thao, du lịch",
-                            "Vẽ, viết, sáng tác",
-                            "Làm đồ thủ công, sửa chữa"
-                        ]
-                    },
-                    {
-                        id: 9,
-                        text: "Bạn muốn công việc của mình có tác động như thế nào?",
-                        description: "Mục tiêu tác động xã hội sẽ định hướng lựa chọn nghề nghiệp.",
-                        type: "Giá trị",
-                        options: [
-                            "Tạo ra sản phẩm hữu ích",
-                            "Giúp đỡ mọi người",
-                            "Khám phá kiến thức mới",
-                            "Bảo vệ môi trường"
-                        ]
-                    },
-                    {
-                        id: 10,
-                        text: "Khi gặp thất bại, bạn thường phản ứng như thế nào?",
-                        description: "Cách đối phó với thất bại phản ánh khả năng phục hồi nghề nghiệp.",
-                        type: "Khả năng phục hồi",
-                        options: [
-                            "Phân tích nguyên nhân và cải thiện",
-                            "Tìm cách khác sáng tạo hơn",
-                            "Xin lời khuyên từ người khác",
-                            "Nghỉ ngơi rồi thử lại"
-                        ]
-                    },
-                    {
-                        id: 11,
-                        text: "Bạn thích làm việc với thông tin theo cách nào?",
-                        description: "Cách xử lý thông tin ảnh hưởng đến lựa chọn ngành nghề.",
-                        type: "Xử lý thông tin",
-                        options: [
-                            "Phân tích số liệu chi tiết",
-                            "Tạo biểu đồ và hình ảnh",
-                            "Thuyết trình và chia sẻ",
-                            "Ứng dụng thực tế"
-                        ]
-                    },
-                    {
-                        id: 12,
-                        text: "Môi trường làm việc lý tưởng của bạn có đặc điểm gì?",
-                        description: "Môi trường làm việc ưa thích sẽ ảnh hưởng đến hiệu suất.",
-                        type: "Môi trường",
-                        options: [
-                            "Có cấu trúc rõ ràng, ổn định",
-                            "Linh hoạt, thay đổi thường xuyên",
-                            "Cạnh tranh, thử thách cao",
-                            "Hợp tác, hỗ trợ lẫn nhau"
-                        ]
-                    },
-                    {
-                        id: 13,
-                        text: "Khi làm việc nhóm, điều gì khiến bạn khó chịu nhất?",
-                        description: "Hiểu rõ điểm yếu giúp lựa chọn môi trường làm việc phù hợp.",
-                        type: "Thách thức",
-                        options: [
-                            "Thiếu tổ chức và kế hoạch",
-                            "Không có sự sáng tạo",
-                            "Ít giao tiếp và phản hồi",
-                            "Thiếu thời gian thực hiện"
-                        ]
-                    },
-                    {
-                        id: 14,
-                        text: "Bạn thích học những kỹ năng mới theo cách nào?",
-                        description: "Phương pháp học kỹ năng mới phản ánh phong cách phát triển nghề nghiệp.",
-                        type: "Phát triển",
-                        options: [
-                            "Khóa học có hệ thống",
-                            "Tự nghiên cứu và thực hành",
-                            "Học từ đồng nghiệp",
-                            "Thử nghiệm trực tiếp"
-                        ]
-                    },
-                    {
-                        id: 15,
-                        text: "Điều gì quan trọng nhất đối với bạn trong công việc?",
-                        description: "Giá trị cốt lõi sẽ định hướng lựa chọn nghề nghiệp dài hạn.",
-                        type: "Giá trị cốt lõi",
-                        options: [
-                            "Sự ổn định và an toàn",
-                            "Cơ hội thăng tiến",
-                            "Sự cân bằng cuộc sống",
-                            "Ý nghĩa xã hội"
-                        ]
-                    },
-                    {
-                        id: 16,
-                        text: "Bạn xử lý áp lực công việc như thế nào?",
-                        description: "Khả năng quản lý stress ảnh hưởng đến lựa chọn ngành nghề.",
-                        type: "Quản lý stress",
-                        options: [
-                            "Lập kế hoạch chi tiết",
-                            "Tìm cách thư giãn",
-                            "Chia sẻ với đồng nghiệp",
-                            "Tập trung vào giải pháp"
-                        ]
-                    },
-                    {
-                        id: 17,
-                        text: "Loại thành tựu nào khiến bạn tự hào nhất?",
-                        description: "Định nghĩa thành công cá nhân định hướng mục tiêu nghề nghiệp.",
-                        type: "Thành tựu",
-                        options: [
-                            "Hoàn thành dự án đúng hạn",
-                            "Tạo ra ý tưởng mới",
-                            "Giúp người khác thành công",
-                            "Vượt qua thử thách khó"
-                        ]
-                    },
-                    {
-                        id: 18,
-                        text: "Bạn thích giao tiếp với người khác bằng cách nào?",
-                        description: "Phong cách giao tiếp ảnh hưởng đến lựa chọn vai trò nghề nghiệp.",
-                        type: "Giao tiếp",
-                        options: [
-                            "Văn bản và email",
-                            "Trực tiếp, mặt đối mặt",
-                            "Thuyết trình công khai",
-                            "Thảo luận nhóm nhỏ"
-                        ]
-                    },
-                    {
-                        id: 19,
-                        text: "Khi bắt đầu một nhiệm vụ mới, bạn thường?",
-                        description: "Cách tiếp cận nhiệm vụ mới phản ánh phong cách làm việc.",
-                        type: "Khởi đầu",
-                        options: [
-                            "Nghiên cứu kỹ trước khi bắt đầu",
-                            "Bắt tay vào làm ngay lập tức",
-                            "Hỏi ý kiến người có kinh nghiệm",
-                            "Thử nhiều cách tiếp cận"
-                        ]
-                    },
-                    {
-                        id: 20,
-                        text: "Trong 5-10 năm tới, bạn muốn đạt được điều gì?",
-                        description: "Tầm nhìn dài hạn sẽ định hướng kế hoạch nghề nghiệp.",
-                        type: "Tầm nhìn",
-                        options: [
-                            "Trở thành chuyên gia trong lĩnh vực",
-                            "Khởi nghiệp kinh doanh riêng",
-                            "Có tác động tích cực đến xã hội",
-                            "Cân bằng giữa công việc và cuộc sống"
-                        ]
+            async createExamSession() {
+                try {
+                    console.log('🔄 Creating exam session...');
+                    
+                    let response = await fetch('api/quiz/create-exam.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            exam_type: 'FREE'
+                        })
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    
+                    let responseText = await response.text();
+                    console.log('Response text:', responseText);
+                    
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        throw new Error(`Parse error: ${parseError.message}. Raw response: ${responseText}`);
                     }
-                ];
+                    
+                    // If error 460 (incomplete exam exists), try with force_new
+                    if (!response.ok && data.error_code === 460) {
+                        console.log('🔄 Incomplete exam found, trying with force_new...');
+                        
+                        response = await fetch('api/quiz/create-exam.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                exam_type: 'FREE',
+                                force_new: true
+                            })
+                        });
+                        
+                        console.log('Force new response status:', response.status);
+                        
+                        responseText = await response.text();
+                        console.log('Force new response text:', responseText);
+                        
+                        try {
+                            data = JSON.parse(responseText);
+                        } catch (parseError) {
+                            throw new Error(`Parse error: ${parseError.message}. Raw response: ${responseText}`);
+                        }
+                    }
+                    
+                    if (response.ok && data.status === 'success') {
+                        this.examId = data.data.exam_id;
+                        console.log('✅ Exam session created:', this.examId);
+                        
+                        // If response includes questions, use them directly
+                        if (data.data.questions && data.data.questions.length > 0) {
+                            this.questions = data.data.questions;
+                            this.fixedChoices = data.data.fixed_choices || [];
+                            
+                            // Update UI with actual question count
+                            document.getElementById('totalQuestions').textContent = this.questions.length;
+                            document.getElementById('remainingCount').textContent = this.questions.length;
+                            
+                            console.log('✅ Questions loaded from create-exam response:', this.questions.length);
+                            return; // Skip separate get-questions call
+                        }
+                    } else {
+                        throw new Error(data.message || `HTTP ${response.status}: ${responseText}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Error creating exam session:', error);
+                    throw error;
+                }
+            }
+            
+            async loadQuestionsFromAPI() {
+                try {
+                    if (!this.examId) {
+                        throw new Error('No exam session available');
+                    }
+                    
+                    console.log('🔄 Loading questions for exam:', this.examId);
+                    
+                    const response = await fetch(`api/quiz/get-questions.php?exam_id=${this.examId}`, {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    
+                    const responseText = await response.text();
+                    console.log('Response text:', responseText);
+                    
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        throw new Error(`Parse error: ${parseError.message}. Raw response: ${responseText}`);
+                    }
+                    
+                    if (response.ok && data.status === 'success') {
+                        this.questions = data.data.questions;
+                        this.fixedChoices = data.data.fixed_choices || [];
+                        
+                        // Update UI with actual question count
+                        document.getElementById('totalQuestions').textContent = this.questions.length;
+                        document.getElementById('remainingCount').textContent = this.questions.length;
+                        
+                        console.log('✅ Questions loaded:', this.questions.length);
+                    } else {
+                        throw new Error(data.message || `HTTP ${response.status}: ${responseText}`);
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading questions:', error);
+                    throw error;
+                }
             }
             
             renderMinimap() {
@@ -1087,7 +1161,10 @@
                     if (i === this.currentQuestionIndex) {
                         questionBtn.classList.add('current');
                     }
-                    if (this.answers[i] !== undefined) {
+                    
+                    // Check if question is answered using question ID
+                    const questionId = this.questions[i].id;
+                    if (this.answers[questionId] !== undefined) {
                         questionBtn.classList.add('answered');
                     }
                     
@@ -1095,35 +1172,46 @@
                 }
             }
             
+            
             renderQuestion() {
                 const container = document.getElementById('questionContainer');
                 const question = this.questions[this.currentQuestionIndex];
                 
                 if (!question) return;
                 
+                // Use choices from API response (3 choices per question)
+                const choices = question.choices || [];
+                
+                // Get current answer using question ID
+                const currentAnswer = this.answers[question.id];
+                
+                const optionsHTML = choices.map((choice, choiceIndex) => `
+                    <div class="answer-option ${currentAnswer === choice.value ? 'selected' : ''}" 
+                         onclick="testManager.selectAnswer(${choice.value})">
+                        <label class="answer-label">
+                            <input type="radio" name="question${question.id}" value="${choice.value}" class="answer-radio" 
+                                   ${currentAnswer === choice.value ? 'checked' : ''}>
+                            <div class="answer-marker"></div>
+                            <div class="answer-text">${choice.text}</div>
+                        </label>
+                    </div>
+                `).join('');
+                
                 container.innerHTML = `
                     <div class="question-header">
                         <div class="question-number">Câu hỏi ${this.currentQuestionIndex + 1}</div>
-                        <div class="question-type">${question.type}</div>
+                        <div class="question-type">${this.questions.length} câu hỏi</div>
                     </div>
                     
                     <div class="question-content">
-                        <h3 class="question-text">${question.text}</h3>
-                        <p class="question-description">${question.description}</p>
+                        <h3 class="question-text">${question.question_text}</h3>
+                        <p class="question-description">
+                            Chọn mức độ đồng ý của bạn với câu phát biểu trên:
+                        </p>
                     </div>
                     
                     <div class="answers-section">
-                        ${question.options.map((option, index) => `
-                            <div class="answer-option ${this.answers[this.currentQuestionIndex] === index ? 'selected' : ''}" 
-                                 onclick="testManager.selectAnswer(${index})">
-                                <label class="answer-label">
-                                    <input type="radio" name="question${question.id}" value="${index}" class="answer-radio" 
-                                           ${this.answers[this.currentQuestionIndex] === index ? 'checked' : ''}>
-                                    <div class="answer-marker"></div>
-                                    <div class="answer-text">${option}</div>
-                                </label>
-                            </div>
-                        `).join('')}
+                        ${optionsHTML}
                     </div>
                     
                     <div class="question-actions">
@@ -1135,7 +1223,7 @@
                         
                         <div>
                             ${this.currentQuestionIndex === this.questions.length - 1 ? `
-                                <button class="btn-nav btn-submit" onclick="testManager.finishTest()">
+                                <button class="btn-nav btn-next" onclick="testManager.finishTest()">
                                     <i class="fas fa-check"></i>
                                     Hoàn thành
                                 </button>
@@ -1151,7 +1239,12 @@
             }
             
             selectAnswer(answerIndex) {
-                this.answers[this.currentQuestionIndex] = answerIndex;
+                // Store answer using question ID (not index)
+                const currentQuestion = this.questions[this.currentQuestionIndex];
+                this.answers[currentQuestion.id] = answerIndex;
+                
+                console.log(`Selected answer for question ${currentQuestion.id}: ${answerIndex}`);
+                
                 this.renderQuestion();
                 this.renderMinimap();
                 this.updateStats();
@@ -1231,10 +1324,47 @@
             
             timeUp() {
                 clearInterval(this.timer);
-                showToast('Hết giờ!', 'Thời gian làm bài đã kết thúc. Bài thi sẽ được nộp tự động.', 'warning', 5000);
+                this.isSubmitting = true; // Disable beforeunload warning
+                showToast('Hết giờ!', 'Thời gian làm bài đã kết thúc. Trắc nghiệm sẽ được nộp tự động.', 'warning', 5000);
                 setTimeout(() => {
                     this.submitTest();
                 }, 2000);
+            }
+            
+            autoFillAllQuestions() {
+                console.log('🎲 Auto-filling all questions with random answers...');
+                
+                let filledCount = 0;
+                
+                // Loop through all questions and assign random answers
+                this.questions.forEach((question, index) => {
+                    // Generate random answer (0, 1, or 2)
+                    const randomAnswer = Math.floor(Math.random() * 3);
+                    
+                    // Store the answer using question ID (not index)
+                    this.answers[question.id] = randomAnswer;
+                    filledCount++;
+                    
+                    console.log(`Question ${index + 1} (${question.id}): Auto-selected option ${randomAnswer}`);
+                });
+                
+                // Update progress and display
+                this.updateStats();
+                this.renderQuestion();
+                this.renderMinimap();
+                
+                // Show success message
+                showToast(
+                    'Auto Fill Complete!', 
+                    `Đã tự động chọn đáp án cho ${filledCount} câu hỏi. Bạn có thể xem lại và chỉnh sửa nếu cần.`, 
+                    'success', 
+                    3000
+                );
+                
+                console.log('🎲 Auto-fill completed. Current answers:', this.answers);
+                console.log('📊 To submit: testManager.finishTest()');
+                
+                return this.answers;
             }
             
             finishTest() {
@@ -1242,11 +1372,14 @@
                 const unansweredCount = this.questions.length - answeredCount;
                 
                 if (unansweredCount > 0) {
-                    const confirmMessage = `Bạn còn ${unansweredCount} câu chưa trả lời. Bạn có chắc chắn muốn hoàn thành bài thi?`;
+                    const confirmMessage = `Bạn còn ${unansweredCount} câu chưa trả lời. Bạn có chắc chắn muốn hoàn thành trắc nghiệm?`;
                     if (!confirm(confirmMessage)) {
                         return;
                     }
                 }
+                
+                // Disable beforeunload warning since user is finishing the test
+                this.isSubmitting = true;
                 
                 // Show completion screen
                 document.getElementById('questionContainer').style.display = 'none';
@@ -1257,22 +1390,88 @@
             
             async submitTest() {
                 try {
+                    // Disable the beforeunload warning since user is intentionally submitting
+                    this.isSubmitting = true;
+                    
+                    // Hide completion message and show video player
+                    document.getElementById('completionMessage').style.display = 'none';
+                    document.getElementById('videoPlayerContainer').style.display = 'block';
+                    
                     showToast('Đang nộp bài...', 'Vui lòng chờ trong giây lát', 'info');
                     
-                    // Here you would normally send answers to the server
-                    // For demo, we'll just simulate the submission
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    // Prepare answers for submission
+                    const submissionData = {
+                        exam_id: this.examId,
+                        answers: this.answers
+                    };
                     
-                    showToast('Thành công!', 'Bài thi đã được nộp thành công. Kết quả sẽ được gửi về email của bạn.', 'success', 5000);
+                    console.log('Submitting answers:', submissionData);
                     
-                    // Redirect after successful submission
-                    setTimeout(() => {
-                        window.location.href = 'test-results';
-                    }, 3000);
+                    // Submit to API
+                    const response = await fetch('api/quiz/submit-quiz.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify(submissionData)
+                    });
+                    
+                    console.log('Submit response status:', response.status);
+                    
+                    const responseText = await response.text();
+                    console.log('Submit raw response:', responseText);
+                    
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('Failed to parse response as JSON:', parseError);
+                        throw new Error(`Server response invalid. Status: ${response.status}`);
+                    }
+                    
+                    console.log('Submit API response:', result);
+                    
+                    if (response.ok && result.status === 'success') {
+                        showToast('Thành công!', 'Trắc nghiệm đã được nộp thành công!', 'success', 3000);
+                        
+                        // Hide the waiting message
+                        const videoStatusMessage = document.querySelector('.video-status-message');
+                        if (videoStatusMessage) {
+                            videoStatusMessage.style.display = 'none';
+                        }
+                        
+                        // Show "View Results Now" button
+                        document.getElementById('viewResultsContainer').style.display = 'block';
+                    } else {
+                        console.error('API Error Details:', result);
+                        
+                        // Handle specific error cases
+                        let errorMessage = result.message || result.details || 'Có lỗi xảy ra khi nộp bài';
+                        
+                        if (result.error_code === 404) {
+                            errorMessage = 'Trắc nghiệm không tồn tại hoặc đã được nộp trước đó';
+                        } else if (result.error_code === 401) {
+                            errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại';
+                            setTimeout(() => {
+                                window.location.href = 'dangnhap';
+                            }, 3000);
+                        }
+                        
+                        // Show submit button again on error
+                        document.getElementById('submitTestBtn').style.display = 'inline-flex';
+                        document.getElementById('videoPlayerContainer').style.display = 'none';
+                        
+                        throw new Error(errorMessage);
+                    }
                     
                 } catch (error) {
                     console.error('❌ Error submitting test:', error);
-                    showToast('Lỗi', 'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.', 'error');
+                    showToast('Lỗi nộp bài', `${error.message}`, 'error', 5000);
+                    
+                    // Show submit button again on error
+                    document.getElementById('submitTestBtn').style.display = 'inline-flex';
+                    document.getElementById('videoPlayerContainer').style.display = 'none';
                 }
             }
         }
@@ -1296,9 +1495,9 @@
             
             // Prevent accidental page refresh during test
             window.addEventListener('beforeunload', function (e) {
-                if (testManager && testManager.timer) {
+                if (testManager && testManager.timer && !testManager.isSubmitting) {
                     e.preventDefault();
-                    e.returnValue = 'Bạn có chắc chắn muốn rời khỏi trang? Tiến độ làm bài sẽ bị mất.';
+                    e.returnValue = 'Bạn có chắc chắn muốn rời khỏi trang? Tiến độ làm trắc nghiệm sẽ bị mất.';
                     return e.returnValue;
                 }
             });

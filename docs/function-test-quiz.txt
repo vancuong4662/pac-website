@@ -1,0 +1,6 @@
+// Auto fill tất cả câu hỏi
+testManager.autoFillAllQuestions()
+// Hoàn thành bài test
+testManager.finishTest()
+// Submit bài test
+testManager.submitTest()

@@ -13,20 +13,31 @@ Database PAC Shopping Cart được thiết kế để hỗ trợ hệ thống b
 
 ## Cấu trúc tổng quan
 
-Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
+Database gồm **18 bảng chính** được chia thành 4 nhóm chức năng:
 
 ### 1. Nhóm Authentication & Users (2 bảng)
 - `users` - Quản lý tài khoản người dùng
 - `sessions` - Quản lý phiên đăng nhập
 
-### 2. Nhóm Products & Shopping (5 bảng)
+### 2. Nhóm Holland Code Assessment & Quiz System (9 bảng)
+- `questions` - Câu hỏi trắc nghiệm Holland Code
+- `quiz_exams` - Quản lý bài thi với random questions (**MỚI**)
+- `quiz_answers` - Chi tiết câu trả lời trong bài thi (**MỚI**)
+- `quiz_results` - Kết quả Holland Code được tính toán (**MỚI**)
+- `quiz_suggested_jobs` - Nghề nghiệp gợi ý theo hệ thống sao (**MỚI**)
+- `quiz_fraud_logs` - Log phát hiện gian lận (**MỚI**)
+- `quiz_user_limits` - Giới hạn và khóa user (**MỚI**)
+- `test_results` - Kết quả làm bài test tổng quan (legacy)
+- `test_answers` - Chi tiết câu trả lời từng test (legacy)
+
+### 3. Nhóm Products & Shopping (5 bảng)
 - `products` - Sản phẩm chính (tests, courses, consultations)
 - `product_packages` - Các gói giá cho mỗi sản phẩm
 - `cart` - Giỏ hàng người dùng
 - `orders` - Đơn hàng và thanh toán
 - `order_items` - Chi tiết sản phẩm trong đơn hàng
 
-### 3. Nhóm Payment & Purchased Services (2 bảng)
+### 4. Nhóm Payment & Purchased Services (2 bảng)
 - `vnpay_transactions` - Giao dịch VNPay
 - `purchased_packages` - Tất cả packages đã mua (unified table)
 
@@ -75,7 +86,330 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 3. Bảng `products` - Sản phẩm chính
+### 3. Bảng `questions` - Câu hỏi Holland Code Assessment
+
+**Mục đích**: Lưu trữ câu hỏi trắc nghiệm Holland Code để đánh giá hướng nghiệp, migration từ hệ thống cũ MongoDB.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT(11) AUTO_INCREMENT | Khóa chính |
+| `question_id` | VARCHAR(10) UNIQUE | ID gốc từ dữ liệu cũ (1, 2, 3...) |
+| `question_text` | TEXT | Nội dung câu hỏi |
+| `holland_code` | ENUM('R','I','A','S','E','C') | Mã Holland Code |
+| `category` | ENUM | 'personality', 'interests', 'activities', 'subjects' |
+| `difficulty_level` | ENUM | 'easy', 'medium', 'hard' |
+| `sort_order` | INT(11) | Thứ tự hiển thị câu hỏi |
+| `is_active` | TINYINT(1) | Trạng thái kích hoạt |
+
+**Holland Code mapping**:
+- **R** = Realistic (Thực tế)
+- **I** = Investigative (Nghiên cứu) 
+- **A** = Artistic (Nghệ thuật)
+- **S** = Social (Xã hội)
+- **E** = Enterprising (Doanh nghiệp)
+- **C** = Conventional (Truyền thống)
+
+**Tính năng đặc biệt**:
+- Migration data từ MongoDB questions.json
+- Phân loại câu hỏi theo category để quản lý tốt hơn
+- Support múi đổi independent question ordering
+- Full-text search ready cho nội dung câu hỏi
+
+---
+
+### 4. Bảng `test_results` - Kết quả làm bài test Holland Code
+
+**Mục đích**: Lưu trữ kết quả tổng quan của bài test Holland Code, migration từ hệ thống cũ MongoDB results.json.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT(11) AUTO_INCREMENT | Khóa chính |
+| `result_id` | VARCHAR(50) UNIQUE | ID gốc từ MongoDB _id |
+| `user_id` | INT(11) | ID người dùng làm bài (FK) |
+| `exam_type` | TINYINT(1) | Loại bài thi: 0=ngắn, 1=đầy đủ |
+| `exam_status` | TINYINT(1) | Trạng thái: 0=hoàn thành, 1=đang làm, 2=hủy |
+| `total_questions` | INT(11) | Tổng số câu hỏi |
+| `answered_questions` | INT(11) | Số câu đã trả lời |
+| `total_score` | INT(11) | Tổng điểm |
+| `total_time_minutes` | INT(11) | Tổng thời gian làm bài (phút) |
+| `r_score`, `i_score`, `a_score` | INT(11) | Điểm theo 6 nhóm Holland Code |
+| `s_score`, `e_score`, `c_score` | INT(11) | (Realistic, Investigative, Artistic, Social, Enterprising, Conventional) |
+| `primary_code` | VARCHAR(10) | Mã Holland Code chính (điểm cao nhất) |
+| `holland_code_result` | VARCHAR(20) | Kết quả tổng hợp (ví dụ: ASE) |
+| `personality_type` | VARCHAR(100) | Loại tính cách được phân tích |
+| `exam_start_time` | INT(11) | Unix timestamp bắt đầu làm bài |
+| `exam_end_time` | INT(11) | Unix timestamp kết thúc dự kiến |
+| `exam_stop_time` | INT(11) | Unix timestamp hoàn thành thực tế |
+| `sent_email` | TINYINT(1) | Đã gửi email báo cáo |
+| `report_generated` | TINYINT(1) | Đã tạo báo cáo |
+| `report_url` | VARCHAR(500) | Link báo cáo PDF |
+
+**Tính năng đặc biệt**:
+- **Holland Code Scoring**: Tự động tính điểm cho 6 nhóm tính cách
+- **Report Generation**: Tích hợp tạo báo cáo PDF và gửi email
+- **Time Tracking**: Theo dõi chi tiết thời gian làm bài
+- **Migration Ready**: Tương thích với dữ liệu MongoDB cũ
+
+---
+
+### 5. Bảng `test_answers` - Chi tiết câu trả lời
+
+**Mục đích**: Lưu trữ từng câu trả lời của user trong bài test, được tối ưu hóa theo thiết kế normalized.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT(11) AUTO_INCREMENT | Khóa chính |
+| `test_result_id` | INT(11) | ID kết quả test (FK đến test_results) |
+| `question_id` | VARCHAR(10) | ID câu hỏi (FK đến questions.question_id) |
+| `chosen_answer` | TINYINT(1) | Đáp án chọn: 0=Không đồng ý, 1=Trung lập, 2=Đồng ý |
+| `answer_time` | INT(11) | Unix timestamp thời điểm trả lời |
+| `time_spent` | INT(11) | Thời gian suy nghĩ (giây) |
+
+**Thiết kế tối ưu**:
+- **Normalized Structure**: Không lưu trùng question text, code - chỉ reference question_id
+- **Efficient Storage**: Giảm dung lượng database so với cách lưu trữ cũ
+- **Query Performance**: Có thể JOIN với questions để lấy thông tin câu hỏi
+- **Unique Constraint**: Mỗi test chỉ có 1 đáp án cho 1 câu hỏi
+
+**So sánh với cấu trúc cũ**:
+```json
+// Cũ (MongoDB): Lưu trùng dữ liệu
+{
+  "question": "62d766364ccd11297044bf87",
+  "chooseAnswer": 1,
+  "timeAnswer": 1664959879,
+  "label": "Bạn có phải là người giỏi thể thao", // ❌ Trùng lặp
+  "id": "159",
+  "code": "R" // ❌ Trùng lặp
+}
+
+// Mới (MySQL): Tối ưu hóa
+{
+  "test_result_id": 1,
+  "question_id": "159", // ✅ Chỉ reference
+  "chosen_answer": 1,
+  "answer_time": 1664959879
+}
+```
+
+---
+
+## Hệ thống Quiz mới (6 bảng)
+
+### 6. Bảng `quiz_exams` - Quản lý bài thi Holland Code (**MỚI**)
+
+**Mục đích**: Quản lý các bài thi Holland Code với random questions selection, thay thế cách tiếp cận cũ từ MongoDB.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `exam_code` | VARCHAR(20) UNIQUE | Mã bài thi unique (EX20251101_ABC123) |
+| `user_id` | INT | FK đến users.id |
+| `exam_type` | TINYINT | 0=Free(30 câu), 1=Paid(120 câu) |
+| `exam_status` | TINYINT | 0=Completed, 1=InProgress, 2=Timeout, 3=Cancelled |
+| `total_questions` | INT | Tổng số câu hỏi trong bài thi |
+| `answered_questions` | INT | Số câu đã trả lời |
+| `start_time` | TIMESTAMP | Thời gian bắt đầu |
+| `end_time` | TIMESTAMP | Thời gian kết thúc |
+| `time_limit` | INT | Thời gian giới hạn (phút) |
+| `actual_time_spent` | INT | Thời gian thực tế (giây) |
+| `ip_address` | VARCHAR(45) | IP tracking |
+| `user_agent` | TEXT | Browser tracking |
+
+**Tính năng đặc biệt**:
+- **Random Question Selection**: Mỗi bài thi chọn random câu hỏi theo quy tắc (5 câu/nhóm cho FREE, 20 câu/nhóm cho PAID)
+- **Time Management**: Theo dõi thời gian làm bài chính xác
+- **Status Tracking**: Quản lý trạng thái bài thi real-time
+- **Security**: IP và User Agent tracking
+
+---
+
+### 7. Bảng `quiz_answers` - Chi tiết câu trả lời trong bài thi (**MỚI**)
+
+**Mục đích**: Lưu trữ từng câu trả lời trong quiz với Holland Code fixed choices (0,1,2).
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `exam_id` | INT | FK đến quiz_exams.id |
+| `question_id` | VARCHAR(10) | FK đến questions.question_id |
+| `user_answer` | TINYINT | -1=Chưa trả lời, 0=Không đồng ý, 1=Bình thường, 2=Đồng ý |
+| `answer_time` | TIMESTAMP | Thời điểm trả lời |
+| `time_spent` | INT | Thời gian suy nghĩ (giây) |
+| `is_changed` | BOOLEAN | Có thay đổi câu trả lời |
+| `change_count` | INT | Số lần thay đổi |
+
+**Khác biệt với traditional quiz**:
+- **Fixed Choices**: Tất cả câu hỏi đều có 3 lựa chọn cố định (0,1,2)
+- **Point-based Scoring**: Không phải đúng/sai, mà là điểm số
+- **Real-time Updates**: Câu trả lời được save ngay khi user chọn
+
+---
+
+### 8. Bảng `quiz_results` - Kết quả Holland Code được tính toán (**MỚI**)
+
+**Mục đích**: Lưu trữ kết quả Holland Code với 6 điểm số và phân tích nghề nghiệp.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `exam_id` | INT UNIQUE | FK đến quiz_exams.id |
+| `user_id` | INT | FK đến users.id |
+| `score_r`, `score_i`, `score_a` | INT | Điểm số 6 nhóm Holland |
+| `score_s`, `score_e`, `score_c` | INT | (R,I,A,S,E,C) |
+| `total_score` | INT | Tổng điểm |
+| `holland_code` | VARCHAR(3) | Mã Holland 3 ký tự (VD: AEI, RIC) |
+| `primary_group` | CHAR(1) | Nhóm chính (điểm cao nhất) |
+| `secondary_group` | CHAR(1) | Nhóm phụ (điểm cao thứ 2) |
+| `tertiary_group` | CHAR(1) | Nhóm thứ 3 |
+| `characteristics_code` | VARCHAR(2) | Đặc trưng công việc (từ 2 ký tự đầu) |
+| `work_activities` | JSON | Hoạt động công việc |
+| `work_values` | JSON | Top 3 giá trị làm việc |
+| `calculation_time` | FLOAT | Thời gian tính toán (milliseconds) |
+| `has_fraud_flags` | BOOLEAN | Có cờ gian lận |
+| `fraud_details` | JSON | Chi tiết gian lận |
+
+**Algorithm highlights**:
+- **Holland Code Generation**: Top 3 nhóm cao nhất → "AEI"
+- **Job Matching**: Chuẩn bị data cho suggested jobs
+- **Work Analysis**: Phân tích đặc trưng và giá trị công việc
+
+---
+
+### 9. Bảng `quiz_suggested_jobs` - Nghề nghiệp gợi ý theo hệ thống sao (**MỚI**)
+
+**Mục đích**: Lưu trữ các nghề nghiệp gợi ý với hệ thống rating từ 2-5 sao dựa trên Holland Code.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `result_id` | INT | FK đến quiz_results.id |
+| `job_code` | VARCHAR(20) | Mã nghề nghiệp |
+| `job_name` | VARCHAR(255) | Tên nghề tiếng Việt |
+| `job_name_en` | VARCHAR(255) | Tên nghề tiếng Anh |
+| `holland_code` | VARCHAR(3) | Holland Code của nghề |
+| `star_rating` | TINYINT | Mức độ phù hợp (2-5 sao) |
+| `match_type` | ENUM | 'exact', 'permutation', 'two_char', 'single_char' |
+| `match_score` | DECIMAL(5,2) | Điểm khớp % |
+| `job_group` | VARCHAR(100) | Nhóm nghề |
+| `essential_ability` | VARCHAR(255) | Khả năng cốt lõi cần thiết |
+| `work_environment` | VARCHAR(255) | Môi trường làm việc |
+| `education_level` | VARCHAR(100) | Trình độ học vấn |
+| `job_description` | TEXT | Mô tả công việc |
+| `work_areas` | JSON | Nơi làm việc |
+| `main_tasks` | JSON | Nhiệm vụ chính |
+| `is_highlighted` | BOOLEAN | Nghề được highlight |
+
+**Hệ thống sao algorithm**:
+- **5 sao**: Exact match Holland Code (VD: AEI = AEI)
+- **4 sao**: Permutation match (VD: AEI = AIE, EAI, EIA, IEA, IAE)
+- **3 sao**: Two-char match (VD: AEI = AE, AI, EI, EA, IA, IE)
+- **2 sao**: Single-char match (VD: AEI = A, E, I)
+
+---
+
+### 10. Bảng `quiz_fraud_logs` - Log phát hiện gian lận (**MỚI**)
+
+**Mục đích**: Ghi lại các trường hợp phát hiện gian lận trong quiz và hành động xử lý.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `user_id` | INT | FK đến users.id |
+| `exam_id` | INT | FK đến quiz_exams.id |
+| `fraud_type` | ENUM | 'same_answers', 'insufficient_yes', 'time_too_fast', 'suspicious_pattern', 'other' |
+| `severity` | ENUM | 'low', 'medium', 'high', 'critical' |
+| `detection_details` | JSON | Chi tiết phát hiện |
+| `action_taken` | ENUM | 'warning', 'reset_exam', 'lock_12h', 'lock_24h', 'revoke_access', 'none' |
+| `admin_reviewed` | BOOLEAN | Đã được admin review |
+| `admin_notes` | TEXT | Ghi chú của admin |
+| `ip_address` | VARCHAR(45) | IP tracking |
+
+**Anti-fraud mechanisms**:
+- **Same Answers Detection**: Phát hiện tất cả câu trả lời giống nhau
+- **Yes Ratio Check**: Kiểm tra tỷ lệ câu "Đồng ý" >= 1/6
+- **Time Analysis**: Phát hiện làm bài quá nhanh hoặc quá chậm
+- **Progressive Punishment**: Từ warning → reset → lock → revoke
+
+---
+
+### 11. Bảng `quiz_user_limits` - Giới hạn và khóa user (**MỚI**)
+
+**Mục đích**: Quản lý giới hạn làm bài và trạng thái khóa của user cho quiz system.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT PRIMARY KEY | Khóa chính |
+| `user_id` | INT UNIQUE | FK đến users.id |
+| `free_exam_count` | INT | Số lần làm bài miễn phí |
+| `free_exam_violations` | INT | Số lần vi phạm free |
+| `last_free_exam` | TIMESTAMP | Lần cuối làm bài free |
+| `paid_exam_count` | INT | Số lần làm bài có phí |
+| `paid_exam_violations` | INT | Số lần vi phạm paid |
+| `last_paid_exam` | TIMESTAMP | Lần cuối làm bài paid |
+| `lock_until` | TIMESTAMP | Khóa đến thời điểm |
+| `lock_reason` | VARCHAR(255) | Lý do khóa |
+| `is_permanently_locked` | BOOLEAN | Khóa vĩnh viễn |
+| `access_revoked` | BOOLEAN | Thu hồi quyền truy cập |
+| `revoke_reason` | TEXT | Lý do thu hồi |
+| `admin_notes` | TEXT | Ghi chú admin |
+
+**Business rules**:
+- **Free exam**: Tối đa 2 lần vi phạm → khóa 12h
+- **Paid exam**: Tối đa 3 lần vi phạm → thu hồi quyền
+- **Cooldown**: 12h giữa các lần làm bài miễn phí
+- **Admin override**: Admin có thể reset limits
+
+---
+
+### Migration từ hệ thống cũ
+
+**Quiz System cũ (MongoDB)**:
+```javascript
+// Collection: results
+{
+  "_id": ObjectId,
+  "user": ObjectId,
+  "examType": 0|1,
+  "questions": [
+    {
+      "question": ObjectId,
+      "chooseAnswer": 0|1|2,
+      "timeAnswer": Number,
+      "label": "Text câu hỏi", // ❌ Trùng lặp
+      "id": "159",
+      "code": "R" // ❌ Trùng lặp
+    }
+  ],
+  "tendencies": [
+    {"label": "Kỹ thuật", "code": "R", "point": 15}
+  ],
+  "hollandCode": "AEI"
+}
+```
+
+**Quiz System mới (MySQL)**:
+```sql
+-- Phân tách normalized
+quiz_exams: Quản lý bài thi
+quiz_answers: Chi tiết câu trả lời (không trùng lặp)
+quiz_results: Kết quả Holland Code
+quiz_suggested_jobs: Nghề gợi ý với star rating
+quiz_fraud_logs: Log gian lận
+quiz_user_limits: Giới hạn user
+```
+
+**Lợi ích**:
+- ✅ **Normalized**: Không trùng lặp dữ liệu
+- ✅ **Performance**: Indexes tối ưu cho queries
+- ✅ **Scalable**: Dễ mở rộng và maintain
+- ✅ **Security**: Anti-fraud mechanisms
+- ✅ **Flexible**: Random question selection
+- ✅ **Audit**: Comprehensive logging
+
+---
+
+### 12. Bảng `products` - Sản phẩm chính
 
 **Mục đích**: Lưu trữ thông tin các sản phẩm (tests, courses, consultations).
 
@@ -104,7 +438,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 4. Bảng `product_packages` - Gói giá sản phẩm
+### 13. Bảng `product_packages` - Gói giá sản phẩm
 
 **Mục đích**: Mỗi sản phẩm có thể có nhiều gói giá khác nhau (miễn phí, nhóm, cá nhân).
 
@@ -127,7 +461,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 5. Bảng `shopping_cart` - Giỏ hàng
+### 14. Bảng `shopping_cart` - Giỏ hàng
 
 **Mục đích**: Lưu trữ sản phẩm người dùng đã thêm vào giỏ hàng.
 
@@ -148,7 +482,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 6. Bảng `orders` - Đơn hàng
+### 15. Bảng `orders` - Đơn hàng
 
 **Mục đích**: Quản lý đơn hàng và trạng thái thanh toán.
 
@@ -164,7 +498,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 7. Bảng `order_items` - Chi tiết đơn hàng
+### 16. Bảng `order_items` - Chi tiết đơn hàng
 
 **Mục đích**: Lưu chi tiết sản phẩm trong mỗi đơn hàng, bao gồm snapshot giá tại thời điểm mua.
 
@@ -184,7 +518,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 8. Bảng `vnpay_transactions` - Giao dịch VNPay
+### 17. Bảng `vnpay_transactions` - Giao dịch VNPay
 
 **Mục đích**: Lưu trữ thông tin giao dịch thanh toán qua VNPay, bao gồm request và response data.
 
@@ -210,7 +544,7 @@ Database gồm **9 bảng chính** được chia thành 3 nhóm chức năng:
 
 ---
 
-### 9. Bảng `purchased_packages` - Packages đã mua (Unified Table)
+### 18. Bảng `purchased_packages` - Packages đã mua (Unified Table)
 
 **Mục đích**: Quản lý TẤT CẢ các loại packages đã mua (courses, tests, consultations) trong một bảng thống nhất.
 
@@ -287,6 +621,23 @@ users (1) ──── (n) user_sessions
 users (1) ──── (n) shopping_cart
 users (1) ──── (n) orders
 users (1) ──── (n) purchased_packages
+users (1) ──── (n) test_results (legacy)
+users (1) ──── (n) quiz_exams (new)
+users (1) ──── (n) quiz_results (new)
+users (1) ──── (n) quiz_fraud_logs (new)
+users (1) ──── (1) quiz_user_limits (new)
+
+questions (standalone table for Holland Code Assessment)
+questions (1) ──── (n) test_answers (via question_id, legacy)
+questions (1) ──── (n) quiz_answers (via question_id, new)
+
+-- Legacy Holland Code system
+test_results (1) ──── (n) test_answers
+
+-- New Quiz system  
+quiz_exams (1) ──── (n) quiz_answers
+quiz_exams (1) ──── (1) quiz_results
+quiz_results (1) ──── (n) quiz_suggested_jobs
 
 products (1) ──── (n) product_packages
 products (1) ──── (n) shopping_cart
@@ -350,6 +701,15 @@ Database được tối ưu với các indexes:
 
 - **Users**: status, role, email_verified
 - **User Sessions**: expires_at, user_id
+- **Questions**: holland_code, category, is_active, sort_order, difficulty_level
+- **Quiz Exams** (**MỚI**): user_status (user_id, exam_status), exam_code, created
+- **Quiz Answers** (**MỚI**): exam_id, answer_status (exam_id, user_answer), unique constraint (exam_id, question_id)
+- **Quiz Results** (**MỚI**): user_holland (user_id, holland_code), holland_code, primary_group, created
+- **Quiz Suggested Jobs** (**MỚI**): result_star (result_id, star_rating DESC, sort_order), job_code, fulltext (job_name, job_description)
+- **Quiz Fraud Logs** (**MỚI**): user_fraud (user_id, fraud_type), severity (severity, created_at), created
+- **Quiz User Limits** (**MỚI**): user_id, lock_status (lock_until, access_revoked)
+- **Test Results** (legacy): result_id, user_id, exam_type, exam_status, primary_code, exam_start_time, sent_email
+- **Test Answers** (legacy): test_result_id, question_id, chosen_answer, answer_time, unique constraint (test_result_id, question_id)
 - **Products**: type, category, status, slug, sort_order
 - **Product Packages**: product_id, status, is_free, sort_order
 - **Orders**: order_code, user_id, status, payment_status
@@ -412,6 +772,9 @@ USE pac_db;
 SHOW TABLES;
 SELECT COUNT(*) FROM products;
 SELECT COUNT(*) FROM product_packages;
+SELECT COUNT(*) FROM questions;
+SELECT COUNT(*) FROM test_results;
+SELECT COUNT(*) FROM test_answers;
 ```
 
 ---

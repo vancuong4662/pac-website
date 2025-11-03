@@ -6,14 +6,24 @@
 -- 1. Mở HeidiSQL và kết nối đến database pac_db
 -- 2. Copy toàn bộ nội dung file này
 -- 3. Paste vào SQL tab và chạy (Execute)
--- 4. File này bao gồm: users, sessions, shopping cart và dữ liệu mẫu
+-- 4. File này bao gồm: users, sessions, shopping cart, quiz system
 --
 -- LƯU Ý: File này sẽ XÓA và TẠO LẠI TẤT CẢ các bảng
+-- Bao gồm cả quiz_exams, quiz_answers, quiz_results và các bảng quiz khác
 -- =====================================================
 
 -- Xóa tất cả các bảng (theo thứ tự ngược lại để tránh lỗi foreign key)
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- Drop quiz system tables (new)
+DROP TABLE IF EXISTS quiz_suggested_jobs;
+DROP TABLE IF EXISTS quiz_fraud_logs;
+DROP TABLE IF EXISTS quiz_user_limits;
+DROP TABLE IF EXISTS quiz_results;
+DROP TABLE IF EXISTS quiz_answers;
+DROP TABLE IF EXISTS quiz_exams;
+
+-- Drop legacy tables
 DROP TABLE IF EXISTS vnpay_transactions;
 DROP TABLE IF EXISTS purchased_packages;
 DROP TABLE IF EXISTS order_items;
@@ -21,8 +31,19 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart;
 DROP TABLE IF EXISTS product_packages;
 DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS test_answers;
+DROP TABLE IF EXISTS test_results;
+DROP TABLE IF EXISTS questions;
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS users;
+
+-- Drop views (if exists)
+DROP VIEW IF EXISTS order_payment_summary;
+DROP VIEW IF EXISTS vnpay_statistics;
+DROP VIEW IF EXISTS pending_payments;
+DROP VIEW IF EXISTS purchased_courses_view;
+DROP VIEW IF EXISTS purchased_tests_view;
+DROP VIEW IF EXISTS consultation_bookings_view;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -75,7 +96,311 @@ CREATE TABLE sessions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =====================================================
--- PHẦN 2: BẢNG SAN PHẨM VÀ SHOPPING CART
+-- PHẦN 2: BẢNG HOLLAND CODE ASSESSMENT SYSTEM
+-- =====================================================
+
+-- Bảng câu hỏi Holland Code (đã tối ưu từ thiết kế cũ)
+CREATE TABLE questions (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    question_id VARCHAR(10) NOT NULL COMMENT 'ID gốc từ dữ liệu cũ (1, 2, 3...)',
+    question_text TEXT NOT NULL COMMENT 'Nội dung câu hỏi',
+    holland_code ENUM('R','I','A','S','E','C') NOT NULL COMMENT 'Mã Holland Code: R=Realistic, I=Investigative, A=Artistic, S=Social, E=Enterprising, C=Conventional',
+    category ENUM('personality','interests','activities','subjects') DEFAULT 'personality' COMMENT 'Loại câu hỏi',
+    difficulty_level ENUM('easy','medium','hard') DEFAULT 'medium' COMMENT 'Mức độ khó',
+    sort_order INT(11) DEFAULT 0 COMMENT 'Thứ tự hiển thị câu hỏi',
+    is_active TINYINT(1) DEFAULT 1 COMMENT 'Trạng thái kích hoạt',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (id),
+    UNIQUE KEY question_id (question_id),
+    KEY idx_holland_code (holland_code),
+    KEY idx_category (category),
+    KEY idx_active (is_active),
+    KEY idx_sort_order (sort_order),
+    KEY idx_difficulty (difficulty_level)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+COMMENT='Bảng câu hỏi trắc nghiệm Holland Code để đánh giá hướng nghiệp';
+
+-- =====================================================
+-- PHẦN 2A: QUIZ SYSTEM TABLES (TRIỂN KHAI MỚI)
+-- =====================================================
+
+-- Bảng quiz_exams: Quản lý bài thi Holland Code
+CREATE TABLE quiz_exams (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    exam_code VARCHAR(20) UNIQUE NOT NULL COMMENT 'Mã bài thi unique (EX20251101_ABC123)',
+    user_id INT NOT NULL,
+    exam_type TINYINT NOT NULL COMMENT '0=Free(30 câu), 1=Paid(120 câu)',
+    exam_status TINYINT DEFAULT 0 COMMENT '0=Draft(chưa submit), 1=Completed(đã submit)',
+    
+    -- Question info
+    total_questions INT NOT NULL,
+    answered_questions INT DEFAULT 0,
+    
+    -- Timing (for display only, no business logic)
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP NULL,
+    time_limit INT DEFAULT 0 COMMENT 'Thời gian giới hạn (0 = không giới hạn)',
+    
+    -- Tracking
+    ip_address VARCHAR(45) NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_status (user_id, exam_status),
+    INDEX idx_exam_code (exam_code),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng quản lý bài thi Holland Code - Simplified: No time limits, only DRAFT/COMPLETED';
+
+-- Bảng quiz_answers: Chi tiết câu trả lời trong bài thi
+CREATE TABLE quiz_answers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    exam_id INT NOT NULL,
+    question_id VARCHAR(10) NOT NULL,
+    user_answer TINYINT DEFAULT -1 COMMENT '-1=Chưa trả lời, 0=Không đồng ý, 1=Bình thường, 2=Đồng ý',
+    answer_time TIMESTAMP NULL,
+    is_changed BOOLEAN DEFAULT FALSE COMMENT 'Có thay đổi câu trả lời',
+    change_count INT DEFAULT 0,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (exam_id) REFERENCES quiz_exams(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(question_id) ON DELETE RESTRICT,
+    UNIQUE KEY unique_exam_question (exam_id, question_id),
+    INDEX idx_exam_id (exam_id),
+    INDEX idx_answer_status (exam_id, user_answer)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng chi tiết câu trả lời Holland Code với fixed choices [0,1,2]';
+
+-- Bảng quiz_results: Kết quả Holland Code được tính toán  
+CREATE TABLE quiz_results (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    exam_id INT UNIQUE NOT NULL,
+    user_id INT NOT NULL,
+    
+    -- Điểm số 6 nhóm Holland (RIASEC)
+    score_r INT DEFAULT 0 COMMENT 'Realistic - Kỹ thuật/Thực tế',
+    score_i INT DEFAULT 0 COMMENT 'Investigative - Nghiên cứu/Điều tra',
+    score_a INT DEFAULT 0 COMMENT 'Artistic - Nghệ thuật/Sáng tạo',
+    score_s INT DEFAULT 0 COMMENT 'Social - Xã hội/Giúp đỡ',
+    score_e INT DEFAULT 0 COMMENT 'Enterprising - Quản lý/Kinh doanh',
+    score_c INT DEFAULT 0 COMMENT 'Conventional - Nghiệp vụ/Tổ chức',
+    
+    total_score INT NOT NULL,
+    
+    -- Holland Code 3 ký tự
+    holland_code VARCHAR(3) NOT NULL COMMENT 'VD: AEI, RIC',
+    primary_group CHAR(1) NOT NULL,
+    secondary_group CHAR(1) NOT NULL,
+    tertiary_group CHAR(1) NOT NULL,
+    
+    -- Đặc trưng công việc
+    characteristics_code VARCHAR(2) NOT NULL COMMENT 'Từ 2 ký tự đầu Holland Code',
+    work_activities JSON NULL COMMENT 'Hoạt động công việc',
+    work_values JSON NULL COMMENT 'Top 3 giá trị làm việc',
+    
+    -- Metadata
+    calculation_time FLOAT DEFAULT 0 COMMENT 'Thời gian tính toán (milliseconds)',
+    has_fraud_flags BOOLEAN DEFAULT FALSE,
+    fraud_details JSON NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (exam_id) REFERENCES quiz_exams(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_holland (user_id, holland_code),
+    INDEX idx_holland_code (holland_code),
+    INDEX idx_primary_group (primary_group),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng kết quả Holland Code với 6 điểm số và phân tích';
+
+-- Bảng quiz_suggested_jobs: Nghề nghiệp gợi ý theo hệ thống sao
+CREATE TABLE quiz_suggested_jobs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    result_id INT NOT NULL,
+    
+    -- Job information
+    job_code VARCHAR(20) NOT NULL COMMENT 'Mã nghề nghiệp',
+    job_name VARCHAR(255) NOT NULL,
+    job_name_en VARCHAR(255) NULL,
+    holland_code VARCHAR(3) NOT NULL,
+    
+    -- Matching details
+    star_rating TINYINT NOT NULL COMMENT '2-5 sao',
+    match_type ENUM('exact','permutation','two_char','single_char') NOT NULL,
+    match_score DECIMAL(5,2) DEFAULT 0 COMMENT 'Điểm khớp %',
+    
+    -- Job details
+    job_group VARCHAR(100) NULL COMMENT 'Nhóm nghề',
+    essential_ability VARCHAR(255) NULL,
+    supplementary_ability VARCHAR(255) NULL,
+    work_environment VARCHAR(255) NULL,
+    work_style VARCHAR(255) NULL,
+    education_level VARCHAR(100) NULL,
+    
+    job_description TEXT NULL,
+    work_areas JSON NULL COMMENT 'Nơi làm việc',
+    main_tasks JSON NULL COMMENT 'Nhiệm vụ chính',
+    
+    -- Display control
+    sort_order INT DEFAULT 0,
+    is_highlighted BOOLEAN DEFAULT FALSE,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (result_id) REFERENCES quiz_results(id) ON DELETE CASCADE,
+    INDEX idx_result_star (result_id, star_rating DESC, sort_order),
+    INDEX idx_job_code (job_code),
+    FULLTEXT INDEX idx_job_search (job_name, job_description)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng nghề nghiệp gợi ý với hệ thống sao từ 2-5';
+
+-- Bảng quiz_fraud_logs: Log phát hiện gian lận
+CREATE TABLE quiz_fraud_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    exam_id INT NOT NULL,
+    
+    fraud_type ENUM('same_answers','insufficient_yes','time_too_fast','suspicious_pattern','other') NOT NULL,
+    severity ENUM('low','medium','high','critical') DEFAULT 'medium',
+    
+    detection_details JSON NOT NULL COMMENT 'Chi tiết phát hiện',
+    action_taken ENUM('warning','reset_exam','lock_12h','lock_24h','revoke_access','none') NOT NULL,
+    
+    admin_reviewed BOOLEAN DEFAULT FALSE,
+    admin_notes TEXT NULL,
+    
+    ip_address VARCHAR(45) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (exam_id) REFERENCES quiz_exams(id) ON DELETE CASCADE,
+    INDEX idx_user_fraud (user_id, fraud_type),
+    INDEX idx_severity (severity, created_at),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng log phát hiện và xử lý gian lận trong quiz';
+
+-- Bảng quiz_user_limits: Giới hạn và khóa user
+CREATE TABLE quiz_user_limits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNIQUE NOT NULL,
+    
+    -- Free exam tracking
+    free_exam_count INT DEFAULT 0 COMMENT 'Số lần làm bài miễn phí',
+    free_exam_violations INT DEFAULT 0 COMMENT 'Số lần vi phạm free',
+    last_free_exam TIMESTAMP NULL,
+    
+    -- Paid exam tracking
+    paid_exam_count INT DEFAULT 0,
+    paid_exam_violations INT DEFAULT 0 COMMENT 'Số lần vi phạm paid',
+    last_paid_exam TIMESTAMP NULL,
+    
+    -- Lock status
+    lock_until TIMESTAMP NULL COMMENT 'Khóa đến thời điểm',
+    lock_reason VARCHAR(255) NULL,
+    is_permanently_locked BOOLEAN DEFAULT FALSE,
+    
+    -- Access control
+    access_revoked BOOLEAN DEFAULT FALSE,
+    revoke_reason TEXT NULL,
+    revoked_at TIMESTAMP NULL,
+    
+    -- Notes
+    admin_notes TEXT NULL,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_lock_status (lock_until, access_revoked)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng quản lý giới hạn và khóa user cho quiz system';
+
+-- Bảng kết quả làm bài test Holland Code (legacy, giữ cho backward compatibility)
+CREATE TABLE test_results (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    result_id VARCHAR(50) NOT NULL COMMENT 'ID gốc từ MongoDB _id',
+    user_id INT(11) NOT NULL COMMENT 'ID người dùng làm bài',
+    exam_type TINYINT(1) DEFAULT 0 COMMENT 'Loại bài thi: 0=ngắn, 1=đầy đủ',
+    exam_status TINYINT(1) DEFAULT 0 COMMENT 'Trạng thái bài thi: 0=hoàn thành, 1=đang làm, 2=hủy',
+    
+    -- Thống kê tổng quan
+    total_questions INT(11) DEFAULT 0 COMMENT 'Tổng số câu hỏi',
+    answered_questions INT(11) DEFAULT 0 COMMENT 'Số câu đã trả lời',
+    total_score INT(11) DEFAULT 0 COMMENT 'Tổng điểm',
+    total_time_minutes INT(11) DEFAULT 0 COMMENT 'Tổng thời gian làm bài (phút)',
+    
+    -- Điểm số theo 6 nhóm Holland Code
+    r_score INT(11) DEFAULT 0 COMMENT 'Điểm Realistic (Kỹ thuật)',
+    i_score INT(11) DEFAULT 0 COMMENT 'Điểm Investigative (Nghiên cứu)',
+    a_score INT(11) DEFAULT 0 COMMENT 'Điểm Artistic (Nghệ thuật)',
+    s_score INT(11) DEFAULT 0 COMMENT 'Điểm Social (Xã hội)',
+    e_score INT(11) DEFAULT 0 COMMENT 'Điểm Enterprising (Quản lý)',
+    c_score INT(11) DEFAULT 0 COMMENT 'Điểm Conventional (Nghiệp vụ)',
+    
+    -- Kết quả phân tích
+    primary_code VARCHAR(10) DEFAULT NULL COMMENT 'Mã Holland Code chính (điểm cao nhất)',
+    holland_code_result VARCHAR(20) DEFAULT NULL COMMENT 'Kết quả tổng hợp (ví dụ: ASE)',
+    personality_type VARCHAR(100) DEFAULT NULL COMMENT 'Loại tính cách được phân tích',
+    
+    -- Thời gian
+    exam_start_time INT(11) DEFAULT NULL COMMENT 'Unix timestamp bắt đầu làm bài',
+    exam_end_time INT(11) DEFAULT NULL COMMENT 'Unix timestamp kết thúc dự kiến',
+    exam_stop_time INT(11) DEFAULT NULL COMMENT 'Unix timestamp hoàn thành thực tế',
+    
+    -- Email và báo cáo
+    sent_email TINYINT(1) DEFAULT 0 COMMENT 'Đã gửi email báo cáo',
+    report_generated TINYINT(1) DEFAULT 0 COMMENT 'Đã tạo báo cáo',
+    report_url VARCHAR(500) DEFAULT NULL COMMENT 'Link báo cáo PDF',
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (id),
+    UNIQUE KEY result_id (result_id),
+    KEY idx_user_id (user_id),
+    KEY idx_exam_type (exam_type),
+    KEY idx_exam_status (exam_status),
+    KEY idx_primary_code (primary_code),
+    KEY idx_exam_start_time (exam_start_time),
+    KEY idx_sent_email (sent_email),
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+COMMENT='Bảng lưu kết quả tổng quan của bài test Holland Code (legacy)';
+
+-- Bảng chi tiết câu trả lời của từng test (legacy, giữ cho backward compatibility)
+CREATE TABLE test_answers (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    test_result_id INT(11) NOT NULL COMMENT 'ID kết quả test',
+    question_id VARCHAR(10) NOT NULL COMMENT 'ID câu hỏi (reference đến questions.question_id)',
+    chosen_answer TINYINT(1) NOT NULL COMMENT 'Đáp án được chọn: 0=Không đồng ý, 1=Trung lập, 2=Đồng ý',
+    answer_time INT(11) DEFAULT NULL COMMENT 'Unix timestamp thời điểm trả lời',
+    time_spent INT(11) DEFAULT NULL COMMENT 'Thời gian suy nghĩ (giây)',
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (id),
+    KEY idx_test_result_id (test_result_id),
+    KEY idx_question_id (question_id),
+    KEY idx_chosen_answer (chosen_answer),
+    KEY idx_answer_time (answer_time),
+    UNIQUE KEY unique_test_question (test_result_id, question_id),
+    FOREIGN KEY (test_result_id) REFERENCES test_results (id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions (question_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+COMMENT='Bảng lưu chi tiết câu trả lời của từng bài test Holland Code (legacy)';
+
+-- =====================================================
+-- PHẦN 3: BẢNG SAN PHẨM VÀ SHOPPING CART
 -- =====================================================
 
 -- Bảng sản phẩm chính (products)
@@ -329,7 +654,7 @@ ALTER TABLE product_packages ADD INDEX idx_packages_sort_order (sort_order);
 -- Purchased Packages (indexes đã được tạo trong CREATE TABLE)
 
 -- =====================================================
--- PHẦN 3: BỔ SUNG CÁC CƠ CHẾ ĐỒNG BỘ VÀ RÀNG BUỘC
+-- PHẦN 4: BỔ SUNG CÁC CƠ CHẾ ĐỒNG BỘ VÀ RÀNG BUỘC
 -- =====================================================
 
 -- 1. Trigger cập nhật vnpay_txn_ref trong orders khi có transaction VNPay
@@ -690,6 +1015,6 @@ WHERE pp.product_type = 'consultation';
 -- =====================================================
 -- HOÀN THÀNH TẠO CẤU TRÚC DATABASE
 -- =====================================================
-SELECT 'Package-based purchase system created successfully!' as message,
-       'Database now uses unified purchased_packages table' as info,
-       'Run sample-data.sql for demo data' as next_step;
+SELECT 'All tables created successfully!' as message,
+       'Includes quiz system + shopping cart + users' as info,
+       'Run sample-data.sql then sample-quiz-data.sql for demo data' as next_step;

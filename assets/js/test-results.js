@@ -1,6 +1,6 @@
 /**
  * Test Results Management System
- * Quản lý hiển thị kết quả trắc nghiệm
+ * Quản lý hiển thị kết quả trắc nghiệm tính cách nghề nghiệp
  */
 
 class TestResultsManager {
@@ -9,40 +9,53 @@ class TestResultsManager {
         this.init();
     }
 
-    init() {
-        this.loadTestResults();
+    async init() {
+        await this.loadTestResults();
         this.renderTestResults();
     }
 
-    // Load dữ liệu kết quả test (demo data)
-    loadTestResults() {
-        // Dữ liệu demo - trong thực tế sẽ load từ API
-        this.testResults = [
-            {
-                id: 'TEST001',
-                date: '2024-12-10',
-                testName: 'Bài trắc nghiệm hướng nghiệp cơ bản',
-                score: 85,
-                maxScore: 100,
-                duration: '25 phút',
-                status: 'completed',
-                category: 'career-orientation',
-                questions: 20,
-                correctAnswers: 17
-            },
-            {
-                id: 'TEST002', 
-                date: '2024-12-05',
-                testName: 'Bài trắc nghiệm hướng nghiệp chuyên sâu',
-                score: 78,
-                maxScore: 100,
-                duration: '45 phút',
-                status: 'completed',
-                category: 'career-advanced',
-                questions: 35,
-                correctAnswers: 27
+    // Load dữ liệu kết quả test từ API
+    async loadTestResults() {
+        try {
+            // Load tất cả bài thi (cả Free và Paid)
+            const response = await fetch('api/quiz/get-user-exams.php?page=1&limit=50', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            console.log('API Response status:', response.status);
+
+            const data = await response.json();
+            console.log('API Response data:', data);
+
+            if (response.ok && data.status === 'success') {
+                console.log("Loaded test results:", data);
+                this.testResults = data.data.exams;
+                
+                // Update total count
+                const totalElement = document.getElementById('total-tests');
+                if (totalElement) {
+                    totalElement.textContent = data.data.pagination.total_count || this.testResults.length;
+                }
+            } else {
+                console.error('Failed to load test results:', data.message || data.error);
+                console.error('Full API response:', data);
+                this.testResults = [];
+                
+                // Show error toast if available
+                if (window.showToast) {
+                    showToast(data.message || 'Không thể tải danh sách bài kiểm tra', 'error');
+                }
             }
-        ];
+        } catch (error) {
+            console.error('Error loading test results:', error);
+            this.testResults = [];
+            
+            // Show error toast if available
+            if (window.showToast) {
+                showToast('Lỗi kết nối khi tải danh sách bài kiểm tra', 'error');
+            }
+        }
     }
 
     // Render test results table
@@ -60,95 +73,84 @@ class TestResultsManager {
         table.classList.remove('d-none');
         emptyState.classList.add('d-none');
 
-        tbody.innerHTML = this.testResults.map(test => {
-            const formattedDate = this.formatDateOnly(test.date);
-            const scorePercentage = Math.round((test.score / test.maxScore) * 100);
-
+        tbody.innerHTML = this.testResults.map(exam => {
+            // Determine question count based on exam data
+            let questionCount = '30'; // Default
+            if (exam.total_questions) {
+                questionCount = exam.total_questions;
+            } else if (exam.exam_type === 'PREMIUM' || exam.exam_type === 'PAID') {
+                questionCount = '120';
+            }
+            
             return `
-                <tr class="test-row" data-id="${test.id}">
+                <tr class="test-row" data-id="${exam.exam_code}">
                     <td class="px-4 py-3">
-                        <span class="fw-medium">${formattedDate}</span>
+                        <div class="d-flex flex-column">
+                            <span class="fw-medium">Bộ ${questionCount} câu hỏi</span>
+                            ${exam.progress_percent !== undefined ? `
+                                <div class="progress mt-1" style="height: 4px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: ${exam.progress_percent}%"></div>
+                                </div>
+                                <small class="text-muted">${exam.progress_percent}% hoàn thành</small>
+                            ` : ''}
+                        </div>
                     </td>
                     <td class="px-4 py-3">
                         <div class="d-flex flex-column">
-                            <span class="fw-medium">${test.testName}</span>
-                            <small class="text-muted">
-                                <i class="fas fa-clock me-1"></i>${test.duration}
-                                <span class="mx-2">•</span>
-                                <i class="fas fa-question me-1"></i>${test.questions} câu hỏi
-                            </small>
+                            <span class="fw-medium">${exam.created_at_formatted}</span>
+                            ${exam.duration_minutes ? `<small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>${exam.duration_minutes} phút
+                            </small>` : ''}
+                            ${exam.status_info ? `
+                                <span class="badge badge-${exam.status_info.class} mt-1">
+                                    <i class="fas fa-${exam.status_info.icon} me-1"></i>
+                                    ${exam.status_info.text}
+                                </span>
+                            ` : ''}
                         </div>
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <button type="button" 
-                                class="btn btn-outline-primary btn-sm" 
-                                onclick="testResults.viewTestDetails('${test.id}')"
-                                title="Xem kết quả chi tiết">
-                            <i class="fas fa-eye me-1"></i>
-                            Xem kết quả
-                        </button>
+                        ${this.renderActionButton(exam)}
                     </td>
                 </tr>
             `;
         }).join('');
-
-        // Update total tests count
-        document.getElementById('total-tests').textContent = this.testResults.length;
     }
 
-    // Format date only (without time)
-    formatDateOnly(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN');
-    }
-
-    // Get score information
-    getScoreInfo(scorePercentage) {
-        if (scorePercentage >= 80) {
-            return {
-                class: 'bg-success-subtle text-success',
-                icon: 'fas fa-trophy'
-            };
-        } else if (scorePercentage >= 60) {
-            return {
-                class: 'bg-warning-subtle text-warning',
-                icon: 'fas fa-star'
-            };
-        } else {
-            return {
-                class: 'bg-danger-subtle text-danger',
-                icon: 'fas fa-exclamation-triangle'
-            };
-        }
-    }
-
-    // View test details
-    viewTestDetails(testId) {
-        const test = this.testResults.find(t => t.id === testId);
-        if (!test) return;
-
-        // Navigate to test detail page
-        // In a real application, this would route to a detailed results page
-        window.location.href = `test-detail?id=${testId}`;
-        
-        // For demo, show alert
-        const scorePercentage = Math.round((test.score / test.maxScore) * 100);
-        alert(`Chi tiết kết quả bài test: ${test.testName}\n\n` +
-              `Điểm số: ${test.score}/${test.maxScore} (${scorePercentage}%)\n` +
-              `Số câu đúng: ${test.correctAnswers}/${test.questions}\n` +
-              `Thời gian: ${test.duration}\n` +
-              `Ngày thực hiện: ${this.formatDate(test.date).day}\n\n` +
-              `Đang chuyển đến trang kết quả chi tiết...`);
-    }
-
-    // Retake test
-    retakeTest(testId) {
-        const test = this.testResults.find(t => t.id === testId);
-        if (!test) return;
-
-        if (confirm(`Bạn có muốn làm lại bài "${test.testName}"?\n\nKết quả cũ sẽ được thay thế bằng kết quả mới.`)) {
-            // Navigate to test page
-            window.location.href = `test?retry=${testId}`;
+    // Render action button for each exam
+    renderActionButton(exam) {
+        switch (exam.display_status) {
+            case 'completed':
+                // Exam completed and result is processed
+                return `
+                    <button class="btn btn-outline-primary btn-sm" 
+                            onclick="window.open('read-test-result?exam_code=${exam.exam_code}', '_blank')"
+                            title="Xem kết quả chi tiết">
+                        <i class="fas fa-eye me-1"></i>Xem kết quả
+                    </button>
+                `;
+                
+            case 'processing':
+                // Exam completed but result is still processing
+                return `
+                    <button class="btn btn-outline-info btn-sm" disabled title="Đang xử lý kết quả">
+                        <i class="fas fa-spinner fa-spin me-1"></i>Đang xử lý
+                    </button>
+                `;
+                
+            case 'draft':
+                // Exam is draft, can start/continue taking quiz
+                return `
+                    <button class="btn btn-outline-success btn-sm" 
+                            onclick="window.open('quiz?exam_code=${exam.exam_code}', '_blank')"
+                            title="Làm bài trắc nghiệm">
+                        <i class="fas fa-edit me-1"></i>Làm bài
+                    </button>
+                `;
+                
+            default:
+                return `<span class="text-muted small">Không xác định</span>`;
         }
     }
 }

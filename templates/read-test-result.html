@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Kết quả trắc nghiệm - PAC Group</title>
+  <meta name="description" content="PAC Group - Xem kết quả chi tiết bài trắc nghiệm tính cách nghề nghiệp và phân tích định hướng career.">
+  <meta name="keywords" content="kết quả trắc nghiệm, PAC Group, phân tích tính cách, career assessment, định hướng nghề nghiệp">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts - Montserrat for PAC Group -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Chart.js for radar chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  
+  <!-- Result Page CSS -->
+  <link href="assets/css/read-result.css" rel="stylesheet">
+</head>
+
+<body class="result-page">
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Header Section Container -->
+  <div id="header-section">
+    <!-- Header component will be loaded here -->
+  </div>
+
+  <main class="main">
+    <!-- Page Hero -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto text-center">
+            <h1 class="hero-title">Kết quả trắc nghiệm tính cách</h1>
+            <p class="hero-subtitle">Phân tích chi tiết tính cách nghề nghiệp của bạn</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-nav">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="my-tests">Danh sách trắc nghiệm</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Kết quả</li>
+              </ol>
+            </nav>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <a href="my-tests" class="btn btn-pac-primary">
+              <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result Content -->
+    <section class="test-results-content py-5">
+      <div class="container">
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-5" style="display: block;">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Đang tải...</span>
+          </div>
+          <p class="mt-3 text-muted">Đang tải kết quả...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="text-center py-5" style="display: none;">
+          <div class="mb-4">
+            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+          </div>
+          <h3 class="text-muted mb-3">Không tìm thấy kết quả</h3>
+          <p class="text-muted mb-4">Kết quả trắc nghiệm không tồn tại hoặc đã bị xóa.</p>
+          <a href="my-tests" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Quay lại danh sách
+          </a>
+        </div>
+
+        <!-- Main Result Content -->
+        <div id="result-content" style="display: none;">
+          <!-- Export Actions -->
+          <div class="export-actions">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+              <div>
+                <h6 class="mb-1">Mã bài thi: <span id="exam-code" class="text-primary fw-bold"></span></h6>
+                <small class="text-muted">Ngày thực hiện: <span id="exam-date"></span></small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" id="export-pdf-btn">
+                  <i class="fas fa-file-pdf me-2"></i>
+                  Xuất PDF
+                </button>
+                <button class="btn btn-outline-success" id="share-result-btn">
+                  <i class="fas fa-share-alt me-2"></i>
+                  Chia sẻ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Result Navigation Tabs -->
+          <ul class="nav nav-pills nav-fill mb-4" id="result-tabs" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#overview-tab">
+                <i class="fas fa-chart-pie me-2"></i>Tổng quan
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#personality-tab">
+                <i class="fas fa-user me-2"></i>Nhóm tính cách
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#detailed-analysis-tab">
+                <i class="fas fa-search me-2"></i>Phân tích chi tiết
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#jobs-tab">
+                <i class="fas fa-briefcase me-2"></i>Nghề phù hợp
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#guidance-tab">
+                <i class="fas fa-video me-2"></i>Hướng dẫn
+              </button>
+            </li>
+          </ul>
+
+          <!-- Tab Content -->
+          <div class="tab-content" id="result-tab-content">
+            <!-- Tab 1: Overview -->
+            <div class="tab-pane fade show active" id="overview-tab">
+              <!-- Personality Group Introduction -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <div id="personality-group-intro">
+                    <!-- Will be populated by JavaScript -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- Radar Chart -->
+                <div class="col-lg-6 mb-4" data-aos="fade-right">
+                  <div class="card h-100">
+                    <div class="card-header bg-white">
+                      <h4 class="mb-0">
+                        <i class="fas fa-chart-radar text-primary me-2"></i>
+                        Biểu đồ 6 nhóm tính cách
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="chart-container">
+                        <canvas id="radar-chart"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tendency Ranking -->
+                <div class="col-lg-6 mb-4" data-aos="fade-left">
+                  <div class="card h-100">
+                    <div class="card-header bg-white">
+                      <h4 class="mb-0">
+                        <i class="fas fa-trophy text-primary me-2"></i>
+                        Xếp hạng các nhóm tính cách
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <div id="tendency-ranking">
+                        <!-- Will be populated by JavaScript -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Personality Groups -->
+            <div class="tab-pane fade" id="personality-tab">
+              <div id="personality-groups-content">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Tab 3: Detailed Analysis -->
+            <div class="tab-pane fade" id="detailed-analysis-tab">
+              <div class="row">
+                <div class="col-12">
+                  <h3 class="mb-4">
+                    <i class="fas fa-search text-primary me-2"></i>
+                    Phân tích tính cách chi tiết
+                  </h3>
+
+                  <!-- Information Card -->
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Hướng dẫn:</strong> Nhấp vào các nút phía trên để xem phân tích chi tiết về từng khía cạnh tính cách của bạn.
+                    Kết quả được phân tích dựa trên 3 nhóm tính cách nổi bật nhất của bạn.
+                  </div>
+                  
+                  <!-- Analysis Action Buttons -->
+                  <div class="row mb-4">
+                    <div class="col-lg-4 mb-3">
+                      <div class="analysis-card h-100" data-bs-toggle="modal" data-bs-target="#personalityTraitsModal">
+                        <div class="analysis-icon-wrapper">
+                          <div class="analysis-icon">
+                            <i class="fas fa-star"></i>
+                          </div>
+                        </div>
+                        <h5 class="analysis-title">Đặc trưng tính cách</h5>
+                        <p class="analysis-description">Khám phá điểm mạnh và những khía cạnh cần phát triển trong tính cách của bạn để tối ưu hóa tiềm năng</p>
+                      </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-3">
+                      <div class="analysis-card h-100" data-bs-toggle="modal" data-bs-target="#workStyleModal">
+                        <div class="analysis-icon-wrapper">
+                          <div class="analysis-icon">
+                            <i class="fas fa-briefcase"></i>
+                          </div>
+                        </div>
+                        <h5 class="analysis-title">Phong cách làm việc</h5>
+                        <p class="analysis-description">Hiểu rõ cách bạn tiếp cận công việc, môi trường làm việc lý tưởng và phong cách quản lý phù hợp</p>
+                      </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-3">
+                      <div class="analysis-card h-100" data-bs-toggle="modal" data-bs-target="#preferredActivitiesModal">
+                        <div class="analysis-icon-wrapper">
+                          <div class="analysis-icon">
+                            <i class="fas fa-heart"></i>
+                          </div>
+                        </div>
+                        <h5 class="analysis-title">Hoạt động ưa thích</h5>
+                        <p class="analysis-description">Tìm hiểu các hoạt động, sở thích và môi trường học tập mà bạn yêu thích và phát triển tốt nhất</p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Suggested Jobs -->
+            <div class="tab-pane fade" id="jobs-tab">
+              <div class="row">
+                <div class="col-12 mb-4">
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Nghề nghiệp được gợi ý dựa trên:</strong> Kết quả phân tích tính cách của bạn và mức độ tương thích với các lĩnh vực nghề nghiệp.
+                  </div>
+                </div>
+              </div>
+              <div id="suggested-jobs-content">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Tab 5: Video Guidance -->
+            <div class="tab-pane fade" id="guidance-tab">
+              <div id="guidance-content">
+                <!-- Will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section Container -->
+  <div id="footer-section">
+    <!-- Footer component will be loaded here -->
+  </div>
+
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Personality Traits Modal -->
+  <div class="modal fade" id="personalityTraitsModal" tabindex="-1" aria-labelledby="personalityTraitsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-brand-primary text-white">
+          <h5 class="modal-title" id="personalityTraitsModalLabel">
+            <i class="fas fa-star me-2"></i>Đặc trưng tính cách của bạn
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="personality-traits-content">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work Style Modal -->
+  <div class="modal fade" id="workStyleModal" tabindex="-1" aria-labelledby="workStyleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-brand-primary text-white">
+          <h5 class="modal-title" id="workStyleModalLabel">
+            <i class="fas fa-briefcase me-2"></i>Phong cách làm việc của bạn
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="work-style-content">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preferred Activities Modal -->
+  <div class="modal fade" id="preferredActivitiesModal" tabindex="-1" aria-labelledby="preferredActivitiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-brand-primary text-white">
+          <h5 class="modal-title" id="preferredActivitiesModalLabel">
+            <i class="fas fa-heart me-2"></i>Hoạt động ưa thích của bạn
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="preferred-activities-content">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+
+  <!-- Component Loader -->
+  <script src="assets/js/component-loader.js"></script>
+  
+  <!-- Authentication -->
+  <script src="assets/js/authen.js"></script>
+
+  <!-- Test Results Management -->
+  <script src="assets/js/read-result.js"></script>
+
+</body>
+</html>

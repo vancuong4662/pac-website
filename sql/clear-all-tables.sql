@@ -1,4 +1,19 @@
--- Dọn dẹp toàn bộ database (xóa tất cả tables, views, triggers, functions, procedures)
+-- =====================================================
+-- PAC Database Complete Cleanup Script
+-- =====================================================
+-- 
+-- CHỨC NĂNG: Dọn dẹp toàn bộ database (xóa tất cả tables, views, triggers, functions, procedures)
+-- 
+-- BAO GỒM:
+-- - Quiz system tables (quiz_exams, quiz_answers, quiz_results, quiz_user_limits, etc.)
+-- - Legacy Holland Code tables (questions, test_results, test_answers)
+-- - E-commerce tables (products, orders, vnpay_transactions, etc.)
+-- - User management tables (users, sessions)
+-- - All views, triggers, functions, and procedures
+--
+-- CẢNH BÁO: File này sẽ XÓA TẤT CẢ dữ liệu trong database!
+-- Chỉ sử dụng khi muốn reset hoàn toàn database về trạng thái ban đầu.
+-- =====================================================
 
 -- 1. Tắt foreign key checks
 SET FOREIGN_KEY_CHECKS = 0;
@@ -25,6 +40,21 @@ DROP FUNCTION IF EXISTS check_payment_status;
 DROP PROCEDURE IF EXISTS sync_payment_status;
 
 -- 5. Xóa tất cả tables (theo thứ tự tránh foreign key)
+
+-- Quiz system tables (new)
+DROP TABLE IF EXISTS quiz_suggested_jobs;
+DROP TABLE IF EXISTS quiz_fraud_logs;
+DROP TABLE IF EXISTS quiz_user_limits;
+DROP TABLE IF EXISTS quiz_results;
+DROP TABLE IF EXISTS quiz_answers;
+DROP TABLE IF EXISTS quiz_exams;
+
+-- Legacy Holland Code tables
+DROP TABLE IF EXISTS test_answers;
+DROP TABLE IF EXISTS test_results;
+DROP TABLE IF EXISTS questions;
+
+-- E-commerce tables
 DROP TABLE IF EXISTS vnpay_transactions;
 DROP TABLE IF EXISTS purchased_packages;
 DROP TABLE IF EXISTS order_items;
@@ -32,12 +62,19 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart;
 DROP TABLE IF EXISTS product_packages;
 DROP TABLE IF EXISTS products;
+
+-- User management tables
 DROP TABLE IF EXISTS sessions;
 DROP TABLE IF EXISTS users;
 
 -- 6. Bật lại foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 7. Reset database (tùy chọn - nếu muốn xóa toàn bộ database)
+-- 7. Thông báo hoàn thành
+SELECT 'Database cleanup completed successfully!' as status,
+       'All tables, views, triggers, functions, and procedures have been dropped.' as message,
+       'You can now run create-all-tables.sql to recreate the database structure.' as next_step;
+
+-- 8. Reset database (tùy chọn - nếu muốn xóa toàn bộ database)
 -- DROP DATABASE IF EXISTS pac_db;
 -- CREATE DATABASE pac_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

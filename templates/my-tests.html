@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Kết quả trắc nghiệm - PAC Group</title>
-  <meta name="description" content="PAC Group - Xem lại kết quả các bài trắc nghiệm đã thực hiện và theo dõi tiến độ đánh giá năng lực.">
-  <meta name="keywords" content="kết quả trắc nghiệm, PAC Group, đánh giá năng lực, career test">
+  <title>Danh sách trắc nghiệm - PAC Group</title>
+  <meta name="description" content="PAC Group - Xem lại danh sách các bài trắc nghiệm đã thực hiện và theo dõi tiến độ đánh giá tính cách.">
+  <meta name="keywords" content="danh sách trắc nghiệm, PAC Group, đánh giá tính cách, career test, my tests">
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
@@ -31,140 +31,124 @@
 
 <body class="my-tests-page">
 
-  <!-- Header -->
-  <div id="header-section"></div>
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Header Section Container -->
+  <div id="header-section">
+    <!-- Header component will be loaded here -->
+  </div>
 
   <main class="main">
-    <!-- My Tests Page Header -->
-    <section class="page-header pac-gradient-primary text-white py-5">
+    <!-- Page Hero -->
+    <section class="page-hero">
       <div class="container">
         <div class="row">
-          <div class="col-12">
-            <h1 class="display-6 fw-bold mb-2 text-white">
-              Kết quả trắc nghiệm
-            </h1>
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb breadcrumb-dark mb-0">
-                <li class="breadcrumb-item"><a href="/" class="text-white-50">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="profile" class="text-white-50">Tài khoản</a></li>
-                <li class="breadcrumb-item active text-white" aria-current="page">Kết quả trắc nghiệm</li>
-              </ol>
-            </nav>
+          <div class="col-lg-8 mx-auto text-center">
+            <h1 class="hero-title" id="page-title">Danh sách trắc nghiệm</h1>
+            <p class="hero-subtitle" id="page-subtitle">Xem lại kết quả các bài trắc nghiệm đã thực hiện</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- My Tests Content -->
-    <section class="my-tests-content py-5">
+    <!-- Breadcrumb -->
+    <section class="breadcrumb-nav">
+      <div class="container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="profile">Tài khoản</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Danh sách trắc nghiệm</li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Test Results Content -->
+    <section class="test-results-content py-5">
       <div class="container">
         <div class="row">
-          
           <!-- Sidebar -->
           <div class="col-lg-3 col-md-4 mb-4">
             <div id="profile-sidebar">
               <!-- Sidebar component will be loaded here -->
             </div>
           </div>
-          
+
           <!-- Main Content -->
           <div class="col-lg-9 col-md-8">
-            <div class="my-tests-main-content">
-            
-            <!-- Filter Section -->
-            <div class="card mb-4">
-              <div class="card-header bg-pac-primary text-white">
-                <h5 class="mb-0">
-                  <i class="fas fa-filter me-2"></i>Bộ lọc kết quả
-                </h5>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-3">
-                    <label for="statusFilter" class="form-label fw-semibold">Kết quả</label>
-                    <select class="form-select" id="statusFilter">
-                      <option value="">Tất cả kết quả</option>
-                      <option value="passed">Đạt yêu cầu</option>
-                      <option value="failed">Chưa đạt</option>
-                      <option value="pending">Chờ kết quả</option>
-                    </select>
+            <div class="test-results-main-content">
+              
+              <!-- Test Results Table -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                  <div class="row align-items-center">
+                    <div class="col">
+                      <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>
+                        Lịch sử trắc nghiệm
+                      </h5>
+                    </div>
+                    <div class="col-auto">
+                      <div class="text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Tổng số bài đã làm: <span id="total-tests" class="fw-bold text-primary">0</span>
+                      </div>
+                    </div>
                   </div>
-                  <div class="col-md-3">
-                    <label for="typeFilter" class="form-label fw-semibold">Loại test</label>
-                    <select class="form-select" id="typeFilter">
-                      <option value="">Tất cả loại</option>
-                      <option value="career_test">Test định hướng</option>
-                      <option value="skill_assessment">Đánh giá kỹ năng</option>
-                      <option value="knowledge_test">Kiểm tra kiến thức</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label for="searchInput" class="form-label fw-semibold">Tìm kiếm</label>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên bài test...">
-                  </div>
-                  <div class="col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-pac-primary w-100" onclick="applyFilters()">
-                      <i class="fas fa-search me-1"></i>Lọc
-                    </button>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="test-results-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-file-alt me-2"></i>Bộ trắc nghiệm
+                          </th>
+                          <th scope="col" class="px-4 py-3">
+                            <i class="fas fa-calendar me-2"></i>Thời gian làm
+                          </th>
+                          <th scope="col" class="px-4 py-3 text-center">
+                            <i class="fas fa-cog me-2"></i>Thao tác
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="test-results-tbody">
+                        <!-- Test results rows will be populated by JavaScript -->
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <!-- Tests Content -->
-            <div class="card">
-              <div class="card-header bg-pac-secondary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                  <i class="fas fa-list me-2"></i>Danh sách kết quả test
-                </h5>
-                <button class="btn btn-outline-light btn-sm" onclick="refreshTests()">
-                  <i class="fas fa-sync-alt me-1"></i>Làm mới
-                </button>
-              </div>
-              
-              <!-- Loading State -->
-              <div id="loadingTests" class="card-body text-center py-5">
-                <div class="d-flex flex-column align-items-center">
-                  <div class="spinner-border text-pac-primary mb-3" role="status">
-                    <span class="visually-hidden">Đang tải...</span>
+
+              <!-- Empty State (initially hidden) -->
+              <div class="card border-0 shadow-sm d-none" id="empty-state">
+                <div class="card-body text-center py-5">
+                  <div class="empty-state-icon mb-4">
+                    <i class="fas fa-clipboard-list text-muted" style="font-size: 4rem;"></i>
                   </div>
-                  <h5 class="text-muted">Đang tải kết quả test...</h5>
-                  <p class="text-muted mb-0">Vui lòng chờ trong giây lát</p>
-                </div>
-              </div>
-              
-              <!-- Tests Content -->
-              <div id="testsContent" style="display: none;">
-                <!-- Tests table will be loaded here -->
-              </div>
-              
-              <!-- Empty State -->
-              <div id="empty-state" class="card-body text-center py-5 d-none">
-                <div class="d-flex flex-column align-items-center">
-                  <div class="text-muted mb-3">
-                    <i class="fas fa-clipboard-check fa-4x"></i>
-                  </div>
-                  <h4 class="text-muted mb-3">Chưa có kết quả test nào</h4>
-                  <p class="text-muted mb-4">Bạn chưa thực hiện bài test nào. Hãy bắt đầu với các bài test định hướng nghề nghiệp.</p>
-                  <a href="test-quiz" class="btn btn-pac-primary">
-                    <i class="fas fa-play me-2"></i>Bắt đầu test ngay
+                  <h4 class="text-muted mb-3">Chưa có trắc nghiệm nào</h4>
+                  <p class="text-muted mb-4">Bạn chưa thực hiện bài trắc nghiệm nào. Hãy bắt đầu với bài trắc nghiệm định hướng nghề nghiệp!</p>
+                  <a href="huongnghiep" class="btn btn-primary">
+                    <i class="fas fa-play me-2"></i>
+                    Bắt đầu trắc nghiệm
                   </a>
                 </div>
               </div>
-              
+
             </div>
-            
           </div>
         </div>
       </div>
     </section>
-
   </main>
 
-  <!-- Footer -->
-  <div id="footer-section"></div>
+  <!-- Footer Section Container -->
+  <div id="footer-section">
+    <!-- Footer component will be loaded here -->
+  </div>
 
-  <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
     <i class="bi bi-arrow-up-short"></i>
   </a>
@@ -175,21 +159,32 @@
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
-  <!-- Main JS Files -->
+  <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+
+  <!-- Component Loader -->
   <script src="assets/js/component-loader.js"></script>
+  
+  <!-- Authentication -->
   <script src="assets/js/authen.js"></script>
-  <script src="assets/js/my-tests.js"></script>
+  
+  <!-- Test Results JS -->
+  <script src="assets/js/test-results.js"></script>
 
   <script>
-    // Page components configuration
-    window.pageComponentsConfig = {
-      sidebar: 'profile-sidebar.html' // Sử dụng chung sidebar với profile
-    };
+    // Configure page-specific components
+    window.pageComponentsConfig = [
+      { name: 'header', target: '#header-section' },
+      { name: 'footer', target: '#footer-section' },
+      { name: 'profile-sidebar', target: '#profile-sidebar' }
+    ];
 
-    // Initialize page
+    // Check authentication before initializing page
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('[My Tests Page] Checking authentication...');
         
@@ -200,13 +195,15 @@
             if (user) {
                 console.log('[My Tests Page] User authenticated:', user);
                 // User is authenticated, continue with page initialization
-                // The main.js and my-tests.js will handle the rest
+                // The test-results.js will handle the rest
             }
             // If user is not authenticated, authChecker will handle redirection
             
         } catch (error) {
             console.error('[My Tests Page] Error during authentication check:', error);
-            authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+            if (window.authChecker) {
+                authChecker.showToast('Lỗi kiểm tra đăng nhập. Vui lòng thử lại', 'error');
+            }
         }
     });
   </script>

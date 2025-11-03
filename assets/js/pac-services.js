@@ -31,7 +31,7 @@ const careerGuidanceServices = [
         icon: 'fas fa-compass',
         image_url: 'assets/img/pic/career-orientation.jpg',
         features: [
-            'Test Holland Code (RIASEC)',
+            'Trắc nghiệm tính cách nghề nghiệp',
             'Đánh giá 6 nhóm nghề nghiệp',
             'Danh sách nghề nghiệp phù hợp',
             'Lộ trình phát triển sự nghiệp'

@@ -101,6 +101,7 @@ RewriteRule ^vnpay-test/?$ test/vnpay-test.html [L]
 # Profile Management pages
 RewriteRule ^my-courses/?$ templates/my-courses.html [L]
 RewriteRule ^my-tests/?$ templates/my-tests.html [L]
+RewriteRule ^read-test-result/?$ templates/read-test-result.html [L]
 RewriteRule ^my-consultations/?$ templates/my-consultations.html [L]
 
 # Course related pages
@@ -110,10 +111,11 @@ RewriteRule ^course-player/?$ templates/course-player.html [L]
 # Consultation related pages
 RewriteRule ^consultation-details/?$ templates/consultation-details.html [L]
 
-# Test route page (for development)
+# Test DEMO (for development)
 RewriteRule ^test-routes/?$ test-routes.html [L]
 RewriteRule ^test-package-detail/?$ test/package-detail-free-test.html [L]
 RewriteRule ^test-api-debug/?$ test-api-debug.html [L]
+RewriteRule ^test-demo-quiz/?$ test-demo/quiz-api-test.html [L]
 
 # Admin pages (with authentication check) - All at root level
 RewriteRule ^admin/?$ templates/admin/login.html [L]

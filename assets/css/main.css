@@ -8820,3 +8820,163 @@ section,
     justify-content: center;
   }
 }
+
+/*--------------------------------------------------------------
+# Test Results Page - Badge Status Styles
+--------------------------------------------------------------*/
+.badge-success {
+  background-color: var(--secondary-color);
+  color: var(--contrast-color);
+}
+
+.badge-warning {
+  background-color: #f59e0b;
+  color: var(--contrast-color);
+}
+
+.badge-info {
+  background-color: #3b82f6;
+  color: var(--contrast-color);
+}
+
+.badge-danger {
+  background-color: #ef4444;
+  color: var(--contrast-color);
+}
+
+.badge-primary {
+  background-color: var(--brand-primary);
+  color: var(--contrast-color);
+}
+
+.badge-secondary {
+  background-color: #6b7280;
+  color: var(--contrast-color);
+}
+
+/*--------------------------------------------------------------
+# Common Page Hero Section
+--------------------------------------------------------------*/
+.page-hero {
+  background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
+  color: var(--contrast-color);
+  padding: 140px 0 80px 0;
+  position: relative;
+  overflow: hidden;
+  margin-top: 20px; /* Account for fixed header */
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('img/banner/banner-1024x507.png') center/cover;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.page-hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+.page-hero .hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  line-height: 1.2;
+  font-family: var(--heading-font);
+  color: #fff5a5; /* Màu vàng nhạt */
+}
+
+.page-hero .hero-subtitle {
+  font-size: 1.3rem;
+  font-weight: 400;
+  margin-bottom: 0;
+  opacity: 0.95;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: var(--default-font);
+  color: var(--contrast-color);
+}
+
+/* Page Hero Responsive */
+@media (max-width: 992px) {
+  .page-hero {
+    padding: 120px 0 60px 0;
+    margin-top: 10px; /* Adjust for smaller screens */
+  }
+  
+  .page-hero .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .page-hero .hero-subtitle {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-hero {
+    padding: 100px 0 50px 0;
+    margin-top: 5px; /* Adjust for smaller screens */
+  }
+  
+  .page-hero .hero-title {
+    font-size: 2rem;
+  }
+  
+  .page-hero .hero-subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .page-hero .hero-title {
+    font-size: 1.8rem;
+  }
+}
+
+/*--------------------------------------------------------------
+# Common Breadcrumb Navigation
+--------------------------------------------------------------*/
+.breadcrumb-nav {
+  background: var(--bg-light, #f8f9fa);
+  padding: 20px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.breadcrumb {
+  margin-bottom: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.breadcrumb .breadcrumb-item {
+  font-size: 0.95rem;
+}
+
+.breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: ">";
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.breadcrumb .breadcrumb-item a {
+  color: var(--brand-primary);
+  text-decoration: none;
+}
+
+.breadcrumb .breadcrumb-item a:hover {
+  color: var(--brand-secondary);
+  text-decoration: underline;
+}
+
+.breadcrumb .breadcrumb-item.active {
+  color: var(--default-color);
+  font-weight: 500;
+}
