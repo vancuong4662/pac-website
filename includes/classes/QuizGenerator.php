@@ -505,6 +505,194 @@ class QuizGenerator {
             throw $e; // Re-throw to ensure force_new fails if cleanup fails
         }
     }
+    
+    /**
+     * Tạo bài thi từ package với cấu hình linh hoạt
+     * 
+     * @param int $userId
+     * @param int $packageId
+     * @param int $productId
+     * @param int $questionCount
+     * @param int $questionsPerGroup
+     * @return array
+     * @throws Exception
+     */
+    public function createExamFromPackage($userId, $packageId, $productId, $questionCount, $questionsPerGroup) {
+        try {
+            // Step 1: Generate question set với số lượng tùy chỉnh
+            $questions = $this->generateQuestionSetCustom($questionCount, $questionsPerGroup);
+            
+            if (empty($questions)) {
+                throw new Exception('Không đủ câu hỏi để tạo bài thi', ERROR_QUESTION_GENERATION_FAILED);
+            }
+            
+            // Step 2: Create exam record với package info
+            $examId = $this->createExamRecordFromPackage($userId, $packageId, $productId, count($questions));
+            
+            // Step 3: Save question assignments
+            $this->saveExamQuestions($examId, $questions);
+            
+            // Step 4: Generate exam code
+            $examCode = $this->generateExamCode($examId);
+            
+            // Step 5: Update exam with code
+            $this->updateExamCode($examId, $examCode);
+            
+            // Step 6: Format response
+            return [
+                'exam_id' => $examId,
+                'exam_code' => $examCode,
+                'package_id' => $packageId,
+                'product_id' => $productId,
+                'total_questions' => count($questions),
+                'questions_per_group' => $questionsPerGroup,
+                'questions' => $this->formatQuestionsForFrontend($questions),
+                'fixed_choices' => HOLLAND_FIXED_CHOICES
+            ];
+            
+        } catch (Exception $e) {
+            error_log("QuizGenerator::createExamFromPackage Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+    /**
+     * Generate question set với số lượng tùy chỉnh
+     * 
+     * @param int $totalQuestions
+     * @param int $questionsPerGroup
+     * @return array
+     */
+    private function generateQuestionSetCustom($totalQuestions, $questionsPerGroup) {
+        $selectedQuestions = [];
+        
+        // Validate that we can create requested distribution
+        $expectedTotal = $questionsPerGroup * count($this->hollandGroups);
+        if ($expectedTotal != $totalQuestions) {
+            error_log("Warning: Question count mismatch. Expected: $expectedTotal, Requested: $totalQuestions");
+        }
+        
+        foreach ($this->hollandGroups as $code) {
+            $groupQuestions = $this->getRandomQuestionsByHollandCode($code, $questionsPerGroup);
+            
+            if (count($groupQuestions) < $questionsPerGroup) {
+                throw new Exception("Không đủ câu hỏi cho nhóm {$code}. Cần {$questionsPerGroup}, có " . count($groupQuestions), ERROR_QUESTION_GENERATION_FAILED);
+            }
+            
+            $selectedQuestions = array_merge($selectedQuestions, $groupQuestions);
+        }
+        
+        // Shuffle để câu hỏi không theo thứ tự nhóm
+        shuffle($selectedQuestions);
+        
+        return $selectedQuestions;
+    }
+    
+    /**
+     * Create exam record với package information
+     * 
+     * @param int $userId
+     * @param int $packageId
+     * @param int $productId
+     * @param int $totalQuestions
+     * @return int exam_id
+     */
+    private function createExamRecordFromPackage($userId, $packageId, $productId, $totalQuestions) {
+        // Determine exam_type from question count (for backward compatibility)
+        $examType = $totalQuestions <= 30 ? QUIZ_TYPE_FREE : QUIZ_TYPE_PAID;
+        
+        $sql = "
+            INSERT INTO quiz_exams (
+                user_id, exam_type, package_id, product_id, total_questions,
+                exam_status, start_time, ip_address, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, NOW())
+        ";
+        
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                $userId,
+                $examType,
+                $packageId,
+                $productId, 
+                $totalQuestions,
+                EXAM_STATUS_IN_PROGRESS,
+                $_SERVER['REMOTE_ADDR'] ?? null
+            ]);
+            
+            $examId = $this->pdo->lastInsertId();
+            
+            if (!$examId) {
+                throw new Exception('Không thể tạo bài thi', ERROR_INTERNAL_SERVER);
+            }
+            
+            return $examId;
+            
+        } catch (PDOException $e) {
+            error_log("Database error in createExamRecordFromPackage: " . $e->getMessage());
+            throw new Exception('Lỗi tạo bài thi', ERROR_INTERNAL_SERVER);
+        }
+    }
+    
+    /**
+     * Get available packages for quiz creation
+     * 
+     * @param int $userId
+     * @return array
+     */
+    public function getAvailablePackages($userId) {
+        $sql = "
+            SELECT 
+                qpd.*,
+                upa.access_type,
+                upa.attempts_used,
+                upa.max_attempts,
+                (upa.max_attempts - upa.attempts_used) as attempts_left
+            FROM quiz_package_details qpd
+            LEFT JOIN user_package_access upa ON qpd.package_id = upa.package_id AND upa.user_id = ?
+            WHERE qpd.package_status = 'active' AND qpd.product_status = 'active'
+            AND (qpd.is_free = 1 OR upa.status = 'active')
+            ORDER BY qpd.is_free DESC, qpd.original_price ASC
+        ";
+        
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$userId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error in getAvailablePackages: " . $e->getMessage());
+            throw new Exception('Lỗi lấy danh sách gói bài thi', ERROR_INTERNAL_SERVER);
+        }
+    }
+    
+    /**
+     * Get exam by package_id and user_id
+     * 
+     * @param int $userId
+     * @param int $packageId
+     * @return array|null
+     */
+    public function getExamByPackage($userId, $packageId) {
+        $sql = "
+            SELECT 
+                qe.*,
+                qpd.package_name,
+                qpd.product_name
+            FROM quiz_exams qe
+            LEFT JOIN quiz_package_details qpd ON qe.package_id = qpd.package_id
+            WHERE qe.user_id = ? AND qe.package_id = ?
+            ORDER BY qe.created_at DESC LIMIT 1
+        ";
+        
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$userId, $packageId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error in getExamByPackage: " . $e->getMessage());
+            return null;
+        }
+    }
 }
 
 ?>

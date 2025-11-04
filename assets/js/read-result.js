@@ -93,6 +93,11 @@ class ResultViewer {
             this.chart.destroy();
         }
 
+        // Calculate dynamic max value based on total questions
+        const totalQuestions = this.resultData.total_questions || 30;
+        const questionsPerGroup = Math.ceil(totalQuestions / 6); // 6 Holland groups
+        const maxScore = questionsPerGroup * 2; // Each question max score is 2
+
         this.chart = new Chart(ctx, {
             type: 'radar',
             data: {
@@ -134,8 +139,8 @@ class ResultViewer {
                 scales: {
                     r: {
                         beginAtZero: true,
-                        max: 10,
-                        stepSize: 1,
+                        max: maxScore,
+                        stepSize: Math.ceil(maxScore / 10),
                         grid: {
                             color: 'rgba(0, 0, 0, 0.1)'
                         },
@@ -146,7 +151,7 @@ class ResultViewer {
                             }
                         },
                         ticks: {
-                            stepSize: 1,
+                            stepSize: Math.ceil(maxScore / 10),
                             font: {
                                 size: 10
                             }
@@ -160,11 +165,16 @@ class ResultViewer {
     renderTendencyRanking(tendencies) {
         const container = document.getElementById('tendency-ranking');
 
+        // Calculate dynamic max value based on total questions
+        const totalQuestions = this.resultData.total_questions || 30;
+        const questionsPerGroup = Math.ceil(totalQuestions / 6); // 6 Holland groups
+        const maxScore = questionsPerGroup * 2; // Each question max score is 2
+
         // Sort by score
         const sorted = Object.entries(tendencies)
             .sort(([, a], [, b]) => b - a)
             .map(([code, score], index) => {
-                const percent = Math.max((score / 10) * 100, 5); // Scale 0-10 to percentage, minimum 5% for visibility
+                const percent = Math.max((score / maxScore) * 100, 5); // Scale based on actual max score, minimum 5% for visibility
 
                 return `
               <div class="tendency-item" data-aos="fade-up" data-aos-delay="${index * 100}">
@@ -175,7 +185,7 @@ class ResultViewer {
                   <div class="flex-grow-1">
                     <div class="d-flex justify-content-between mb-2">
                       <strong>${this.getGroupName(code)}</strong>
-                      <span class="text-primary fw-bold">${score} điểm</span>
+                      <span class="text-primary fw-bold">${score}/${maxScore} điểm</span>
                     </div>
                     <div class="progress" style="height: 8px;">
                       <div class="progress-bar" style="width: ${percent}%; background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));">
@@ -296,10 +306,10 @@ class ResultViewer {
                       <h5 class="group-title">${this.getGroupName(code)}</h5>
                       <div class="score-display">
                         <span class="score-number">${score}</span>
-                        <span class="score-max">/10</span>
+                        <span class="score-max">/${this.getMaxScoreForGroup()}</span>
                       </div>
                       <div class="score-bar">
-                        <div class="score-fill" style="width: ${(score / 10) * 100}%; background: ${this.getGroupColor(code)};"></div>
+                        <div class="score-fill" style="width: ${(score / this.getMaxScoreForGroup()) * 100}%; background: ${this.getGroupColor(code)};"></div>
                       </div>
                     </div>
                   </div>
@@ -1164,6 +1174,13 @@ class ResultViewer {
             'C': 'Nghiệp vụ'
         };
         return names[code] || code;
+    }
+
+    getMaxScoreForGroup() {
+        // Calculate max score based on total questions
+        const totalQuestions = this.resultData.total_questions || 30;
+        const questionsPerGroup = Math.ceil(totalQuestions / 6); // 6 Holland groups
+        return questionsPerGroup * 2; // Each question max score is 2
     }
 
     getGroupDescription(code) {

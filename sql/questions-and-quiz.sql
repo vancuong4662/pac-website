@@ -14857,13 +14857,49 @@ INSERT INTO questions (question_id, question_text, holland_code, category) VALUE
 ('Q059', 'Tôi thích môi trường làm việc ổn định', 'C', 'interests'),
 ('Q060', 'Tôi giỏi sử dụng máy tính văn phòng', 'C', 'activities');
 
+-- =====================================================
+-- PHẦN 2: SETUP QUIZ PACKAGE SYSTEM DATA
+-- =====================================================
+
+-- 1. Insert quiz package configurations
+-- Lấy package_id và product_id từ sample-data.sql
+INSERT INTO quiz_package_configs (
+    package_id, product_id, question_count, questions_per_group, 
+    time_limit_minutes, max_attempts, report_type, features
+) VALUES
+-- Package 1: Gói Miễn phí (30 câu hỏi) - product "Hướng nghiệp trực tuyến"
+(1, 1, 30, 5, 0, 999, 'basic',
+ JSON_OBJECT('detailed_analysis', false, 'career_suggestions', true, 'report_pages', 5)),
+
+-- Package 2: Gói Tăng tốc (120 câu hỏi) - product "Hướng nghiệp trực tuyến"  
+(2, 1, 120, 20, 0, 999, 'premium', 
+ JSON_OBJECT('detailed_analysis', true, 'career_suggestions', true, 'report_pages', 25)),
+
+-- Package 3: Custom package (60 câu hỏi) - for testing flexibility
+(3, 1, 60, 10, 45, 999, 'standard',
+ JSON_OBJECT('detailed_analysis', true, 'career_suggestions', true, 'report_pages', 15))
+
+ON DUPLICATE KEY UPDATE 
+question_count = VALUES(question_count),
+questions_per_group = VALUES(questions_per_group),
+max_attempts = 999,  -- Unlimited attempts for all users
+features = VALUES(features);
+
 -- 2. Setup default user limits cho tài khoản có sẵn
 -- Sử dụng user_id từ sample-data.sql (id=2 là customer@example.com)
 INSERT INTO quiz_user_limits (user_id) 
-SELECT id FROM users WHERE email = 'customer@example.com'
+SELECT id FROM users WHERE email IN ('customer@example.com', 'admin@pac.edu.vn')
+ON DUPLICATE KEY UPDATE user_id = user_id;
+-- Sử dụng user_id từ sample-data.sql (id=2 là customer@example.com)
+INSERT INTO quiz_user_limits (user_id) 
+SELECT id FROM users WHERE email IN ('customer@example.com', 'admin@pac.edu.vn')
 ON DUPLICATE KEY UPDATE user_id = user_id;
 
--- 3. Verify data đã insert thành công
+-- =====================================================
+-- PHẦN 3: VERIFICATION QUERIES
+-- =====================================================
+
+-- Verify questions data
 SELECT 'Quiz questions inserted successfully!' as status;
 
 SELECT 
@@ -14878,14 +14914,36 @@ WHERE is_active = 1
 GROUP BY holland_code
 ORDER BY holland_code;
 
--- 4. Kiểm tra user setup
+-- Verify package configurations
+SELECT 'Quiz package configs setup successfully!' as status;
+
 SELECT 
-    u.id, 
-    u.fullname, 
-    u.email,
-    CASE WHEN qul.user_id IS NOT NULL THEN 'Quiz limits created' ELSE 'No quiz limits' END as quiz_status
-FROM users u
-LEFT JOIN quiz_user_limits qul ON u.id = qul.user_id
-WHERE u.email IN ('admin@pac.edu.vn', 'customer@example.com');
+    qpc.*,
+    p.name as product_name,
+    pp.package_name,
+    pp.is_free,
+    pp.original_price,
+    pp.sale_price
+FROM quiz_package_configs qpc
+JOIN products p ON qpc.product_id = p.id
+JOIN product_packages pp ON qpc.package_id = pp.id
+ORDER BY qpc.question_count;
+
+-- Verify user access
+SELECT 'All users have equal access to all packages!' as status;
+
+-- Test package configurations available to everyone
+SELECT 
+    qpc.*,
+    p.name as product_name,
+    pp.package_name,
+    pp.is_free,
+    pp.original_price,
+    pp.sale_price,
+    'Available to all users' as access_note
+FROM quiz_package_configs qpc
+JOIN products p ON qpc.product_id = p.id
+JOIN product_packages pp ON qpc.package_id = pp.id
+ORDER BY qpc.question_count;
 
 SELECT 'Sample quiz data setup complete!' as final_status;

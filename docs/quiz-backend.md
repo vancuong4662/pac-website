@@ -23,11 +23,12 @@
 The Quiz Backend System implements a complete Holland Code (RIASEC) personality assessment platform with the following key features:
 
 - **Holland Code Assessment**: 6 personality groups (Realistic, Investigative, Artistic, Social, Enterprising, Conventional)
-- **Dual Exam Types**: FREE (30 questions) and PAID (120 questions)
+- **Package-based Quiz System**: Flexible question counts based on purchased packages
 - **Question Randomization**: Dynamic question selection per exam session
 - **Fixed Choice System**: 3-point Likert scale (0=Disagree, 1=Neutral, 2=Agree)
 - **Real-time Progress Tracking**: Session-based exam state management
 - **Comprehensive Result Calculation**: RIASEC scoring with personality group analysis
+- **Access Control**: Integration with product/package system for user access management
 
 ### System Architecture
 
@@ -41,7 +42,32 @@ The Quiz Backend System implements a complete Holland Code (RIASEC) personality 
                        │   Core Classes  │
                        │ (QuizGenerator) │
                        └─────────────────┘
+                                │
+                       ┌─────────────────┐
+                       │ Package System  │
+                       │ (Products/Cart) │
+                       └─────────────────┘
 ```
+
+### Package Integration
+
+The quiz system is now fully integrated with the product/package system with **simplified access control**:
+- **Dynamic Question Counts**: Based on package configuration (30, 60, 120, etc.)
+- **Open Access**: All users can access all packages equally
+- **No Purchase Requirements**: All packages available to all users
+- **Unlimited Attempts**: All users have unlimited attempts for all packages  
+- **Report Types**: Different report quality based on package tier (basic, standard, premium)
+- **Access Code Integration**: Support for purchased package access codes
+- **Multiple Entry Points**: access_code, package_id, and legacy exam_type support
+
+### Recent Updates (November 2024)
+
+- ✅ **Access Code API**: `get-package-by-access-code.php` for access_code → package_id mapping
+- ✅ **Database Connection Fix**: Resolved DB_HOST constant issues in package APIs
+- ✅ **Simplified Access Control**: Removed user_package_access complexity
+- ✅ **Frontend Integration**: Quiz.html supports all three initialization methods
+- ✅ **Response Structure Enhancement**: Consistent API responses across package and legacy systems
+- ✅ **120-Question Quiz Support**: Tested and validated for premium packages
 
 ---
 
@@ -55,20 +81,47 @@ CREATE TABLE quiz_exams (
     id INT PRIMARY KEY AUTO_INCREMENT,
     exam_code VARCHAR(20) UNIQUE NOT NULL,           -- EX20251101_ABC123
     user_id INT NOT NULL,
-    exam_type TINYINT NOT NULL,                      -- 0=Free, 1=Paid
+    exam_type TINYINT NOT NULL,                      -- 0=Free, 1=Paid (backward compatibility)
+    package_id INT NULL,                             -- Link to product_packages
+    product_id INT NULL,                             -- Link to products
     exam_status TINYINT DEFAULT 0,                   -- 0=Draft, 1=Completed
-    total_questions INT NOT NULL,                    -- 30 or 120
+    total_questions INT NOT NULL,                    -- Dynamic based on package
     answered_questions INT DEFAULT 0,
     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     end_time TIMESTAMP NULL,
     time_limit INT DEFAULT 0,                        -- 0 = unlimited
     ip_address VARCHAR(45) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    INDEX idx_quiz_exams_package_id (package_id),
+    INDEX idx_quiz_exams_product_id (product_id),
+    INDEX idx_quiz_exams_user_package (user_id, package_id)
 );
 ```
 
-#### 2. `quiz_answers` - User Responses
+#### 2. `quiz_package_configs` - Package Quiz Configuration
+```sql
+CREATE TABLE quiz_package_configs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    package_id INT NOT NULL,
+    product_id INT NOT NULL,
+    question_count INT NOT NULL DEFAULT 30,          -- Questions per exam
+    questions_per_group INT NOT NULL DEFAULT 5,      -- Questions per Holland group
+    time_limit_minutes INT DEFAULT 0,                -- Time limit (0 = unlimited)
+    max_attempts INT DEFAULT 999,                    -- Unlimited attempts for all users
+    allow_review BOOLEAN DEFAULT TRUE,
+    report_type ENUM('basic', 'standard', 'premium') DEFAULT 'basic',
+    features JSON NULL,                              -- Additional features config
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE KEY unique_package (package_id),
+    INDEX idx_config_product_id (product_id)
+);
+```
+
+#### 3. `quiz_answers` - User Responses
 ```sql
 CREATE TABLE quiz_answers (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -83,7 +136,7 @@ CREATE TABLE quiz_answers (
 );
 ```
 
-#### 3. `quiz_results` - Holland Code Results
+#### 4. `quiz_results` - Holland Code Results
 ```sql
 CREATE TABLE quiz_results (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -104,7 +157,7 @@ CREATE TABLE quiz_results (
 );
 ```
 
-#### 4. `questions` - Question Bank
+#### 5. `questions` - Question Bank
 ```sql
 CREATE TABLE questions (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -236,9 +289,158 @@ $questions = $this->pdo->prepare("
 
 ## API Endpoints
 
-### 1. `POST /api/quiz/create-exam.php`
+### Package-based Quiz APIs
 
-**Purpose**: Create new exam session with randomized questions
+#### 1. `POST /api/quiz/create-exam-from-package.php`
+
+**Purpose**: Create new exam session from package configuration
+
+**Request**:
+```json
+{
+    "package_id": 2,
+    "force_new": false
+}
+```
+
+**Response**:
+```json
+{
+    "status": "success",
+    "message": "Tạo bài thi thành công",
+    "data": {
+        "exam_info": {
+            "exam_id": "5",
+            "exam_code": "EX20251104_27E638",
+            "package_id": 2,
+            "product_id": 1,
+            "total_questions": 120,
+            "questions_per_group": 20,
+            "questions": [
+                {
+                    "id": "462",
+                    "question_number": 1,
+                    "question_text": "Bạn thích khám phá các ý tưởng",
+                    "category": "activities",
+                    "choices": [
+                        {"value": 0, "text": "Không đồng ý", "points": 0},
+                        {"value": 1, "text": "Bình thường", "points": 1},
+                        {"value": 2, "text": "Đồng ý", "points": 2}
+                    ],
+                    "holland_code": null
+                }
+                // ... additional 119 questions
+            ]
+        }
+    }
+}
+```
+
+**Error Responses**:
+- `404`: Package not found
+- `409`: Existing incomplete exam (error_code: 460)
+
+#### 2. `GET /api/packages/get-package-by-access-code.php`
+
+**Purpose**: Map access_code from purchased packages to package_id
+
+**Request**: `GET ?access_code=TST_1_1762219141_2`
+
+**Response**:
+```json
+{
+    "status": "success",
+    "message": "Tìm thấy thông tin gói",
+    "data": {
+        "package_id": 2,
+        "product_id": 1,
+        "access_code": "TST_1_1762219141_2",
+        "package_name": "Gói Tăng tốc",
+        "question_count": 120,
+        "time_limit_minutes": 0,
+        "max_attempts": 999,
+        "report_type": "premium",
+        "package_config": {
+            "questions_per_group": 20,
+            "features": {},
+            "allow_review": true
+        }
+    }
+}
+```
+
+**Error Responses**:
+- `404`: Access code not found
+- `410`: Access code expired
+
+**Implementation Notes**:
+- Queries `purchased_packages` table for access_code mapping
+- Returns package configuration for quiz creation
+- Includes package features and limitations
+
+#### 2. `GET /api/quiz/available-packages.php`
+
+**Purpose**: Get list of quiz packages available to user
+
+**Parameters**: 
+- `?product_type=career_test` (optional)
+- `?include_purchased=true` (optional)
+- `?include_free=true` (optional)
+
+**Response**:
+```json
+{
+    "status": "success",
+    "data": {
+        "packages": [
+            {
+                "package_id": 1,
+                "package_name": "Gói Miễn phí",
+                "question_count": 30,
+                "is_free": true,
+                "access_type": "free",
+                "attempts_left": 3,
+                "can_access": true,
+                "has_incomplete_exam": false,
+                "actions": {
+                    "start_quiz_url": "/quiz?package_id=1",
+                    "detail_url": "/package-detail?id=1"
+                }
+            },
+            {
+                "package_id": 2,
+                "package_name": "Gói Tăng tốc",
+                "question_count": 120,
+                "is_free": false,
+                "final_price": 1975000,
+                "access_type": "open_access",
+                "attempts_left": 999,
+                "can_access": true,
+                "has_incomplete_exam": true,
+                "latest_exam": {
+                    "exam_code": "EX20251101_DEF456",
+                    "progress": "45/120"
+                },
+                "actions": {
+                    "continue_quiz_url": "/quiz?exam_code=EX20251101_DEF456",
+                    "detail_url": "/package-detail?id=2"
+                }
+            }
+        ],
+        "summary": {
+            "total_packages": 2,
+            "all_packages_accessible": true,
+            "incomplete_exams": 1
+        }
+    }
+}
+```
+
+### Legacy APIs (Backward Compatibility)
+
+#### 3. `POST /api/quiz/create-exam.php`
+
+**Purpose**: Create exam with hardcoded FREE/PAID types (legacy)
 
 **Request**:
 ```json
@@ -248,47 +450,33 @@ $questions = $this->pdo->prepare("
 }
 ```
 
-**Response**:
+**Note**: Still supported for backward compatibility, but new implementations should use `create-exam-from-package.php`
+
+#### 4. `GET /api/quiz/get-questions.php`
+
+**Purpose**: Retrieve questions for existing exam session
+
+**Parameters**: `?exam_id=123` or `?exam_code=EX20251101_ABC123`
+
+**Enhanced Response** (now includes package info):
 ```json
 {
     "status": "success",
     "data": {
         "exam_id": 123,
         "exam_code": "EX20251101_ABC123",
-        "exam_type": 0,
-        "total_questions": 30,
-        "questions": [
-            {
-                "id": "R001",
-                "question_text": "Tôi thích làm việc với máy móc và công cụ",
-                "choices": [
-                    {"value": 0, "text": "Không đồng ý"},
-                    {"value": 1, "text": "Bình thường"},
-                    {"value": 2, "text": "Đồng ý"}
-                ]
-            }
-        ],
-        "fixed_choices": {
-            "0": "Không đồng ý",
-            "1": "Bình thường", 
-            "2": "Đồng ý"
-        }
+        "questions": [...],
+        "fixed_choices": {...},
+        "package_info": {
+            "package_id": 2,
+            "package_name": "Gói Tăng tốc",
+            "question_count": 120,
+            "report_type": "premium"
+        },
+        "existing_answers": {...}
     }
 }
 ```
-
-**Error Responses**:
-- `460`: Existing incomplete exam found
-- `461`: Invalid exam type
-- `462`: Question generation failed
-
-### 2. `GET /api/quiz/get-questions.php`
-
-**Purpose**: Retrieve questions for existing exam session
-
-**Parameters**: `?exam_id=123`
-
-**Response**: Same format as create-exam endpoint
 
 ### 3. `POST /api/quiz/submit-quiz.php`
 
@@ -554,21 +742,103 @@ if (DEBUG_MODE) {
 ## Integration Points
 
 ### Frontend Integration
-- See `quiz-frontend.md` for client-side implementation
-- AJAX-based communication with APIs
-- Real-time progress tracking
-- Error handling and user feedback
+
+The quiz system now supports comprehensive access method integration:
+
+#### Access Code Integration (Recommended)
+```javascript
+// 1. Frontend detects access_code URL parameter
+const accessCode = urlParams.get('access_code'); // TST_1_1762219141_2
+
+// 2. Frontend calls package lookup API
+const packageData = await fetch(`/api/packages/get-package-by-access-code.php?access_code=${accessCode}`);
+
+// 3. Frontend creates quiz with found package_id
+const response = await fetch('/api/quiz/create-exam-from-package.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ package_id: packageData.package_id })
+});
+
+// 4. Frontend processes enhanced response structure
+// Response includes exam_info.exam_id instead of just exam_id
+this.examId = response.data.exam_info.exam_id;
+this.questions = response.data.exam_info.questions; // 120 questions included
+```
+
+#### Package ID Integration (Direct)
+```javascript
+// Direct package access
+const packageId = urlParams.get('package_id'); // 2
+const response = await fetch('/api/quiz/create-exam-from-package.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ package_id: parseInt(packageId) })
+});
+```
+
+#### Legacy Integration (Backward Compatible)
+```javascript
+// Old method still works
+const response = await fetch('/api/quiz/create-exam.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ exam_type: 'FREE' })
+});
+```
+
+#### Database Connection Fixes Applied
+
+**Issue**: Package APIs were failing with "Undefined constant DB_HOST" errors
+
+**Solution**: Replaced hardcoded database connection with `db-pdo.php` inclusion:
+
+```php
+// Before (Failed)
+$dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME;
+$pdo = new PDO($dsn, DB_USER, DB_PASS);
+
+// After (Fixed)  
+require_once '../config/db-pdo.php';
+// $pdo is now available from db-pdo.php
+
+// Applied to:
+// - api/packages/get-package-by-access-code.php  
+// - api/quiz/create-exam-from-package.php
+```
+
+#### Response Structure Compatibility
+
+**Frontend Enhancement**: Quiz frontend now handles both response structures:
+
+```javascript
+// Package-based response (new)
+if (data.data.exam_info && data.data.exam_info.exam_id) {
+    this.examId = data.data.exam_info.exam_id;
+    this.questions = data.data.exam_info.questions;
+}
+// Legacy response (backward compatible)
+else if (data.data.exam_id) {
+    this.examId = data.data.exam_id;
+    this.questions = data.data.questions;
+}
+```
 
 ### Result Display
 - See `read-test-result-system.md` for result rendering
 - See `personality-images-integration.md` for visual assets
 - Holland Code personality group mapping
 - Career suggestion algorithms
+- Enhanced result features based on package tier
 
 ### Shopping Cart Integration
-- Exam type determination based on purchased packages
-- User access level validation
-- Payment verification for PAID exams
+- **Package-based Access**: Quiz creation validates user's package access
+- **Purchase Integration**: Links with order system for paid packages
+- **Free Package Access**: Automatic access to free packages with attempt limits
+- **Access Expiration**: Time-based access control for trial/subscription packages
 
 ---
 
@@ -581,6 +851,10 @@ if (DEBUG_MODE) {
 4. **API Versioning**: v2 endpoints with enhanced features
 5. **Caching Layer**: Redis integration for performance
 6. **Real-time Sync**: WebSocket-based progress updates
+7. **Custom Package Creation**: Admin interface for creating quiz packages
+8. **Bulk User Access**: Admin tools for granting package access
+9. **Package Analytics**: Detailed usage statistics per package
+10. **Dynamic Pricing**: Time-based and user-based pricing strategies
 
 ### Technical Debt
 1. Refactor `QuizGenerator` into smaller, focused classes
@@ -588,9 +862,56 @@ if (DEBUG_MODE) {
 3. Add comprehensive unit tests
 4. Standardize error response formats
 5. Optimize database queries for large datasets
+6. Create migration scripts for existing quiz data
+7. Implement package access caching for performance
+8. Add comprehensive API documentation with examples
+
+### Completed Enhancements (November 2024)
+
+✅ **Access Code Integration**: 
+- `get-package-by-access-code.php` API implemented
+- Frontend support for `?access_code=TST_1_1762219141_2` URLs
+- Seamless integration with purchased package flow
+
+✅ **Database Connection Standardization**:
+- Fixed "Undefined constant DB_HOST" errors in package APIs
+- Standardized `db-pdo.php` usage across all quiz endpoints
+- Consistent database connection handling
+
+✅ **Response Structure Enhancement**:
+- Frontend compatibility with both package and legacy response formats
+- Proper handling of nested `exam_info` structures
+- Dynamic question count updates (30/120/etc.)
+
+✅ **Simplified Access Control**:
+- Removed complex `user_package_access` table
+- Open access model for all packages
+- Unlimited attempts for all users
+
+✅ **Full Testing and Validation**:
+- 120-question quiz functionality verified
+- Access code to package mapping tested
+- Submit and result flow validated
+
+### Migration Notes
+
+For existing installations:
+1. **Database Migration**: Run `sql/quiz-package-integration.sql` to add new tables and columns
+2. **Data Migration**: Update existing `quiz_exams` records to link with packages
+3. **API Updates**: Gradually migrate from legacy `create-exam.php` to `create-exam-from-package.php`
+4. **Frontend Updates**: Update quiz initialization to support package-based flow
+5. **Testing**: Verify all quiz functionality works with package system
+6. **Access Code Setup**: Configure `purchased_packages` table with access codes
+7. **Database Connection**: Ensure all APIs use standardized `db-pdo.php` connection method
 
 ---
 
 **Last Updated**: November 2024  
-**Version**: 1.0  
+**Version**: 2.0 - Package Integration  
 **Author**: PAC Development Team
+
+**Related Files**:
+- `sql/quiz-package-integration.sql` - Database migration script
+- `api/quiz/create-exam-from-package.php` - New package-based quiz creation
+- `api/quiz/available-packages.php` - Package listing and access validation
+- `assets/js/package-quiz-integration.js` - Frontend integration examples

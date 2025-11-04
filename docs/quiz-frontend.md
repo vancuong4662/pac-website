@@ -47,6 +47,56 @@ Frontend Layer:
 └── YouTube iframe API (Video integration)
 ```
 
+### Package Integration Updates (November 2024)
+
+The quiz system has been enhanced with comprehensive package integration and result display improvements:
+
+- **Access Code Support**: Direct quiz access via purchased package access codes
+- **Dynamic Question Counts**: 30, 60, 120+ questions based on package configuration  
+- **Open Access Model**: All packages accessible to all users (simplified access control)
+- **Multiple Entry Points**: Support for access_code, package_id, and default quiz URLs
+- **Backward Compatibility**: Legacy quiz APIs still functional alongside new package system
+- **Dynamic Result Display**: Radar charts and progress bars automatically scale to match quiz length
+- **Adaptive Scoring**: Result visualization adapts to different question counts (30/120/etc.)
+
+### Result Page Integration Updates
+
+The result display system (`read-test-result.html`) has been enhanced to properly handle different quiz lengths:
+
+#### Dynamic Radar Chart Scaling
+```javascript
+// Calculate dynamic max value based on total questions
+const totalQuestions = this.resultData.total_questions || 30;
+const questionsPerGroup = Math.ceil(totalQuestions / 6); // 6 Holland groups
+const maxScore = questionsPerGroup * 2; // Each question max score is 2
+
+// Radar chart automatically scales to actual question count
+this.chart = new Chart(ctx, {
+    options: {
+        scales: {
+            r: {
+                max: maxScore, // Dynamic instead of fixed 10
+                stepSize: Math.ceil(maxScore / 10)
+            }
+        }
+    }
+});
+```
+
+#### Adaptive Progress Indicators
+```javascript
+// Progress bars scale to actual max possible score
+const percent = Math.max((score / maxScore) * 100, 5);
+
+// Score display shows actual max for each group  
+<span class="score-max">/${this.getMaxScoreForGroup()}</span>
+```
+
+This ensures that:
+- **30-question quizzes**: Show scores like "8/10" per Holland group
+- **120-question quizzes**: Show scores like "32/40" per Holland group  
+- **Any quiz length**: Radar chart and progress bars scale appropriately
+
 ---
 
 ## Architecture
@@ -133,53 +183,203 @@ async initializeTest() {
 
 ---
 
-## API Integration
+## Package Integration and Access Methods
+
+### URL Parameter Support
+
+The quiz system supports multiple entry methods for enhanced flexibility:
+
+#### 1. Access Code Method (Recommended)
+```
+URL: /test-quiz?access_code=TST_1_1762219141_2
+Purpose: Direct access from purchased packages
+Process: access_code → package_id lookup → quiz creation
+Benefits: Seamless integration with purchase flow
+```
+
+#### 2. Package ID Method
+```
+URL: /test-quiz?package_id=2
+Purpose: Direct package-based quiz access
+Process: package_id → quiz configuration → quiz creation
+Benefits: Simple package testing and development
+```
+
+#### 3. Default Method (Fallback)
+```
+URL: /test-quiz
+Purpose: Standard free quiz
+Process: Default FREE quiz (30 questions)
+Benefits: Backward compatibility and simple access
+```
+
+### Implementation Flow
+
+```javascript
+// URL parameter detection and routing
+const urlParams = new URLSearchParams(window.location.search);
+const accessCode = urlParams.get('access_code');
+const packageId = urlParams.get('package_id');
+
+// Access code flow (highest priority)
+if (accessCode) {
+    // 1. Find package via access_code lookup
+    const packageData = await getPackageByAccessCode(accessCode);
+    // 2. Create quiz with found package_id
+    const exam = await createExamFromPackage(packageData.package_id);
+}
+// Package ID flow (medium priority)  
+else if (packageId) {
+    // Direct package-based quiz creation
+    const exam = await createExamFromPackage(packageId);
+}
+// Default flow (lowest priority)
+else {
+    // Legacy free quiz
+    const exam = await createExam('FREE');
+}
+```
+
+### Response Structure Handling
+
+The frontend now handles two different API response structures:
+
+#### Package-based Response Structure
+```json
+{
+    "data": {
+        "exam_info": {
+            "exam_id": "5",
+            "package_id": 2,
+            "total_questions": 120,
+            "questions": [...]
+        }
+    }
+}
+```
+
+#### Legacy Response Structure  
+```json
+{
+    "data": {
+        "exam_id": "5",
+        "questions": [...]
+    }
+}
+```
+
+### Error Handling and Fallbacks
+
+```javascript
+// Graceful degradation when access_code fails
+if (accessCode) {
+    try {
+        const packageData = await getPackageByAccessCode(accessCode);
+        // Success: Use package-based quiz
+    } catch (error) {
+        console.warn('⚠️ Access code failed, falling back to FREE');
+        // Fallback: Use default free quiz
+        apiEndpoint = 'api/quiz/create-exam.php';
+        requestBody = { exam_type: 'FREE' };
+    }
+}
+```
 
 ### 1. Create Exam Session
 
 ```javascript
-async createExamSession() {
-    let response = await fetch('api/quiz/create-exam.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',    // Include session cookies
-        body: JSON.stringify({
-            exam_type: 'FREE'      // FREE (30 questions) or PAID (120 questions)
-        })
-    });
-    
-    let data = JSON.parse(await response.text());
-    
-    // Handle existing incomplete exam (Error 460)
-    if (!response.ok && data.error_code === 460) {
-        // Retry with force_new to clear existing exam
-        response = await fetch('api/quiz/create-exam.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({
-                exam_type: 'FREE',
-                force_new: true     // Clear existing incomplete exam
-            })
-        });
-    }
-    
-    if (response.ok && data.status === 'success') {
-        this.examId = data.data.exam_id;
-        
-        // Questions may be included in response (optimization)
-        if (data.data.questions && data.data.questions.length > 0) {
-            this.questions = data.data.questions;
-            this.fixedChoices = data.data.fixed_choices || [];
-            
-            // Update UI with actual question count
-            document.getElementById('totalQuestions').textContent = this.questions.length;
-            document.getElementById('remainingCount').textContent = this.questions.length;
-        }
-    }
-}
+            async createExamSession() {
+                try {
+                    console.log('🔄 Creating exam session...');
+                    
+                    // Check URL parameters for quiz type
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const accessCode = urlParams.get('access_code');     // From purchased packages
+                    const packageId = urlParams.get('package_id');       // Direct package access
+                    
+                    let requestBody, apiEndpoint;
+                    
+                    if (accessCode) {
+                        // Method 1: Access code from purchased package
+                        console.log('🔍 Finding package for access_code:', accessCode);
+                        
+                        const packageResponse = await fetch(`api/packages/get-package-by-access-code.php?access_code=${accessCode}`, {
+                            method: 'GET',
+                            credentials: 'include'
+                        });
+                        
+                        if (packageResponse.ok) {
+                            const packageData = await packageResponse.json();
+                            if (packageData.status === 'success' && packageData.data.package_id) {
+                                console.log('✅ Found package:', packageData.data.package_id);
+                                apiEndpoint = 'api/quiz/create-exam-from-package.php';
+                                requestBody = { package_id: packageData.data.package_id };
+                            } else {
+                                throw new Error('Không tìm thấy gói từ access_code');
+                            }
+                        } else {
+                            console.warn('⚠️ Could not find package from access_code, falling back to FREE');
+                            apiEndpoint = 'api/quiz/create-exam.php';
+                            requestBody = { exam_type: 'FREE' };
+                        }
+                    } else if (packageId) {
+                        // Method 2: Direct package ID
+                        console.log('📦 Using package_id from URL:', packageId);
+                        apiEndpoint = 'api/quiz/create-exam-from-package.php';
+                        requestBody = { package_id: parseInt(packageId) };
+                    } else {
+                        // Method 3: Default free quiz
+                        console.log('🆓 Using default FREE quiz');
+                        apiEndpoint = 'api/quiz/create-exam.php';
+                        requestBody = { exam_type: 'FREE' };
+                    }
+                    
+                    // Create exam session
+                    let response = await fetch(apiEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    // Handle incomplete exam retry
+                    if (!response.ok && data.error_code === 460) {
+                        requestBody.force_new = true;
+                        response = await fetch(apiEndpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify(requestBody)
+                        });
+                    }
+                    
+                    // Process response with different structures
+                    if (response.ok && data.status === 'success') {
+                        // Handle package-based response structure
+                        if (data.data.exam_info && data.data.exam_info.exam_id) {
+                            this.examId = data.data.exam_info.exam_id;
+                            if (data.data.exam_info.questions && data.data.exam_info.questions.length > 0) {
+                                this.questions = data.data.exam_info.questions;
+                                this.updateQuestionCount();
+                                return; // Skip separate get-questions call
+                            }
+                        } 
+                        // Handle legacy response structure
+                        else if (data.data.exam_id) {
+                            this.examId = data.data.exam_id;
+                            if (data.data.questions && data.data.questions.length > 0) {
+                                this.questions = data.data.questions;
+                                this.updateQuestionCount();
+                                return; // Skip separate get-questions call
+                            }
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Error creating exam session:', error);
+                    throw error;
+                }
+            }
 ```
 
 ### 2. Load Questions (Fallback)

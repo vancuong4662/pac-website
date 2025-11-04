@@ -1028,15 +1028,59 @@
                 try {
                     console.log('🔄 Creating exam session...');
                     
-                    let response = await fetch('api/quiz/create-exam.php', {
+                    // Check if we have an access_code in URL (from purchased package)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const accessCode = urlParams.get('access_code');
+                    const packageId = urlParams.get('package_id');
+                    
+                    let requestBody, apiEndpoint;
+                    
+                    if (accessCode) {
+                        // Find package_id from access_code via purchased_packages
+                        console.log('🔍 Finding package for access_code:', accessCode);
+                        
+                        const packageResponse = await fetch(`api/packages/get-package-by-access-code.php?access_code=${accessCode}`, {
+                            method: 'GET',
+                            credentials: 'include'
+                        });
+                        
+                        if (packageResponse.ok) {
+                            const packageData = await packageResponse.json();
+                            if (packageData.status === 'success' && packageData.data.package_id) {
+                                console.log('✅ Found package:', packageData.data.package_id);
+                                apiEndpoint = 'api/quiz/create-exam-from-package.php';
+                                requestBody = {
+                                    package_id: packageData.data.package_id
+                                };
+                            } else {
+                                throw new Error('Không tìm thấy gói từ access_code');
+                            }
+                        } else {
+                            console.warn('⚠️ Could not find package from access_code, falling back to FREE');
+                            apiEndpoint = 'api/quiz/create-exam.php';
+                            requestBody = { exam_type: 'FREE' };
+                        }
+                    } else if (packageId) {
+                        // Direct package_id from URL
+                        console.log('📦 Using package_id from URL:', packageId);
+                        apiEndpoint = 'api/quiz/create-exam-from-package.php';
+                        requestBody = {
+                            package_id: parseInt(packageId)
+                        };
+                    } else {
+                        // Default to FREE quiz
+                        console.log('🆓 Using default FREE quiz');
+                        apiEndpoint = 'api/quiz/create-exam.php';
+                        requestBody = { exam_type: 'FREE' };
+                    }
+                    
+                    let response = await fetch(apiEndpoint, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         credentials: 'include',
-                        body: JSON.stringify({
-                            exam_type: 'FREE'
-                        })
+                        body: JSON.stringify(requestBody)
                     });
                     
                     console.log('Response status:', response.status);
@@ -1055,16 +1099,16 @@
                     if (!response.ok && data.error_code === 460) {
                         console.log('🔄 Incomplete exam found, trying with force_new...');
                         
-                        response = await fetch('api/quiz/create-exam.php', {
+                        // Add force_new to the existing request body
+                        requestBody.force_new = true;
+                        
+                        response = await fetch(apiEndpoint, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             credentials: 'include',
-                            body: JSON.stringify({
-                                exam_type: 'FREE',
-                                force_new: true
-                            })
+                            body: JSON.stringify(requestBody)
                         });
                         
                         console.log('Force new response status:', response.status);
@@ -1080,21 +1124,42 @@
                     }
                     
                     if (response.ok && data.status === 'success') {
-                        this.examId = data.data.exam_id;
-                        console.log('✅ Exam session created:', this.examId);
-                        
-                        // If response includes questions, use them directly
-                        if (data.data.questions && data.data.questions.length > 0) {
-                            this.questions = data.data.questions;
-                            this.fixedChoices = data.data.fixed_choices || [];
+                        // Handle different response structures
+                        if (data.data.exam_info && data.data.exam_info.exam_id) {
+                            // Package-based exam response structure
+                            this.examId = data.data.exam_info.exam_id;
                             
-                            // Update UI with actual question count
-                            document.getElementById('totalQuestions').textContent = this.questions.length;
-                            document.getElementById('remainingCount').textContent = this.questions.length;
+                            // Questions are nested under exam_info
+                            if (data.data.exam_info.questions && data.data.exam_info.questions.length > 0) {
+                                this.questions = data.data.exam_info.questions;
+                                this.fixedChoices = data.data.fixed_choices || [];
+                                
+                                // Update UI with actual question count
+                                document.getElementById('totalQuestions').textContent = this.questions.length;
+                                document.getElementById('remainingCount').textContent = this.questions.length;
+                                
+                                console.log('✅ Questions loaded from package exam response:', this.questions.length);
+                                return; // Skip separate get-questions call
+                            }
+                        } else if (data.data.exam_id) {
+                            // Regular exam response structure
+                            this.examId = data.data.exam_id;
                             
-                            console.log('✅ Questions loaded from create-exam response:', this.questions.length);
-                            return; // Skip separate get-questions call
+                            // If response includes questions, use them directly
+                            if (data.data.questions && data.data.questions.length > 0) {
+                                this.questions = data.data.questions;
+                                this.fixedChoices = data.data.fixed_choices || [];
+                                
+                                // Update UI with actual question count
+                                document.getElementById('totalQuestions').textContent = this.questions.length;
+                                document.getElementById('remainingCount').textContent = this.questions.length;
+                                
+                                console.log('✅ Questions loaded from regular exam response:', this.questions.length);
+                                return; // Skip separate get-questions call
+                            }
                         }
+                        
+                        console.log('✅ Exam session created:', this.examId);
                     } else {
                         throw new Error(data.message || `HTTP ${response.status}: ${responseText}`);
                     }

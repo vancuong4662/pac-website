@@ -15,9 +15,10 @@
 -- Xóa tất cả các bảng (theo thứ tự ngược lại để tránh lỗi foreign key)
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Drop quiz system tables (new)
+-- Drop quiz system tables (new - package integration)
 DROP TABLE IF EXISTS quiz_suggested_jobs;
 DROP TABLE IF EXISTS quiz_fraud_logs;
+DROP TABLE IF EXISTS quiz_package_configs;
 DROP TABLE IF EXISTS quiz_user_limits;
 DROP TABLE IF EXISTS quiz_results;
 DROP TABLE IF EXISTS quiz_answers;
@@ -123,19 +124,24 @@ CREATE TABLE questions (
 COMMENT='Bảng câu hỏi trắc nghiệm Holland Code để đánh giá hướng nghiệp';
 
 -- =====================================================
--- PHẦN 2A: QUIZ SYSTEM TABLES (TRIỂN KHAI MỚI)
+-- PHẦN 2A: QUIZ SYSTEM TABLES - PACKAGE INTEGRATION
 -- =====================================================
 
--- Bảng quiz_exams: Quản lý bài thi Holland Code
+-- Bảng quiz_exams: Quản lý bài thi Holland Code với package integration
 CREATE TABLE quiz_exams (
     id INT PRIMARY KEY AUTO_INCREMENT,
     exam_code VARCHAR(20) UNIQUE NOT NULL COMMENT 'Mã bài thi unique (EX20251101_ABC123)',
     user_id INT NOT NULL,
-    exam_type TINYINT NOT NULL COMMENT '0=Free(30 câu), 1=Paid(120 câu)',
+    exam_type TINYINT NOT NULL COMMENT '0=Free, 1=Paid (backward compatibility)',
+    
+    -- Package Integration
+    package_id INT NULL COMMENT 'Link to product_packages',
+    product_id INT NULL COMMENT 'Link to products',
+    
     exam_status TINYINT DEFAULT 0 COMMENT '0=Draft(chưa submit), 1=Completed(đã submit)',
     
-    -- Question info
-    total_questions INT NOT NULL,
+    -- Question info (dynamic based on package)
+    total_questions INT NOT NULL COMMENT 'Dynamic based on package config',
     answered_questions INT DEFAULT 0,
     
     -- Timing (for display only, no business logic)
@@ -152,9 +158,38 @@ CREATE TABLE quiz_exams (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_status (user_id, exam_status),
     INDEX idx_exam_code (exam_code),
+    INDEX idx_package_id (package_id),
+    INDEX idx_product_id (product_id),
+    INDEX idx_user_package (user_id, package_id),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Bảng quản lý bài thi Holland Code - Simplified: No time limits, only DRAFT/COMPLETED';
+COMMENT='Bảng quản lý bài thi Holland Code với package integration';
+
+-- Bảng quiz_package_configs: Cấu hình quiz cho từng package
+CREATE TABLE quiz_package_configs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    package_id INT NOT NULL COMMENT 'Link to product_packages.id',
+    product_id INT NOT NULL COMMENT 'Link to products.id',
+    
+    -- Quiz Configuration
+    question_count INT NOT NULL DEFAULT 30 COMMENT 'Total questions per exam',
+    questions_per_group INT NOT NULL DEFAULT 5 COMMENT 'Questions per Holland group (R,I,A,S,E,C)',
+    time_limit_minutes INT DEFAULT 0 COMMENT 'Time limit (0 = unlimited)',
+    max_attempts INT DEFAULT 1 COMMENT 'Max attempts per user',
+    allow_review BOOLEAN DEFAULT TRUE COMMENT 'Allow reviewing answers',
+    
+    -- Report Configuration
+    report_type ENUM('basic', 'standard', 'premium') DEFAULT 'basic',
+    features JSON NULL COMMENT 'Additional features config',
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    UNIQUE KEY unique_package (package_id),
+    INDEX idx_config_product_id (product_id),
+    INDEX idx_question_count (question_count)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Cấu hình quiz cho từng package - flexible question counts';
 
 -- Bảng quiz_answers: Chi tiết câu trả lời trong bài thi
 CREATE TABLE quiz_answers (
@@ -1011,6 +1046,103 @@ FROM purchased_packages pp
 JOIN product_packages pkg ON pp.package_id = pkg.id
 JOIN products p ON pkg.product_id = p.id
 WHERE pp.product_type = 'consultation';
+
+-- =====================================================
+-- PHẦN 5: VIEWS VÀ PROCEDURES CHO QUIZ PACKAGE SYSTEM
+-- =====================================================
+
+-- View tổng hợp thông tin quiz package details
+DROP VIEW IF EXISTS quiz_package_details;
+
+CREATE VIEW quiz_package_details AS
+SELECT 
+    qpc.id as config_id,
+    qpc.package_id,
+    qpc.product_id,
+    qpc.question_count,
+    qpc.questions_per_group,
+    qpc.time_limit_minutes,
+    qpc.max_attempts,
+    qpc.report_type,
+    qpc.features,
+    
+    -- Package info
+    pp.package_name,
+    pp.package_slug,
+    pp.package_description,
+    pp.original_price,
+    pp.sale_price,
+    pp.is_free,
+    pp.status as package_status,
+    
+    -- Product info
+    p.name as product_name,
+    p.slug as product_slug,
+    p.type as product_type,
+    p.short_description as product_description,
+    p.status as product_status
+FROM quiz_package_configs qpc
+JOIN product_packages pp ON qpc.package_id = pp.id
+JOIN products p ON qpc.product_id = p.id;
+
+-- =====================================================
+-- STORED PROCEDURES CHO QUIZ PACKAGE SYSTEM
+-- =====================================================
+
+-- Function để get exam type từ question count (backward compatibility)
+DELIMITER $$
+
+DROP FUNCTION IF EXISTS GetExamTypeFromQuestionCount$$
+
+CREATE FUNCTION GetExamTypeFromQuestionCount(p_question_count INT) 
+RETURNS VARCHAR(10)
+READS SQL DATA
+DETERMINISTIC
+BEGIN
+    IF p_question_count <= 30 THEN
+        RETURN 'FREE';
+    ELSE
+        RETURN 'PAID';
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- =====================================================
+-- TRIGGERS CHO QUIZ PACKAGE SYSTEM
+-- =====================================================
+
+-- Trigger để auto-update exam_type khi insert quiz_exams with package_id
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS tr_quiz_exams_set_exam_type$$
+
+CREATE TRIGGER tr_quiz_exams_set_exam_type 
+BEFORE INSERT ON quiz_exams
+FOR EACH ROW
+BEGIN
+    DECLARE v_question_count INT DEFAULT 30;
+    DECLARE v_product_id INT;
+    
+    -- If package_id is provided, get question count from config
+    IF NEW.package_id IS NOT NULL THEN
+        SELECT question_count, product_id INTO v_question_count, v_product_id
+        FROM quiz_package_configs 
+        WHERE package_id = NEW.package_id;
+        
+        -- Set total_questions and product_id
+        SET NEW.total_questions = v_question_count;
+        SET NEW.product_id = v_product_id;
+        
+        -- Set exam_type based on question count (for backward compatibility)
+        SET NEW.exam_type = CASE 
+            WHEN v_question_count <= 30 THEN 0  -- FREE
+            ELSE 1  -- PAID
+        END;
+    END IF;
+END$$
+
+DELIMITER ;
 
 -- =====================================================
 -- HOÀN THÀNH TẠO CẤU TRÚC DATABASE
