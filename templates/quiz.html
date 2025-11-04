@@ -940,15 +940,12 @@
                             </div>
                         </div>
                         <div class="video-wrapper">
-                            <iframe id="youtubePlayer" 
-                                    width="560" 
-                                    height="315" 
-                                    src="https://www.youtube.com/embed/hsI0Uoz8sXA?autoplay=1&mute=0&rel=0&showinfo=0&enablejsapi=1" 
-                                    title="PAC Group - Hướng dẫn đọc kết quả" 
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                    allowfullscreen>
-                            </iframe>
+                            <div id="youtubePlayerPlaceholder" style="background: #000; display: flex; align-items: center; justify-content: center; height: 315px; border-radius: 12px;">
+                                <div class="text-white text-center">
+                                    <i class="fas fa-play-circle" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                                    <div>Đang tải video...</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -1462,6 +1459,9 @@
                     document.getElementById('completionMessage').style.display = 'none';
                     document.getElementById('videoPlayerContainer').style.display = 'block';
                     
+                    // Create and start YouTube video when submitting
+                    this.createYouTubePlayer();
+                    
                     showToast('Đang nộp bài...', 'Vui lòng chờ trong giây lát', 'info');
                     
                     // Prepare answers for submission
@@ -1537,6 +1537,25 @@
                     // Show submit button again on error
                     document.getElementById('submitTestBtn').style.display = 'inline-flex';
                     document.getElementById('videoPlayerContainer').style.display = 'none';
+                }
+            }
+            
+            createYouTubePlayer() {
+                // Replace placeholder with actual YouTube iframe
+                const placeholder = document.getElementById('youtubePlayerPlaceholder');
+                if (placeholder) {
+                    placeholder.innerHTML = `
+                        <iframe id="youtubePlayer" 
+                                width="560" 
+                                height="315" 
+                                src="https://www.youtube.com/embed/hsI0Uoz8sXA?autoplay=1&mute=0&rel=0&showinfo=0&enablejsapi=1" 
+                                title="PAC Group - Hướng dẫn đọc kết quả" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen>
+                        </iframe>
+                    `;
+                    console.log('✅ YouTube player created and started');
                 }
             }
         }

@@ -59,7 +59,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link text-danger" href="#" onclick="handleLogout()">
+        <a class="nav-link text-danger" href="#" id="profile-logout-btn">
           <i class="fas fa-sign-out-alt me-2"></i>
           Đăng xuất
         </a>
@@ -430,7 +430,121 @@ function getCookie(name) {
 // Initialize sidebar functionality
 document.addEventListener('DOMContentLoaded', function() {
   setActiveNavLink();
+  setupLogoutHandler();
 });
+
+// Also try immediate setup in case DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  // DOM is still loading
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      setActiveNavLink();
+      setupLogoutHandler();
+    }, 100);
+  });
+} else {
+  // DOM already loaded, setup immediately
+  setTimeout(() => {
+    setActiveNavLink();
+    setupLogoutHandler();
+  }, 100);
+}
+
+// Setup logout handler - similar to header.html
+function setupLogoutHandler() {
+  // Use multiple strategies to find the logout button
+  let logoutBtn = document.getElementById('profile-logout-btn');
+  
+  if (!logoutBtn) {
+    // If not found immediately, wait a bit and try again
+    setTimeout(() => {
+      logoutBtn = document.getElementById('profile-logout-btn');
+      if (logoutBtn && !logoutBtn.hasAttribute('data-logout-setup')) {
+        attachLogoutHandler(logoutBtn);
+      }
+    }, 200);
+    return;
+  }
+  
+  // If found immediately
+  if (logoutBtn && !logoutBtn.hasAttribute('data-logout-setup')) {
+    attachLogoutHandler(logoutBtn);
+  }
+}
+
+function attachLogoutHandler(logoutBtn) {
+  logoutBtn.setAttribute('data-logout-setup', 'true');
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('[Profile Sidebar] Logout button clicked');
+    handleProfileLogout();
+  });
+  console.log('[Profile Sidebar] Logout handler attached successfully');
+}
+
+// Handle logout - using same logic as header.html
+async function handleProfileLogout() {
+  try {
+    console.log('[Profile Sidebar] Starting logout process...');
+    
+    // Show confirmation dialog
+    if (!confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      console.log('[Profile Sidebar] Logout cancelled by user');
+      return;
+    }
+    
+    // Check if authChecker is available (from main authentication system)
+    if (typeof authChecker !== 'undefined') {
+      console.log('[Profile Sidebar] Using authChecker for logout');
+      await authChecker.logout(true);
+    } else {
+      console.log('[Profile Sidebar] authChecker not available, using fallback');
+      // Fallback logout implementation
+      await fallbackLogout();
+    }
+    
+  } catch (error) {
+    console.error('[Profile Sidebar] Logout error:', error);
+    // Still redirect on error to ensure logout
+    window.location.href = 'dangnhap';
+  }
+}
+
+// Fallback logout function
+async function fallbackLogout() {
+  console.log('[Profile Sidebar] Executing fallback logout...');
+  
+  try {
+    // Direct API call to logout
+    const response = await fetch('api/auth/logout.php', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('[Profile Sidebar] Logout API response:', response.status);
+    
+    if (response.ok) {
+      // Clear local storage
+      localStorage.removeItem('user_info');
+      localStorage.removeItem('pac_user_profile');
+      localStorage.removeItem('pac_user_data');
+      
+      console.log('[Profile Sidebar] Local storage cleared, redirecting...');
+      
+      // Redirect to login
+      window.location.href = 'dangnhap';
+    } else {
+      throw new Error('Logout API failed');
+    }
+  } catch (error) {
+    console.error('[Profile Sidebar] Fallback logout failed:', error);
+    // Force redirect even on API failure
+    window.location.href = 'dangnhap';
+  }
+}
 
 // Listen for localStorage changes (when user logs in/out in another tab)
 window.addEventListener('storage', function(e) {
@@ -442,9 +556,20 @@ window.addEventListener('storage', function(e) {
 // Expose function globally so profile.js can call it
 window.loadUserInfoFromLocalStorage = loadUserInfoFromLocalStorage;
 
-// Start immediately
+// Start immediately with multiple initialization strategies
 setTimeout(() => {
   waitForSidebarElements();
 }, 100);
+
+// Try setup again after a delay (component loading timing)
+setTimeout(() => {
+  setupLogoutHandler();
+  setActiveNavLink();
+}, 500);
+
+// Final attempt after longer delay
+setTimeout(() => {
+  setupLogoutHandler();
+}, 1000);
 
 </script>
