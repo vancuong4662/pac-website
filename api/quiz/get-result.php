@@ -1,7 +1,7 @@
 <?php
 /**
  * Get Quiz Result API
- * Lấy kết quả chi tiết của một bài thi
+ * Lấy kết quả chi tiết của một bài thi với gợi ý nghề nghiệp thông minh
  */
 
 session_start();
@@ -12,6 +12,7 @@ header('Access-Control-Allow-Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? '*'));
 require_once '../../config/db-pdo.php';
 require_once '../../config/error-codes.php';
 require_once '../../config/quiz-config.php';
+require_once 'CareerSuggestionEngine.php'; // Fixed path
 
 try {
     // Check authentication
@@ -91,8 +92,18 @@ try {
         'C' => intval($examData['conventional_score'] ?? 0)
     ];
     
-    // Get suggested jobs based on Holland Code (mock data for now)
-    $suggestedJobs = getSuggestedJobs($examData['holland_code'], $examData['exam_type']);
+    // Calculate Holland Code từ tendencies để đảm bảo tính chính xác
+    $hollandCode = calculateHollandCodeFromTendencies($tendencies);
+    
+    // Create database adapter for CareerSuggestionEngine
+    $dbAdapter = new DatabaseAdapter($pdo);
+    $careerEngine = new CareerSuggestionEngine($dbAdapter);
+    
+    // Generate career suggestions using the sophisticated 4-tier algorithm
+    $careerSuggestions = $careerEngine->generateSuggestions($hollandCode);
+    
+    // Get suggested jobs with detailed information
+    $suggestedJobs = formatCareerSuggestions($careerSuggestions, $examData['exam_type']);
     
     // Format dates
     $createdAt = $examData['created_at'] ? date('d/m/Y H:i', strtotime($examData['created_at'])) : null;
@@ -107,7 +118,7 @@ try {
         $duration = $interval->format('%H:%I:%S');
     }
     
-    // Build response
+    // Build response with enhanced career suggestions
     $result = [
         'exam_code' => $examData['exam_code'],
         'exam_type' => $examData['exam_type'],
@@ -115,11 +126,17 @@ try {
         'total_questions' => intval($examData['total_questions']),
         'answered_questions' => intval($examData['answered_questions']),
         'total_score' => intval($examData['total_score'] ?? 0),
-        'holland_code' => $examData['holland_code'],
+        'holland_code' => $hollandCode, // Use calculated Holland Code
         'primary_group' => $examData['primary_group'],
         'secondary_group' => $examData['secondary_group'],
         'tendencies' => $tendencies,
         'suggested_jobs' => $suggestedJobs,
+        'career_analysis' => [
+            'algorithm_version' => '4-tier-permutation',
+            'total_jobs_analyzed' => count($careerSuggestions),
+            'matching_tiers' => getMatchingTiersSummary($careerSuggestions),
+            'holland_code_used' => $hollandCode
+        ],
         'duration' => $duration,
         'created_at' => $examData['created_at'],
         'created_at_formatted' => $createdAt,
@@ -137,102 +154,142 @@ try {
 }
 
 /**
- * Get suggested jobs based on Holland Code
+ * Calculate Holland Code từ tendencies scores
  */
-function getSuggestedJobs($hollandCode, $examType = 'FREE') {
-    // Mock data - in production this should come from database
-    $jobsDatabase = [
-        'RIA' => [
-            [
-                'job_title' => 'Kỹ sư Phần mềm',
-                'description' => 'Phát triển và bảo trì các ứng dụng phần mềm, kết hợp kỹ thuật với sáng tạo',
-                'compatibility_score' => 5,
-                'average_salary' => '15-30 triệu',
-                'growth_prospect' => 'Rất tốt',
-                'required_skills' => 'Lập trình, Tư duy logic, Sáng tạo'
-            ],
-            [
-                'job_title' => 'Nhà Thiết kế UX/UI',
-                'description' => 'Thiết kế giao diện người dùng và trải nghiệm người dùng cho các sản phẩm số',
-                'compatibility_score' => 4,
-                'average_salary' => '12-25 triệu',
-                'growth_prospect' => 'Tốt',
-                'required_skills' => 'Thiết kế, Nghiên cứu người dùng, Công nghệ'
-            ],
-            [
-                'job_title' => 'Kỹ sư Dữ liệu',
-                'description' => 'Xử lý và phân tích dữ liệu lớn để tạo ra thông tin hữu ích',
-                'compatibility_score' => 5,
-                'average_salary' => '18-35 triệu',
-                'growth_prospect' => 'Xuất sắc',
-                'required_skills' => 'Toán học, Lập trình, Phân tích dữ liệu'
-            ]
-        ],
-        'RIS' => [
-            [
-                'job_title' => 'Kỹ sư Y sinh',
-                'description' => 'Ứng dụng kỹ thuật vào lĩnh vực y tế và chăm sóc sức khỏe',
-                'compatibility_score' => 5,
-                'average_salary' => '15-28 triệu',
-                'growth_prospect' => 'Tốt',
-                'required_skills' => 'Kỹ thuật, Y học, Nghiên cứu'
-            ],
-            [
-                'job_title' => 'Chuyên viên Phân tích Hệ thống',
-                'description' => 'Phân tích và thiết kế hệ thống thông tin cho doanh nghiệp',
-                'compatibility_score' => 4,
-                'average_salary' => '12-22 triệu',
-                'growth_prospect' => 'Tốt',
-                'required_skills' => 'Phân tích, Công nghệ, Tư vấn'
-            ]
-        ],
-        'SIA' => [
-            [
-                'job_title' => 'Nhà Tâm lý học',
-                'description' => 'Nghiên cứu và tư vấn về tâm lý, hành vi con người',
-                'compatibility_score' => 5,
-                'average_salary' => '10-20 triệu',
-                'growth_prospect' => 'Tốt',
-                'required_skills' => 'Tâm lý học, Giao tiếp, Nghiên cứu'
-            ],
-            [
-                'job_title' => 'Giáo viên Nghệ thuật',
-                'description' => 'Giảng dạy và hướng dẫn học sinh về các môn nghệ thuật',
-                'compatibility_score' => 4,
-                'average_salary' => '8-15 triệu',
-                'growth_prospect' => 'Ổn định',
-                'required_skills' => 'Nghệ thuật, Giảng dạy, Sáng tạo'
-            ]
-        ],
-        // Add more combinations as needed
-        'DEFAULT' => [
-            [
-                'job_title' => 'Chuyên viên Tư vấn Nghề nghiệp',
-                'description' => 'Hỗ trợ và tư vấn cho người khác về lựa chọn nghề nghiệp phù hợp',
-                'compatibility_score' => 4,
-                'average_salary' => '10-18 triệu',
-                'growth_prospect' => 'Tốt',
-                'required_skills' => 'Tư vấn, Giao tiếp, Tâm lý học'
-            ],
-            [
-                'job_title' => 'Chuyên viên Nhân sự',
-                'description' => 'Quản lý và phát triển nguồn nhân lực trong tổ chức',
-                'compatibility_score' => 3,
-                'average_salary' => '12-20 triệu',
-                'growth_prospect' => 'Ổn định',
-                'required_skills' => 'Quản lý, Giao tiếp, Tổ chức'
-            ]
-        ]
-    ];
+function calculateHollandCodeFromTendencies($tendencies) {
+    // Sort tendencies by score (descending) and get top 3
+    arsort($tendencies);
+    $topThree = array_slice(array_keys($tendencies), 0, 3, true);
+    return implode('', $topThree);
+}
+
+/**
+ * Format career suggestions from CareerSuggestionEngine to API response format
+ */
+function formatCareerSuggestions($careerSuggestions, $examType = 'FREE') {
+    $formattedJobs = [];
     
-    // Get jobs for specific Holland Code or default
-    $jobs = $jobsDatabase[$hollandCode] ?? $jobsDatabase['DEFAULT'];
-    
-    // For FREE exam, return only first 3 jobs
-    if ($examType === 'FREE') {
-        $jobs = array_slice($jobs, 0, 3);
+    foreach ($careerSuggestions as $suggestion) {
+        $formattedJobs[] = [
+            // Basic job info
+            'job_title' => $suggestion['job_title'],
+            'job_name' => $suggestion['job_title'], // Alias for compatibility
+            'job_name_en' => $suggestion['job_name_en'] ?? null,
+            'job_description' => $suggestion['description'] ?? 'Nghề nghiệp phù hợp với tính cách của bạn',
+            'description' => $suggestion['description'] ?? 'Nghề nghiệp phù hợp với tính cách của bạn', // Alias
+            
+            // Compatibility & scoring
+            'compatibility_score' => $suggestion['compatibility_score'],
+            'matching_tier' => $suggestion['tier'], // 5⭐, 4⭐, 3⭐, 2⭐
+            'holland_code_match' => $suggestion['holland_code'],
+            'match_type' => $suggestion['match_type'], // exact, permutation, two_char, single_char
+            'priority_score' => $suggestion['priority_score'] ?? 0,
+            
+            // Enhanced fields from database (from jobs table)
+            'job_group' => $suggestion['job_group'] ?? null,
+            'activities_code' => $suggestion['activities_code'] ?? null,
+            'education_level' => $suggestion['education_level'] ?? null,
+            
+            // Abilities (3-tier system)
+            'capacity' => $suggestion['capacity'] ?? null,
+            'essential_ability' => $suggestion['essential_ability'] ?? null,
+            'supplementary_ability' => $suggestion['supplementary_ability'] ?? null,
+            
+            // Work environment & style
+            'work_environment' => $suggestion['work_environment'] ?? null,
+            'work_areas' => $suggestion['work_areas'] ?? null,
+            'work_style' => $suggestion['work_style'] ?? null,
+            'work_value' => $suggestion['work_value'] ?? null,
+            
+            // Tasks & specializations
+            'main_tasks' => $suggestion['main_tasks'] ?? null,
+            'specializations' => $suggestion['specializations'] ?? null,
+            
+            // Career info
+            'average_salary' => $suggestion['salary_range'] ?? 'Liên hệ tư vấn',
+            'growth_prospect' => $suggestion['growth_outlook'] ?? 'Tốt',
+            'required_skills' => $suggestion['key_skills'] ?? 'Đang cập nhật'
+        ];
     }
     
-    return $jobs;
+    // For FREE exam, limit to first 10 results
+    if ($examType === 'FREE') {
+        $formattedJobs = array_slice($formattedJobs, 0, 10);
+    }
+    
+    return $formattedJobs;
+}
+
+/**
+ * Get summary of matching tiers for analytics
+ */
+function getMatchingTiersSummary($careerSuggestions) {
+    $tierSummary = [
+        '5_star' => 0,
+        '4_star' => 0,
+        '3_star' => 0,
+        '2_star' => 0
+    ];
+    
+    foreach ($careerSuggestions as $suggestion) {
+        $tier = $suggestion['tier'] ?? '';
+        switch ($tier) {
+            case '5⭐':
+                $tierSummary['5_star']++;
+                break;
+            case '4⭐':
+                $tierSummary['4_star']++;
+                break;
+            case '3⭐':
+                $tierSummary['3_star']++;
+                break;
+            case '2⭐':
+                $tierSummary['2_star']++;
+                break;
+        }
+    }
+    
+    return $tierSummary;
+}
+
+/**
+ * Database Adapter for CareerSuggestionEngine
+ */
+class DatabaseAdapter {
+    private $pdo;
+    
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
+    }
+    
+    public function fetchAll($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function fetch($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function execute($sql, $params = []) {
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute($params);
+    }
+}
+
+/**
+ * Calculate similarity between two Holland Codes
+ */
+function calculateHollandCodeSimilarity($code1, $code2) {
+    $chars1 = str_split($code1);
+    $chars2 = str_split($code2);
+    
+    $common = count(array_intersect($chars1, $chars2));
+    $total = max(count($chars1), count($chars2));
+    
+    return $total > 0 ? $common / $total : 0;
 }
 ?>

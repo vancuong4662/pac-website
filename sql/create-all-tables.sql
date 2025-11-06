@@ -24,6 +24,9 @@ DROP TABLE IF EXISTS quiz_results;
 DROP TABLE IF EXISTS quiz_answers;
 DROP TABLE IF EXISTS quiz_exams;
 
+-- Drop jobs master data table
+DROP TABLE IF EXISTS jobs;
+
 -- Drop legacy tables
 DROP TABLE IF EXISTS vnpay_transactions;
 DROP TABLE IF EXISTS purchased_packages;
@@ -122,6 +125,52 @@ CREATE TABLE questions (
     KEY idx_difficulty (difficulty_level)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
 COMMENT='Bảng câu hỏi trắc nghiệm Holland Code để đánh giá hướng nghiệp';
+
+-- Bảng nghề nghiệp (jobs) - Master data từ old project
+CREATE TABLE jobs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    job_name VARCHAR(255) NOT NULL COMMENT 'Tên nghề nghiệp',
+    job_name_en VARCHAR(255) NULL COMMENT 'Tên nghề tiếng Anh (để sau)',
+    holland_code VARCHAR(3) NOT NULL COMMENT 'Mã Holland Code (VD: AEI, IAR)',
+    
+    -- Job categorization
+    job_group VARCHAR(100) NULL COMMENT 'Nhóm nghề (VD: Ngôn ngữ, Khoa học)',
+    activities_code VARCHAR(255) NULL COMMENT 'Mã hoạt động công việc',
+    capacity VARCHAR(255) NULL COMMENT 'Năng lực tổng thể yêu cầu',
+    
+    -- Job requirements
+    essential_ability VARCHAR(255) NULL COMMENT 'Năng lực cốt lõi bắt buộc',
+    supplementary_ability VARCHAR(255) NULL COMMENT 'Năng lực bổ trợ hỗ trợ',
+    education_level TINYINT NULL COMMENT 'Cấp độ học vấn tối thiểu (1-7)',
+    
+    -- Job characteristics  
+    work_environment VARCHAR(255) NULL COMMENT 'Môi trường làm việc',
+    work_style VARCHAR(255) NULL COMMENT 'Phong cách làm việc',
+    work_value VARCHAR(100) NULL COMMENT 'Giá trị công việc',
+    
+    -- Detailed information
+    job_description TEXT NULL COMMENT 'Mô tả chi tiết nghề nghiệp',
+    specializations JSON NULL COMMENT 'Các chuyên môn con (expertise)',
+    main_tasks JSON NULL COMMENT 'Nhiệm vụ chính (mission)',
+    work_areas JSON NULL COMMENT 'Nơi làm việc (workArea)',
+    
+    -- Additional metadata
+    icon_url VARCHAR(500) NULL COMMENT 'URL icon Holland Code',
+    is_active BOOLEAN DEFAULT TRUE COMMENT 'Trạng thái kích hoạt',
+    sort_order INT DEFAULT 0 COMMENT 'Thứ tự sắp xếp',
+    
+    -- Tracking
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Indexes
+    INDEX idx_jobs_holland_code (holland_code),
+    INDEX idx_jobs_group (job_group),
+    INDEX idx_jobs_education (education_level),
+    INDEX idx_jobs_active (is_active),
+    FULLTEXT INDEX idx_jobs_search (job_name, job_description)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng master data nghề nghiệp từ old project (200 jobs)';
 
 -- =====================================================
 -- PHẦN 2A: QUIZ SYSTEM TABLES - PACKAGE INTEGRATION

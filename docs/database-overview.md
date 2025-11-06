@@ -13,14 +13,15 @@ Database PAC Shopping Cart được thiết kế để hỗ trợ hệ thống b
 
 ## Cấu trúc tổng quan
 
-Database gồm **18 bảng chính** được chia thành 4 nhóm chức năng:
+Database gồm **19 bảng chính** được chia thành 4 nhóm chức năng:
 
 ### 1. Nhóm Authentication & Users (2 bảng)
 - `users` - Quản lý tài khoản người dùng
 - `sessions` - Quản lý phiên đăng nhập
 
-### 2. Nhóm Holland Code Assessment & Quiz System (9 bảng)
+### 2. Nhóm Holland Code Assessment & Quiz System (10 bảng)
 - `questions` - Câu hỏi trắc nghiệm Holland Code
+- `jobs` - Master data nghề nghiệp từ old project (**MỚI**)
 - `quiz_exams` - Quản lý bài thi với random questions (**MỚI**)
 - `quiz_answers` - Chi tiết câu trả lời trong bài thi (**MỚI**)
 - `quiz_results` - Kết quả Holland Code được tính toán (**MỚI**)
@@ -114,6 +115,59 @@ Database gồm **18 bảng chính** được chia thành 4 nhóm chức năng:
 - Phân loại câu hỏi theo category để quản lý tốt hơn
 - Support múi đổi independent question ordering
 - Full-text search ready cho nội dung câu hỏi
+
+---
+
+### 3.5. Bảng `jobs` - Master data nghề nghiệp (**MỚI**)
+
+**Mục đích**: Lưu trữ 200 nghề nghiệp được migrate từ old project để phục vụ hệ thống gợi ý nghề nghiệp với thuật toán sophisticated.
+
+| Trường | Kiểu dữ liệu | Mô tả |
+|--------|--------------|-------|
+| `id` | INT AUTO_INCREMENT | Khóa chính (primary key duy nhất) |
+| `job_name` | VARCHAR(255) | Tên nghề nghiệp tiếng Việt |
+| `job_name_en` | VARCHAR(255) | Tên nghề tiếng Anh (để mở rộng) |
+| `holland_code` | VARCHAR(3) | **Mã Holland Code** (VD: AEI, IAR, CSR) - dùng cho thuật toán |
+| `job_group` | VARCHAR(100) | Nhóm nghề (VD: "Ngôn ngữ", "Khoa học") |
+| `activities_code` | VARCHAR(255) | Mã hoạt động công việc |
+| `capacity` | VARCHAR(255) | Năng lực yêu cầu |
+| `essential_ability` | VARCHAR(255) | Năng lực cần thiết chính |
+| `supplementary_ability` | VARCHAR(255) | Năng lực bổ sung |
+| `education_level` | TINYINT | Cấp độ học vấn (1-5) |
+| `work_environment` | VARCHAR(255) | Môi trường làm việc |
+| `work_style` | VARCHAR(255) | Phong cách làm việc |
+| `work_value` | VARCHAR(100) | Giá trị công việc |
+| `job_description` | TEXT | Mô tả chi tiết nghề nghiệp |
+| `specializations` | JSON | Các chuyên môn con (expertise) |
+| `main_tasks` | JSON | Nhiệm vụ chính (mission) |
+| `work_areas` | JSON | Nơi làm việc (workArea) |
+| `icon_url` | VARCHAR(500) | URL icon Holland Code |
+| `is_active` | BOOLEAN | Trạng thái kích hoạt |
+| `sort_order` | INT | Thứ tự sắp xếp |
+
+**Migration từ old project**:
+```typescript
+// Old TypeScript format (suggestJobs.ts)
+{
+  code: '2656',
+  name: 'Phát thanh viên, biên tập viên truyền thông',
+  hollandCode: 'AEI',
+  group: 'Ngôn ngữ',
+  description: 'Phát thanh viên trên đài phát thanh...',
+  expertise: ['Phát thanh viên thời sự', 'Phát thanh viên thể thao'],
+  mission: ['Đọc bản tin và các thông báo khác...'],
+  workArea: ['Đài phát thanh và truyền hình'],
+  educationLevel: 3,
+  // ... other fields
+}
+```
+
+**Tính năng đặc biệt**:
+- **200 Jobs**: Comprehensive database từ old project sophisticated algorithm
+- **Holland Code Matching**: Hỗ trợ permutation algorithm cho gợi ý nghề nghiệp  
+- **Structured Data**: JSON fields cho specializations, tasks, work areas
+- **Full-text Search**: Index cho job_name và job_description
+- **Migration Ready**: Direct migration từ TypeScript constants
 
 ---
 
@@ -631,6 +685,9 @@ questions (standalone table for Holland Code Assessment)
 questions (1) ──── (n) test_answers (via question_id, legacy)
 questions (1) ──── (n) quiz_answers (via question_id, new)
 
+jobs (standalone master data table for career suggestions)
+jobs (1) ──── (n) quiz_suggested_jobs (via job_code for matching)
+
 -- Legacy Holland Code system
 test_results (1) ──── (n) test_answers
 
@@ -702,6 +759,7 @@ Database được tối ưu với các indexes:
 - **Users**: status, role, email_verified
 - **User Sessions**: expires_at, user_id
 - **Questions**: holland_code, category, is_active, sort_order, difficulty_level
+- **Jobs** (**MỚI**): holland_code, job_group, education_level, is_active, fulltext (job_name, job_description)
 - **Quiz Exams** (**MỚI**): user_status (user_id, exam_status), exam_code, created
 - **Quiz Answers** (**MỚI**): exam_id, answer_status (exam_id, user_answer), unique constraint (exam_id, question_id)
 - **Quiz Results** (**MỚI**): user_holland (user_id, holland_code), holland_code, primary_group, created
@@ -773,6 +831,7 @@ SHOW TABLES;
 SELECT COUNT(*) FROM products;
 SELECT COUNT(*) FROM product_packages;
 SELECT COUNT(*) FROM questions;
+SELECT COUNT(*) FROM jobs;
 SELECT COUNT(*) FROM test_results;
 SELECT COUNT(*) FROM test_answers;
 ```

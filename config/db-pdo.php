@@ -2,16 +2,16 @@
 // Thông tin kết nối MySQL sử dụng PDO
 
 // REMOTE SERVER (comment out for local testing):
-$host = '103.200.23.126';
-$dbname = 'unlockyo_pac';
-$username = 'unlockyo_admin';
-$password = '%r)wM(j&Y3k.@{;T';
+// $host = '103.200.23.126';
+// $dbname = 'unlockyo_pac';
+// $username = 'unlockyo_admin';
+// $password = '%r)wM(j&Y3k.@{;T';
 
 // LOCALHOST (uncomment for local testing):
-// $host = 'localhost';
-// $dbname = 'pac_db';
-// $username = 'root'; // Default XAMPP username
-// $password = '';     // Default XAMPP password (empty)
+$host = 'localhost';
+$dbname = 'pac_db';
+$username = 'root'; // Default XAMPP username
+$password = '';     // Default XAMPP password (empty)
 
 try {
     // Thiết lập kết nối PDO

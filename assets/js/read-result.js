@@ -233,7 +233,7 @@ class ResultViewer {
                     <ul class="list-unstyled">
                       ${this.getGroupCharacteristics(code).map(char => `
                         <li class="mb-2">
-                          <i class="fas fa-check text-success me-2"></i>
+                          <i class="fas fa-check text-pac-success me-2"></i>
                           ${char}
                         </li>
                       `).join('')}
@@ -605,6 +605,13 @@ class ResultViewer {
     renderSuggestedJobs() {
         const container = document.getElementById('suggested-jobs-content');
         const jobs = this.resultData.suggested_jobs || [];
+        const careerAnalysis = this.resultData.career_analysis || {};
+
+        // Debug: Log first job to see available fields
+        if (jobs.length > 0) {
+            console.log('📋 Sample job data:', jobs[0]);
+            console.log('🔍 Available fields:', Object.keys(jobs[0]));
+        }
 
         if (jobs.length === 0) {
             container.innerHTML = `
@@ -619,48 +626,155 @@ class ResultViewer {
             return;
         }
 
-        const jobsHTML = jobs.map((job, index) => `
-          <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="${index * 100}">
-            <div class="job-card h-100">
-              <div class="d-flex justify-content-between align-items-start mb-3">
-                <h5 class="mb-0">${job.job_title || 'Tên nghề'}</h5>
-                <div class="compatibility-rating">
-                  ${this.renderStarRating(job.compatibility_score || 3)}
-                </div>
+        // Group jobs by star rating
+        const jobsByRating = {
+            5: jobs.filter(job => job.compatibility_score >= 5),
+            4: jobs.filter(job => job.compatibility_score >= 4 && job.compatibility_score < 5),
+            3: jobs.filter(job => job.compatibility_score >= 3 && job.compatibility_score < 4),
+            2: jobs.filter(job => job.compatibility_score < 3)
+        };
+
+        console.log('📊 Jobs by rating:', {
+            '5_star': jobsByRating[5].length,
+            '4_star': jobsByRating[4].length, 
+            '3_star': jobsByRating[3].length,
+            '2_star': jobsByRating[2].length
+        });
+
+        // Display career analysis summary first
+        const analysisHTML = careerAnalysis && Object.keys(careerAnalysis).length > 0 ? `
+          <div class="career-analysis-summary mb-4">
+            <div class="card border-primary">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                  <i class="fas fa-chart-line me-2"></i>
+                  Phân tích gợi ý nghề nghiệp
+                </h5>
               </div>
-              
-              <p class="text-muted mb-3">${job.description || 'Mô tả nghề nghiệp'}</p>
-              
-              <div class="row text-center">
-                <div class="col-4">
-                  <div class="small text-muted">Mức lương TB</div>
-                  <div class="fw-bold text-success">${job.average_salary || 'N/A'}</div>
-                </div>
-                <div class="col-4">
-                  <div class="small text-muted">Triển vọng</div>
-                  <div class="fw-bold text-info">${job.growth_prospect || 'Tốt'}</div>
-                </div>
-                <div class="col-4">
-                  <div class="small text-muted">Độ phù hợp</div>
-                  <div class="fw-bold text-primary">${job.compatibility_score || 3}/5</div>
-                </div>
-              </div>
-              
-              ${job.required_skills ? `
-                <div class="mt-3">
-                  <small class="text-muted">Kỹ năng cần thiết:</small>
-                  <div class="mt-1">
-                    ${job.required_skills.split(',').map(skill => `
-                      <span class="badge bg-light text-dark me-1 mb-1">${skill.trim()}</span>
-                    `).join('')}
+              <div class="card-body">
+                <div class="row text-center">
+                  <div class="col-md-3">
+                    <div class="stat-item">
+                      <div class="stat-number text-primary">${careerAnalysis.total_jobs_analyzed || 0}</div>
+                      <div class="stat-label">Nghề được phân tích</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="stat-item">
+                      <div class="stat-number text-pac-success">${jobsByRating[5].length}</div>
+                      <div class="stat-label">Rất phù hợp (5⭐)</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="stat-item">
+                      <div class="stat-number text-info">${jobsByRating[4].length}</div>
+                      <div class="stat-label">Phù hợp tốt (4⭐)</div>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="stat-item">
+                      <div class="stat-number text-secondary">${jobsByRating[3].length + jobsByRating[2].length}</div>
+                      <div class="stat-label">Khác (≤3⭐)</div>
+                    </div>
                   </div>
                 </div>
-              ` : ''}
+              </div>
             </div>
           </div>
-        `).join('');
+        ` : '';
 
-        container.innerHTML = `<div class="row">${jobsHTML}</div>`;
+        // Render jobs by tiers with progressive disclosure
+        let jobsHTML = '';
+
+        // 5-star jobs (always visible)
+        if (jobsByRating[5].length > 0) {
+            jobsHTML += `
+              <div class="jobs-tier" data-tier="5">
+                <div class="tier-header mb-3">
+                  <h4 class="tier-title text-pac-success">
+                    <i class="fas fa-star me-2"></i>
+                    Nghề nghiệp rất phù hợp (${jobsByRating[5].length} nghề)
+                  </h4>
+                  <p class="text-muted">Những nghề nghiệp hoàn hảo phù hợp với tính cách của bạn</p>
+                </div>
+                <div class="row" id="jobs-tier-5">
+                  ${this.renderJobCards(jobsByRating[5])}
+                </div>
+              </div>
+            `;
+        }
+
+        // 4-star jobs (initially hidden)
+        if (jobsByRating[4].length > 0) {
+            jobsHTML += `
+              <div class="jobs-tier" data-tier="4" style="display: none;">
+                <div class="tier-header mb-3">
+                  <h4 class="tier-title text-primary">
+                    <i class="fas fa-thumbs-up me-2"></i>
+                    Nghề nghiệp phù hợp tốt (${jobsByRating[4].length} nghề)
+                  </h4>
+                  <p class="text-muted">Những nghề nghiệp có nhiều điểm tương đồng với tính cách của bạn</p>
+                </div>
+                <div class="row" id="jobs-tier-4">
+                  ${this.renderJobCards(jobsByRating[4])}
+                </div>
+              </div>
+            `;
+        }
+
+        // 3 & 2-star jobs (initially hidden)
+        const lowerTierJobs = [...jobsByRating[3], ...jobsByRating[2]];
+        if (lowerTierJobs.length > 0) {
+            jobsHTML += `
+              <div class="jobs-tier" data-tier="3-2" style="display: none;">
+                <div class="tier-header mb-3">
+                  <h4 class="tier-title text-info">
+                    <i class="fas fa-check me-2"></i>
+                    Nghề nghiệp khác có tiềm năng (${lowerTierJobs.length} nghề)
+                  </h4>
+                  <p class="text-muted">Những nghề nghiệp có thể phù hợp sau khi phát triển thêm kỹ năng</p>
+                </div>
+                <div class="row" id="jobs-tier-3-2">
+                  ${this.renderJobCards(lowerTierJobs)}
+                </div>
+              </div>
+            `;
+        }
+
+        // Show more buttons
+        let showMoreButtons = '';
+        if (jobsByRating[4].length > 0) {
+            showMoreButtons += `
+              <div class="text-center my-4" id="show-more-4-star">
+                <button class="btn btn-outline-primary btn-lg" onclick="window.resultViewer.showMoreJobs('4')">
+                  <i class="fas fa-chevron-down me-2"></i>
+                  Xem thêm nghề phù hợp tốt (${jobsByRating[4].length} nghề)
+                </button>
+              </div>
+            `;
+        }
+        
+        if (lowerTierJobs.length > 0) {
+            showMoreButtons += `
+              <div class="text-center my-4" id="show-more-3-2-star" style="display: none;">
+                <button class="btn btn-outline-secondary btn-lg" onclick="window.resultViewer.showMoreJobs('3-2')">
+                  <i class="fas fa-chevron-down me-2"></i>
+                  Xem thêm nghề khác (${lowerTierJobs.length} nghề)
+                </button>
+              </div>
+            `;
+        }
+
+        container.innerHTML = analysisHTML + jobsHTML + showMoreButtons;
+        
+        // Add custom styles for enhanced job cards
+        this.addJobCardStyles();
+        
+        // Setup collapse functionality
+        this.setupJobCardCollapse();
+        
+        // Make this instance globally accessible for buttons
+        window.resultViewer = this;
     }
 
     renderGuidance() {
@@ -1274,13 +1388,1119 @@ class ResultViewer {
         return icons[code] || 'fa-question';
     }
 
-    renderStarRating(score) {
+    renderJobCards(jobs) {
+        return jobs.map((job, index) => {
+          // Normalize compatibility score to 0-5 scale for consistent stars/display
+          const displayScore = this.normalizeCompatibilityScore(job.compatibility_score);
+          return `
+          <div class="col-12 mb-4" data-aos="fade-up" data-aos-delay="${index * 100}">
+            <div class="job-card h-100">
+              <div class="job-header">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div class="job-title-section">
+                    <h5 class="mb-1 text-brand-primary">${job.job_name || job.job_title || 'Tên nghề'}</h5>
+                    ${job.job_name_en ? `
+                      <small class="text-muted fst-italic">${job.job_name_en}</small>
+                    ` : ''}
+                  </div>
+                  <div class="job-badges">
+                    ${displayScore >= 5 ? `
+                      <span class="badge bg-brand-primary me-1">
+                        <i class="fas fa-star me-1"></i>Rất phù hợp
+                      </span>
+                    ` : displayScore >= 4 ? `
+                      <span class="badge bg-brand-secondary me-1">
+                        <i class="fas fa-thumbs-up me-1"></i>Phù hợp tốt
+                      </span>
+                    ` : `
+                      <span class="badge secondary me-1">
+                        <i class="fas fa-check me-1"></i>Có tiềm năng
+                      </span>
+                    `}
+                    ${job.job_group ? `
+                      <span class="badge bg-brand-secondary ms-1" title="Nhóm nghề">
+                        <i class="fas fa-layer-group me-1"></i>${job.job_group}
+                      </span>
+                    ` : ''}
+                  </div>
+                </div>
+                
+                <div class="compatibility-section mb-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="compatibility-label fw-semibold text-brand-secondary">Độ phù hợp:</span>
+                    <div class="compatibility-rating">
+                      ${this.renderStarRating(displayScore)}
+                      <span class="ms-2 fw-bold score">${displayScore}/5</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Job Description -->
+              <div class="job-description mb-3">
+                <p class="text-muted mb-2 lh-sm">
+                  ${job.job_description || job.description || 'Mô tả nghề nghiệp'}
+                </p>
+              </div>
+              
+              <!-- Collapsible Sections -->
+              
+              <!-- Abilities Section - Collapsible -->
+              ${job.capacity || job.essential_ability || job.supplementary_ability ? `
+              <div class="collapsible-section mb-3">
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#abilities-${job.id || index}" aria-expanded="false">
+                  <div class="section-title">
+                    <span>
+                      <i class="fas fa-user-graduate me-2"></i>
+                      <strong>Năng lực cần thiết</strong>
+                    </span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                  </div>
+                </div>
+                <div class="collapse" id="abilities-${job.id || index}">
+                  <div class="abilities-section mt-2">
+                    <div class="abilities-grid">
+                      ${job.capacity ? `
+                        <div class="ability-item capacity-item">
+                          <div class="ability-icon">
+                            <i class="fas fa-user-graduate"></i>
+                          </div>
+                          <div class="ability-content">
+                            <div class="ability-label">Năng lực tổng thể</div>
+                            <div class="ability-value">${job.capacity}</div>
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      ${job.essential_ability ? `
+                        <div class="ability-item essential-item">
+                          <div class="ability-icon">
+                            <i class="fas fa-star"></i>
+                          </div>
+                          <div class="ability-content">
+                            <div class="ability-label">Năng lực cốt lõi</div>
+                            <div class="ability-value">${job.essential_ability}</div>
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      ${job.supplementary_ability ? `
+                        <div class="ability-item supplementary-item">
+                          <div class="ability-icon">
+                            <i class="fas fa-plus-circle"></i>
+                          </div>
+                          <div class="ability-content">
+                            <div class="ability-label">Năng lực bổ trợ</div>
+                            <div class="ability-value">${job.supplementary_ability}</div>
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              ` : ''}
+              
+              <!-- Education & Activity Requirements -->
+              <div class="requirements-section mb-3">
+                <div class="req-grid">
+                  <div class="req-item">
+                    <div class="req-icon">
+                      <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="req-content">
+                      <strong>Học vấn:</strong>
+                      <span>${job.education_level ? this.getEducationLevelText(job.education_level) : 'Linh hoạt'}</span>
+                    </div>
+                  </div>
+                  
+                  ${job.activities_code ? `
+                    <div class="req-item">
+                      <div class="req-icon">
+                        <i class="fas fa-tasks"></i>
+                      </div>
+                      <div class="req-content">
+                        <strong>Hoạt động:</strong>
+                        <span>${job.activities_code}</span>
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              
+              <!-- Work Environment & Areas - Collapsible -->
+              ${job.work_environment || job.work_areas ? `
+                <div class="collapsible-section mb-3">
+                  <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#environment-${job.id || index}" aria-expanded="false">
+                    <div class="section-title">
+                      <span>
+                        <i class="fas fa-building me-2"></i>
+                        <strong>Môi trường & Nơi làm việc</strong>
+                      </span>
+                      <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                  </div>
+                  <div class="collapse" id="environment-${job.id || index}">
+                    <div class="environment-content mt-2">
+                      ${job.work_environment ? `
+                        <div class="environment-description mb-2">
+                          <span class="fw-semibold text-brand-primary">Môi trường:</span>
+                          <span class="text-muted">${job.work_environment}</span>
+                        </div>
+                      ` : ''}
+                      
+                      ${job.work_areas ? `
+                        <div class="work-locations">
+                          <span class="fw-semibold text-brand-secondary d-block mb-1">Nơi làm việc chủ yếu:</span>
+                          <div class="locations-list">
+                            ${this.parseJsonArray(job.work_areas).map(area => `
+                              <div class="location-item">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <span>${area}</span>
+                              </div>
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+              
+              <!-- Work Style & Values - Collapsible -->
+              ${job.work_style || job.work_value ? `
+                <div class="collapsible-section mb-3">
+                  <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#characteristics-${job.id || index}" aria-expanded="false">
+                    <div class="section-title">
+                      <span>
+                        <i class="fas fa-user-cog me-2"></i>
+                        <strong>Phong cách & Giá trị làm việc</strong>
+                      </span>
+                      <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                  </div>
+                  <div class="collapse" id="characteristics-${job.id || index}">
+                    <div class="characteristics-grid mt-2">
+                      ${job.work_style ? `
+                        <div class="characteristic-item">
+                          <div class="char-header">
+                            <i class="fas fa-user-cog me-1"></i>
+                            <h6 class="mb-0">Phong cách làm việc</h6>
+                          </div>
+                          <div class="char-content text-muted">
+                            ${job.work_style}
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      ${job.work_value ? `
+                        <div class="characteristic-item">
+                          <div class="char-header">
+                            <i class="fas fa-heart me-1"></i>
+                            <h6 class="mb-0">Giá trị làm việc</h6>
+                          </div>
+                          <div class="char-content text-muted">
+                            ${job.work_value}
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+              
+              <!-- Specializations - Collapsible -->
+              ${job.specializations ? `
+                <div class="collapsible-section mb-3">
+                  <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#specializations-${job.id || index}" aria-expanded="false">
+                    <div class="section-title">
+                      <span>
+                        <i class="fas fa-star-of-life me-2"></i>
+                        <strong>Chuyên môn chi tiết</strong>
+                      </span>
+                      <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                  </div>
+                  <div class="collapse" id="specializations-${job.id || index}">
+                    <div class="specializations-content mt-2">
+                      ${this.parseJsonArray(job.specializations).map((spec, specIndex) => `
+                        <div class="spec-item">
+                          <div class="spec-number">${specIndex + 1}</div>
+                          <div class="spec-text">${spec}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+              
+              <!-- Main Tasks - Collapsible -->
+              ${job.main_tasks ? `
+                <div class="collapsible-section mb-3">
+                  <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#tasks-${job.id || index}" aria-expanded="false">
+                    <div class="section-title">
+                      <span>
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        <strong>Nhiệm vụ chính</strong>
+                      </span>
+                      <i class="fas fa-chevron-down toggle-icon"></i>
+                    </div>
+                  </div>
+                  <div class="collapse" id="tasks-${job.id || index}">
+                    <div class="tasks-content mt-2">
+                      ${this.parseJsonArray(job.main_tasks).map((task, taskIndex) => `
+                        <div class="task-item">
+                          <div class="task-marker">
+                            <i class="fas fa-check"></i>
+                          </div>
+                          <div class="task-text">${task}</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        }).join('');
+    }
+
+    showMoreJobs(tier) {
+        if (tier === '4') {
+            // Show 4-star jobs
+            document.querySelector('[data-tier="4"]').style.display = 'block';
+            document.getElementById('show-more-4-star').style.display = 'none';
+            document.getElementById('show-more-3-2-star').style.display = 'block';
+        } else if (tier === '3-2') {
+            // Show 3 & 2-star jobs
+            document.querySelector('[data-tier="3-2"]').style.display = 'block';
+            document.getElementById('show-more-3-2-star').style.display = 'none';
+        }
+        
+        // Add smooth scroll to new content
+        setTimeout(() => {
+            const targetElement = document.querySelector(`[data-tier="${tier}"]`);
+            if (targetElement) {
+                targetElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }, 100);
+    }
+
+    setupJobCardCollapse() {
+        // Add event listeners for collapsible sections
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.section-toggle')) {
+                const toggle = e.target.closest('.section-toggle');
+                const icon = toggle.querySelector('.toggle-icon');
+                const target = toggle.getAttribute('data-bs-target');
+                
+                // Toggle icon rotation
+                setTimeout(() => {
+                    const collapseElement = document.querySelector(target);
+                    if (collapseElement && collapseElement.classList.contains('show')) {
+                        icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                }, 10);
+            }
+        });
+    }
+
+    parseJsonArray(jsonString) {
+        if (!jsonString) return [];
+        try {
+            // Handle both string and array inputs
+            if (Array.isArray(jsonString)) {
+                return jsonString;
+            }
+            
+            if (typeof jsonString === 'string') {
+                // Try to parse as JSON array
+                if (jsonString.startsWith('[') && jsonString.endsWith(']')) {
+                    return JSON.parse(jsonString);
+                }
+                // Split by common delimiters if not JSON format
+                return jsonString.split(/[,;|]/).map(item => item.trim()).filter(item => item.length > 0);
+            }
+            
+            return [];
+        } catch (error) {
+            console.warn('Failed to parse JSON array:', error);
+            // Fallback to string splitting
+            return typeof jsonString === 'string' 
+                ? jsonString.split(',').map(item => item.trim()).filter(item => item.length > 0)
+                : [];
+        }
+    }
+
+    getEducationLevelText(level) {
+    // Normalize input to support numbers, numeric-strings, percent or textual codes
+    if (level === null || level === undefined || level === '') return 'Không yêu cầu';
+
+    // If it's a number-like value, try to parse integer first
+    let raw = level;
+    if (typeof raw === 'string') raw = raw.trim();
+
+    const asInt = parseInt(raw, 10);
+    if (!isNaN(asInt) && asInt >= 1 && asInt <= 5) {
+      const map = {
+        1: 'Tiểu học',
+        2: 'Trung học cơ sở',
+        3: 'Trung học phổ thông',
+        4: 'Trung cấp / Cao đẳng',
+        5: 'Đại học trở lên'
+      };
+      return map[asInt];
+    }
+
+    // Lowercase textual mappings
+    const text = (typeof raw === 'string') ? raw.toLowerCase() : '';
+    const textMap = {
+      'high_school': 'Trung học phổ thông',
+      'vocational': 'Trung cấp nghề',
+      'college': 'Cao đẳng',
+      'university': 'Đại học',
+      'master': 'Thạc sĩ',
+      'phd': 'Tiến sĩ',
+      'tiểu học': 'Tiểu học',
+      'trung học cơ sở': 'Trung học cơ sở',
+      'trung học phổ thông': 'Trung học phổ thông',
+      'trung cấp': 'Trung cấp / Cao đẳng',
+      'cao đẳng': 'Cao đẳng',
+      'đại học': 'Đại học trở lên'
+    };
+
+    if (text && textMap[text]) return textMap[text];
+
+    // If nothing matches, fallback to original mapping where numeric keys might be strings
+    const fallback = {
+      '1': 'Tiểu học',
+      '2': 'Trung học cơ sở',
+      '3': 'Trung học phổ thông',
+      '4': 'Trung cấp / Cao đẳng',
+      '5': 'Đại học trở lên'
+    };
+
+    if (fallback[String(level)]) return fallback[String(level)];
+
+    // Last resort: return the provided value as-is (trimmed) or 'Không yêu cầu'
+    if (typeof level === 'string' && level.trim().length > 0) return level.trim();
+    return 'Không yêu cầu';
+    }
+
+    addJobCardStyles() {
+        const styleId = 'enhanced-job-cards-styles';
+        const cacheBuster = Date.now();
+        
+        // Remove existing styles to prevent duplicates
+        const existingStyle = document.getElementById(styleId);
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+
+        const css = `
+            /* Enhanced PAC Job Cards Styles v${cacheBuster} */
+            .job-card {
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(150, 75, 223, 0.08);
+                border: 1px solid rgba(150, 75, 223, 0.1);
+                padding: 2rem;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+                backdrop-filter: blur(10px);
+            }
+
+            .job-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 40px rgba(150, 75, 223, 0.15);
+                border-color: var(--brand-primary, #964bdf);
+            }
+
+            .job-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--brand-primary, #964bdf), var(--brand-accent, #fff200));
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .job-card:hover::before {
+                opacity: 1;
+            }
+
+            .job-card::after {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(150, 75, 223, 0.03) 0%, transparent 70%);
+                opacity: 0;
+                transition: opacity 0.4s ease;
+                pointer-events: none;
+            }
+
+            .job-card:hover::after {
+                opacity: 1;
+            }
+
+            /* Job Header Styles with PAC Branding */
+            .job-title-section h5 {
+                color: var(--brand-secondary, #5d2e8b);
+                font-weight: 700;
+                line-height: 1.3;
+                margin-bottom: 0.75rem;
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .job-badges .badge {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+                border-radius: 25px;
+                font-weight: 600;
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                color: white;
+                border: none;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .job-badges .badge.secondary {
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.1), rgba(93, 46, 139, 0.1));
+                color: var(--brand-primary, #964bdf);
+                border: 1px solid rgba(150, 75, 223, 0.2);
+            }
+
+            /* Compatibility Rating with PAC Colors */
+            .compatibility-section {
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.05), rgba(255, 242, 0, 0.05));
+                border-radius: 12px;
+                padding: 1rem;
+                border-left: 4px solid var(--brand-primary, #964bdf);
+                margin: 1rem 0;
+            }
+
+            .compatibility-rating .fas.fa-star,
+            .compatibility-rating .far.fa-star {
+                margin-right: 3px;
+                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+                font-size: 1.1rem;
+                transition: all 0.3s ease;
+            }
+
+            /* Filled stars (yellow) */
+            .compatibility-rating .fas.fa-star {
+                color: var(--brand-accent, #fff200);
+            }
+
+            /* Empty stars (gray) */
+            .compatibility-rating .far.fa-star {
+                color: #dee2e6;
+            }
+
+            .compatibility-rating .score {
+                font-weight: 700;
+                color: var(--brand-primary, #964bdf);
+                font-size: 1.1rem;
+            }
+
+            /* Job Description */
+            .job-description p {
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin-bottom: 0;
+                color: #495057;
+            }
+
+            /* Collapsible Sections with PAC Styling */
+            .collapsible-section {
+                border: 1px solid rgba(150, 75, 223, 0.15);
+                border-radius: 12px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                margin-bottom: 1rem;
+                background: rgba(150, 75, 223, 0.02);
+            }
+
+            .collapsible-section:hover {
+                border-color: rgba(150, 75, 223, 0.3);
+                box-shadow: 0 2px 8px rgba(150, 75, 223, 0.1);
+            }
+
+            .section-toggle {
+                padding: 1rem 1.25rem;
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.08), rgba(93, 46, 139, 0.08));
+                cursor: pointer;
+                transition: all 0.3s ease;
+                border: none;
+                width: 100%;
+                text-align: left;
+            }
+
+            .section-toggle:hover {
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.12), rgba(93, 46, 139, 0.12));
+            }
+
+            .section-toggle.expanded {
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                color: white;
+            }
+
+            .section-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-weight: 600;
+                color: var(--brand-secondary, #5d2e8b);
+                font-size: 0.95rem;
+            }
+
+            .section-toggle.expanded .section-title {
+                color: white;
+            }
+
+            .toggle-icon {
+                transition: transform 0.3s ease;
+                color: var(--brand-primary, #964bdf);
+                font-size: 1.1rem;
+            }
+
+            .section-toggle.expanded .toggle-icon {
+                transform: rotate(180deg);
+                color: white;
+            }
+
+            .collapse {
+                border-top: 1px solid rgba(150, 75, 223, 0.15);
+                background: white;
+            }
+
+            .collapse .mt-2 {
+                padding: 1.25rem;
+            }
+
+            /* Abilities Grid with PAC Design */
+            .abilities-grid {
+                display: grid;
+                gap: 1rem;
+            }
+
+            .ability-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(150, 75, 223, 0.02));
+                border-radius: 12px;
+                border: 1px solid rgba(150, 75, 223, 0.1);
+                transition: all 0.3s ease;
+                backdrop-filter: blur(5px);
+            }
+
+            .ability-item:hover {
+                border-color: var(--brand-primary, #964bdf);
+                box-shadow: 0 4px 16px rgba(150, 75, 223, 0.15);
+                transform: translateY(-1px);
+            }
+
+            .ability-icon {
+                flex-shrink: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                color: white;
+                font-size: 1.1rem;
+            }
+
+            .ability-content {
+                flex: 1;
+            }
+
+            .ability-label {
+                font-weight: 700;
+                color: var(--brand-secondary, #5d2e8b);
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .ability-value {
+                color: #495057;
+                font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            /* Requirements Section with PAC Theme */
+            .req-grid {
+                display: grid;
+                gap: 1rem;
+            }
+
+            .req-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 0.75rem;
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.03), rgba(255, 242, 0, 0.03));
+                border-radius: 8px;
+                border-left: 3px solid var(--brand-accent, #fff200);
+            }
+
+            .req-icon {
+                flex-shrink: 0;
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--brand-accent, #fff200);
+                color: var(--brand-secondary, #5d2e8b);
+                border-radius: 6px;
+                font-weight: 700;
+            }
+
+            /* Work Locations */
+            .locations-list {
+                display: grid;
+                gap: 0.75rem;
+                max-height: none;
+            }
+
+            .location-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.05), rgba(255, 242, 0, 0.05));
+                border-radius: 10px;
+                font-size: 0.9rem;
+                border: 1px solid rgba(150, 75, 223, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .location-item:hover {
+                border-color: var(--brand-primary, #964bdf);
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.08), rgba(255, 242, 0, 0.08));
+                transform: translateX(4px);
+            }
+
+            .location-item i {
+                color: var(--brand-primary, #964bdf);
+                font-size: 1rem;
+            }
+
+            /* Characteristics Grid */
+            .characteristics-grid {
+                display: grid;
+                gap: 1.25rem;
+            }
+
+            .characteristic-item {
+                padding: 1.25rem;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(150, 75, 223, 0.02));
+                border-radius: 12px;
+                border: 1px solid rgba(150, 75, 223, 0.1);
+                transition: all 0.3s ease;
+                backdrop-filter: blur(5px);
+            }
+
+            .characteristic-item:hover {
+                border-color: var(--brand-primary, #964bdf);
+                box-shadow: 0 4px 16px rgba(150, 75, 223, 0.12);
+                transform: translateY(-2px);
+            }
+
+            .char-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.75rem;
+            }
+
+            .char-header i {
+                color: var(--brand-primary, #964bdf);
+                margin-right: 0.75rem;
+                font-size: 1.2rem;
+            }
+
+            .char-header h6 {
+                color: var(--brand-secondary, #5d2e8b);
+                font-weight: 700;
+                margin: 0;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .char-content {
+                font-size: 0.95rem;
+                line-height: 1.6;
+                color: #495057;
+            }
+
+            /* Specializations with Enhanced Design */
+            .specializations-content {
+                display: grid;
+                gap: 0.75rem;
+            }
+
+            .spec-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(150, 75, 223, 0.1);
+            }
+
+            .spec-item:last-child {
+                border-bottom: none;
+            }
+
+            .spec-number {
+                flex-shrink: 0;
+                width: 32px;
+                height: 32px;
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.85rem;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(150, 75, 223, 0.3);
+            }
+
+            .spec-text {
+                color: #495057;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                flex: 1;
+            }
+
+            /* Tasks with PAC Branding */
+            .tasks-content {
+                display: grid;
+                gap: 1rem;
+            }
+
+            .task-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+                background: linear-gradient(135deg, rgba(255, 242, 0, 0.05), rgba(150, 75, 223, 0.05));
+                border-radius: 12px;
+                border-left: 4px solid var(--brand-accent, #fff200);
+                transition: all 0.3s ease;
+            }
+
+            .task-item:hover {
+                background: linear-gradient(135deg, rgba(255, 242, 0, 0.08), rgba(150, 75, 223, 0.08));
+                transform: translateX(4px);
+                box-shadow: 0 2px 8px rgba(150, 75, 223, 0.1);
+            }
+
+            .task-marker {
+                flex-shrink: 0;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--brand-accent, #fff200);
+                color: var(--brand-secondary, #5d2e8b);
+                border-radius: 50%;
+                font-weight: 700;
+            }
+
+            .task-text {
+                color: #495057;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                flex: 1;
+            }
+
+            /* Jobs Tier Sections with PAC Design */
+            .jobs-tier {
+                margin-bottom: 3rem;
+            }
+
+            .tier-header {
+                text-align: left;
+                margin-bottom: 2rem;
+                padding: 1.5rem;
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                border-radius: 16px;
+                color: white;
+                position: relative;
+                overflow: hidden;
+                /* Enhanced text readability */
+                box-shadow: 0 6px 20px rgba(150, 75, 223, 0.3);
+            }
+
+            .tier-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 80px;
+                height: 80px;
+                background: radial-gradient(circle, rgba(255, 242, 0, 0.15) 0%, transparent 70%);
+                border-radius: 50%;
+                transform: translate(25%, -25%);
+                z-index: 1;
+            }
+
+            .tier-header h4 {
+                color: white;
+                font-weight: 800;
+                margin-bottom: 0.5rem;
+                font-size: 1.4rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                /* Enhanced text visibility */
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                position: relative;
+                z-index: 2;
+            }
+
+            .tier-header p {
+                color: white;
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 500;
+                /* Enhanced text visibility */
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+                opacity: 0.95;
+                position: relative;
+                z-index: 2;
+            }
+
+            .tier-header .star-rating {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                position: relative;
+                z-index: 2;
+            }
+
+            .tier-header .star-rating .fas.fa-star,
+            .tier-header .star-rating .far.fa-star {
+                font-size: 1.3rem;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+                margin-right: 3px;
+                transition: transform 0.2s ease;
+            }
+
+            .tier-header .star-rating .fas.fa-star {
+                color: var(--brand-accent, #fff200);
+                text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            }
+
+            .tier-header .star-rating .far.fa-star {
+                color: rgba(255, 255, 255, 0.6);
+                text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            }
+
+            .tier-header .star-rating .fas.fa-star:hover {
+                transform: scale(1.1);
+            }
+
+            /* Show More Buttons */
+            .show-more-btn {
+                display: block;
+                width: 100%;
+                max-width: 400px;
+                margin: 2rem auto;
+                padding: 1rem 2rem;
+                background: linear-gradient(135deg, rgba(150, 75, 223, 0.1), rgba(255, 242, 0, 0.1));
+                border: 2px solid var(--brand-primary, #964bdf);
+                border-radius: 50px;
+                color: var(--brand-primary, #964bdf);
+                font-weight: 700;
+                font-size: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .show-more-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+                transition: left 0.6s ease;
+            }
+
+            .show-more-btn:hover::before {
+                left: 100%;
+            }
+
+            .show-more-btn:hover {
+                background: linear-gradient(135deg, var(--brand-primary, #964bdf), var(--brand-secondary, #5d2e8b));
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(150, 75, 223, 0.3);
+            }
+
+            .show-more-btn i {
+                margin-left: 0.75rem;
+                transition: transform 0.3s ease;
+            }
+
+            .show-more-btn:hover i {
+                transform: translateX(4px);
+            }
+
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .job-card {
+                    padding: 1.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .tier-header {
+                    padding: 1.25rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .tier-header::before {
+                    width: 60px;
+                    height: 60px;
+                }
+
+                .tier-header h4 {
+                    font-size: 1.2rem;
+                    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+                }
+
+                .tier-header p {
+                    font-size: 0.9rem;
+                    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+                }
+
+                .tier-header .star-rating .fas.fa-star,
+                .tier-header .star-rating .far.fa-star {
+                    font-size: 1.1rem;
+                }
+
+                .ability-item {
+                    padding: 0.75rem;
+                }
+
+                .ability-icon {
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .characteristic-item {
+                    padding: 1rem;
+                }
+
+                .show-more-btn {
+                    font-size: 0.9rem;
+                    padding: 0.875rem 1.5rem;
+                }
+            }
+
+            /* Custom Text Colors for Better Visibility */
+            .text-pac-success {
+                color: #10b981 !important; /* Bright green, more visible than Bootstrap's text-success */
+            }
+
+            .text-pac-success:hover {
+                color: #059669 !important; /* Darker green on hover */
+            }
+
+            /* Enhanced Animations */
+            @keyframes pac-glow {
+                0%, 100% { box-shadow: 0 4px 20px rgba(150, 75, 223, 0.15); }
+                50% { box-shadow: 0 8px 30px rgba(150, 75, 223, 0.25); }
+            }
+
+            .job-card:hover {
+                animation: pac-glow 2s ease-in-out infinite;
+            }
+
+            @keyframes pac-pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+
+            .ability-icon:hover {
+                animation: pac-pulse 0.6s ease-in-out;
+            }
+        `;
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = css;
+        document.head.appendChild(style);
+    }
+
+  // Normalize raw compatibility score into 0-5 scale (supports 0-5, 0-10, 0-100 inputs)
+  normalizeCompatibilityScore(score) {
+    const n = Number(score);
+    if (isNaN(n)) return 3; // default
+
+    // If already in 0-5 range
+    if (n >= 0 && n <= 5) {
+      // Round to one decimal for display consistency
+      return Math.round(n * 10) / 10;
+    }
+
+    // If it's 0-10 scale, convert to 0-5
+    if (n > 5 && n <= 10) {
+      return Math.round((n / 2) * 10) / 10;
+    }
+
+    // If it's 0-100 percent scale, convert to 0-5
+    if (n > 10) {
+      const scaled = (n / 100) * 5;
+      return Math.round(Math.max(0, Math.min(5, scaled)) * 10) / 10;
+    }
+
+    return Math.round(Math.max(0, Math.min(5, n)) * 10) / 10;
+  }
+
+  renderStarRating(score) {
         const stars = [];
+        // Convert score to number and ensure it's between 0 and 5
+        const numericScore = Math.max(0, Math.min(5, Number(score) || 0));
+        
         for (let i = 1; i <= 5; i++) {
-            if (i <= score) {
-                stars.push('<i class="fas fa-star star"></i>');
+            if (i <= numericScore) {
+                // Filled star (bright yellow)
+                stars.push('<i class="fas fa-star" style="color: var(--brand-accent, #fff200);"></i>');
             } else {
-                stars.push('<i class="fas fa-star star empty"></i>');
+                // Empty star (gray)
+                stars.push('<i class="far fa-star" style="color: #dee2e6;"></i>');
             }
         }
         return stars.join('');

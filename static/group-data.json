@@ -1,0 +1,432 @@
+{
+  "groups": [
+    {
+      "characterName": "Xây dựng",
+      "code": "R",
+      "description": "Nhà kiến tạo là những người hiện thực hóa các kế hoạch, lý thuyết và nhiệm vụ công việc. Bạn đề cao sự thẳng thắn, sự chủ động, sự tự chủ và tính hiệu quả thực tế. Trong môi trường tổ chức, bạn đóng vai trò chủ chốt trong việc phát triển, cải tiến và vận dụng các phương pháp, công cụ bằng việc kết hợp nhuần nhuyễn các thao tác vận động, sự tò mò và quan sát nhạy bén để tạo ra sản phẩm mới hoặc nâng cao chất lượng sản phẩm.",
+      "explain": "được thúc đẩy bởi mong muốn hành động, khẳng định, kiểm chứng, và cạnh tranh hơn là nghiên cứu lý thuyết và chiêm nghiệm về các lý giải trừu tượng. Bạn hứng thú với các công việc mang tính thực tế, rõ ràng, hướng kết quả, và tiếp cận vấn đề với phương thức giải quyết đơn giản, có hệ thống, và đạt được hiệu quả cụ thể. Những công việc này thường đòi hỏi sự khéo léo của đôi bàn tay và sự phối hợp nhuần nhuyễn giữa các kỹ năng và thao tác vận động. Bạn tận hưởng cảm giác được thấy và chạm tay vào các đồ vật và công cụ, cây cỏ, vật nuôi, hay tham gia vào hoạt động thể thao, hoạt động xây dựng, hoạt động ngoài trời. Bạn có xu hướng học hiệu quả nhất thông qua việc thực hành, làm thí nghiệm. Những người thuộc nhóm tính cách xây dựng như bạn sẽ có xu hướng trở thành kỹ sư, kỹ thuật viên lành nghề, hoặc hướng tới các vị trí và công việc đòi hỏi sự liên kết, sự đơn giản, trao đổi thẳng thắn và tính thực tế. Đồng thời, bạn sẽ làm việc tốt nhất trong các công việc đề cao khả năng suy luận logic, tư duy làm việc độc lập và kỹ thuật lành nghề, và thường tránh né các công việc bàn giấy, các hoạt động yêu cầu giao tiếp xã hội thường xuyên như dạy học, tư vấn, chăm sóc và liên lạc với người khác.",
+      "group": "Nhà Kiến Tạo",
+      "hollandName": "Kỹ thuật",
+      "id": "1",
+      "trendDescription": "Nghề nghiệp liên quan đến máy móc, thiết bị, thao tác vận động, xây dựng, sửa chữa, cắm trại, lái xe, làm việc ngoài trời như kiến trúc, an toàn lao động, xây dựng, thuỷ sản, cơ khí, kỹ thuật, vận hành máy, huấn luyện viên,… Những người thuộc nhóm này tính thực tế, đáng tin cậy, đơn giản, coi trọng truyền thống, và có thao tác vận động khéo léo.",
+      "favoriteActivity": [
+        "Hoạt động ngoài trời",
+        "Làm việc với công cụ, máy móc",
+        "Chơi một môn thể thao chuyên nghiệp",
+        "Sửa chữa đồ điện/điện tử",
+        "Cấu trúc/xây dựng đồ vật"
+      ],
+      "highlights": [
+        "Đáng tin cậy",
+        "Chân thành, trung thực",
+        "Đề cao hiệu suất",
+        "Hướng kết quả",
+        "Coi trọng truyền thống",
+        "Độc lập",
+        "Quan sát, cảm nhận",
+        "Năng động",
+        "Thẳng thắn, rõ ràng"
+      ],
+      "jobs": [
+        "Kỹ sư tự động hoá",
+        "Kỹ sư điện",
+        "Phi công",
+        "Kỹ sư vi tính",
+        "Kỹ sư nông nghiệp",
+        "Chuyên gia hoá-sinh",
+        "Chuyên gia địa chất",
+        "Nhà nhân chủng học",
+        "Y tá",
+        "Bác sĩ phẫu thuật",
+        "Kỹ sư an ninh",
+        "Pha chế rượu",
+        "Đầu bếp",
+        "Phi công",
+        "Nhà động vật học"
+      ],
+      "keywords": [
+        "Liên kết",
+        "Thực tế",
+        "Vận động",
+        "Có cấu trúc",
+        "Ngoài trời",
+        "Kiên nhẫn",
+        "Vận dụng",
+        "Làm việc với công cụ",
+        "Sửa chữa, tối ưu hóa"
+      ],
+      "majors": [
+        "Cơ khí",
+        "Xây dựng",
+        "Điện - Điện tử",
+        "Nông nghiệp",
+        "Khoa học - Thiên nhiên",
+        "Y học",
+        "Giao thông vận tải",
+        "An ninh - Quân sự",
+        "Thể thao",
+        "Dịch vụ - Giải trí"
+      ],
+      "needValue": [
+        "Khả năng làm việc nhóm",
+        "Khả năng giao tiếp xã hội"
+      ]
+    },
+    {
+      "characterName": "Suy nghĩ",
+      "code": "I",
+      "description": "Học giả là những người trí thức. Bạn có khả năng để ý tới các chi tiết và quan sát nhỏ nhất, dành nhiều thời gian để phân tích, chiêm nghiệm và khám phá những ý tưởng mới rồi mới đưa ra quyết định. Bạn có phong cách làm việc độc lập và khao khát mãnh liệt để giải quyết các vấn đề, và thường đề cao việc kiểm chứng các đánh giá, quan sát bằng cách đặt câu hỏi, sau đó tổng hợp, tổ chức, và phân tích thông tin một cách rõ ràng. Lối tư duy rành mạch này giúp bạn biến những thứ lẫn lộn, mơ hồ trở thành các khái niệm và quy luật có cấu trúc. ",
+      "explain": "được thúc đẩy bởi sự tò mò, khao khát lí giải, kiểm chứng và thấu hiểu các học thuyết, sự vật, hiện tượng từ mọi môi trường và hoàn cảnh của cuộc sống, công việc, nghiên cứu. Bạn hứng thú với các hoạt động liên quan tới khoa học (cả khoa học xã hội và khoa học tự nhiên), toán học hay các công việc yêu cầu khả năng quan sát, phân tích logic và tư duy phản biện, có hệ thống và chính xác. Những công việc này thường đòi hỏi khả năng tập trung, thu nhận thông tin (bao hàm thông tin trừu tượng hoặc không rõ ràng) ở mức cao và sự thuần thục trong việc vận dụng các kĩ năng, kiến thức, hiểu biết cá nhân và khả năng làm việc với con người để đưa ra các ý tưởng và cách giải quyết vấn đề mới. Bạn tận hưởng cảm giác được đắm chìm trong dòng suy nghĩ, đặc biệt thông qua việc đọc sách, học tập, tranh luận, phân tích dữ liệu hơn là các công việc thuần tay chân, làm việc với máy móc. Bản thân bạn cũng không thực sự hứng thú với các hoạt động ngoài trời, trừ khi chúng gợi cho bạn sự tò mò và khám phá sâu. Bạn độc lập, biết suy xét, và luôn có nhiều ý tưởng, tuy vậy bạn có thể gặp khó khăn trong các kỹ năng thuyết phục, dẫn dắt người khác. Bạn sử dụng năng lực phân tích thông tin của mình để đạt được kết quả trong nhiệm vụ cụ thể, nhưng thường né tránh các yêu cầu liên quan tới thương thuyết, thương mại hoặc quản lý. ",
+      "group": "Nhà Học Giả",
+      "hollandName": "Nghiên cứu",
+      "id": "2",
+      "trendDescription": "Nghề nghiệp liên quan đến các nhóm khoa học như khoa học tự nhiên, công nghệ, xã hội, y dược. Những người thuộc nhóm tính cách này thường thích đọc sách, nghiên cứu, khai thác và giải quyết các vấn đề có liên quan đến toán học, khoa học.",
+      "favoriteActivity": [
+        "Giải quyết vấn đề",
+        "Khám phá/ Quan sát",
+        "Điều tra/Nghiên cứu",
+        "Sử dụng công cụ",
+        "Thiết kế đồ vật"
+      ],
+      "highlights": [
+        "Trí tuệ",
+        "Tò mò",
+        "Sâu sắc",
+        "Nội tâm",
+        "Thông thái",
+        "Đa chiều",
+        "Tự sự",
+        "Sáng tạo",
+        "Truyền cảm hứng",
+        "Logic, lý trí",
+        "Phân tích",
+        "Tư duy phản biện cao"
+      ],
+      "jobs": [
+        "Bác sỹ phẫu thuật",
+        "Chuyên gia sinh học",
+        "Chuyên viên phân tích hệ thống",
+        "Nha sĩ",
+        "Lập trình viên",
+        "Kỹ sư máy móc",
+        "Nhà thiên văn học",
+        "Phi công",
+        "Nhà công nghệ tế bào học"
+      ],
+      "keywords": [
+        "Phân tích",
+        "Trừu tượng",
+        "Hệ thống hóa",
+        "Liên tục cải tiến",
+        "Tỉ mẩn",
+        "Cân bằng giữa làm việc hợp tác và làm việc độc lập"
+      ],
+      "majors": [
+        "Nhân chủng học",
+        "Tâm lý học",
+        "Toán học",
+        "Xã hội học",
+        "Khoa học giáo dục",
+        "Dược",
+        "Vi sinh học",
+        "Tội phạm học",
+        "Thiên văn học"
+      ],
+      "needValue": [
+        "Khả năng làm việc nhóm",
+        "Khả năng giao tiếp xã hội"
+      ]
+    },
+    {
+      "characterName": "Sáng tạo",
+      "code": "A",
+      "description": "Nhà sáng tạo là những người có khả năng tự cảm nhận và tự thể hiện rất cao. Bạn ưa thích làm việc với ý tưởng và đồ vật trong các công việc và nhiệm vụ đòi hỏi trí tưởng tượng, sự dồi dào và luôn đổi mới. Trong môi trường làm việc chuyên nghiệp, bạn thể hiện mình là một người cởi mở, nhạy cảm, khoáng đạt, độc đáo và đôi khi là bốc đồng. Bạn có xu hướng đi ngược lại các quy tắc, các quy luật vận hành của khoa học, xã hội và né tránh các nhiệm vụ đòi hỏi sự giao tiếp liên tục với con người. Do vậy họ thường cảm thấy hứng thú và bị thu hút với các lĩnh vực về nghệ thuật, văn hóa, thẩm mỹ.",
+      "explain": "có khiếu thưởng thức, có khả năng tưởng tượng, cảm nhận và diễn đạt một cách phong phú và độc lập. Bạn có tính liên kết xã hội cao và mang bản sắc riêng, giàu cảm xúc, và hay thay đổi. Điều này không chỉ được thể hiện qua lời nói giao tiếp, hành động và thể hiện bên ngoài của bạn với người khác, mà còn trong cả sự liên kết và trách nhiệm cá nhân với các thực thể, hiện tượng. Các đối tượng bạn quan tâm thường ở một mức độ trừu tượng nhất định. Bạn hứng thú và phù hợp nhất với các công việc và vị trí đòi hỏi tính thẩm mỹ, sự tự biểu hiện, và các nhiệm vụ được thực hiện mà không tuân theo một bộ quy tắc rõ ràng như mỹ thuật, thiết kế, văn chương, báo chí, ca nhạc, hội họa, điện ảnh, kiến trúc, thời trang. Bạn có khả năng làm việc tốt dưới áp lực và có xu hướng tìm kiếm nguồn cảm hứng từ các hoạt động, khái niệm phi cấu trúc để thể hiện suy nghĩ của bản thân thông qua các chất liệu, biểu hiện nghệ thuật. Mặc dù bạn là một người có khả năng biểu đạt tình cảm của mình và thích được tham gia vào các hoạt động kết nối, bạn sẽ chỉ làm tốt nhất và nên hướng tới các công việc và môi trường trân trọng sự sáng tạo độc lập, suy nghĩ và cảm nhận cá nhân, và cần cải thiện khả năng làm việc nhóm với người thuộc nhóm tính cách Xây dựng, Suy nghĩ và Tổ chức.",
+      "group": "Nhà Sáng Tạo",
+      "hollandName": "Nghệ thuật",
+      "id": "3",
+      "trendDescription": "Nghề nghiệp mang tính nghệ thuật, đòi hỏi tính thẩm mỹ, thường liên quan đến các công việc cần sự tưởng tượng, sự tự biểu hiện, tự thể hiện và các công việc được thực hiện mà không tuân theo một bộ quy tắc rõ ràng như mỹ thuật, thiết kế, văn chương, báo chí, ca nhạc, hội hoạ, điện ảnh, kiến trúc, thời trang. Người thuộc nhóm này thường cá tính, độc lập, có sức tưởng tượng phong phú, và có khả năng âm nhạc, biểu diễn, kịch nghệ, mỹ thuật, viết sáng tạo.",
+      "favoriteActivity": [
+        "Tham dự hoà nhạc, triển lãm nghệ thuật",
+        "Đọc tiểu thuyết, thơ, kịch",
+        "Chụp ảnh",
+        "Ngoại ngữ, văn học",
+        "Tìm hiểu các nền văn hoá",
+        "Phác thảo, sơn, nặn tạo hình, sắp xếp khối",
+        "Chơi 1 loại nhạc cụ",
+        "Viết truyện, nhạc, thơ, kịch",
+        "Nhập vai, ca hát, nhảy múa",
+        "Thiết kế nội thất, cảnh quan, thời trang..."
+      ],
+      "highlights": [
+        "Tính kết nối xã hội",
+        "Năng khiếu mỹ thuật",
+        "Giỏi ứng biến",
+        "Bản sắc cá nhân riêng",
+        "Không chắc chắn, hay thay đổi",
+        "Sự tự trách nhiệm",
+        "Nhạy cảm",
+        "Giàu cảm xúc"
+      ],
+      "jobs": [
+        "Chuyên viên phục trang",
+        "Nhà thiết kế thời trang, thiết kế công nghiệp",
+        "Nhà phê bình/ biên tập văn học/ kịch/ âm nhạc",
+        "Chuyên viên thiết kế nội thất/ đồ hoạ",
+        "Kiến trúc sư",
+        "Nhiếp ảnh gia",
+        "Nhà văn, nhà thơ",
+        "Biên đạo múa",
+        "Biên tập viên",
+        "Chuyên gia tư vấn trang trí",
+        "Nhà báo",
+        "Người sáng tạo quảng cáo, tiếp thị",
+        "Người dẫn chương trình",
+        "Nhà quay phim",
+        "Nhà soạn nhạc",
+        "Chuyên gia đồ hoạ",
+        "Người tổ chức sự kiện"
+      ],
+      "keywords": [
+        "Làm việc dưới áp lực hoặc cường độ cao",
+        "Tự do, không khuân mẫu",
+        "Phá vỡ quy tắc",
+        "Mang tính phản ánh và cải thiện liên tục",
+        "Độc lập",
+        "Sáng tạo và tự thể hiện;"
+      ],
+      "majors": [
+        "Lịch sử nghệ thuật",
+        "Ngôn ngữ học",
+        "Triết học",
+        "Nghệ thuật sân khấu và biểu diễn (âm nhạc, điện ảnh, múa, dẫn chương trình)",
+        "Nghệ thuật hình ảnh và tạo hình (hội họa, điêu khắc, đồ họa vi tính, thời trang, kiến trúc, nội thất)",
+        "Các lĩnh vực bổ trợ: nghệ thuật ẩm thực, quay phim, thủ công mỹ nghệ, thiết kế sân khấu/ phong cảnh/ âm thanh"
+      ],
+      "needValue": [
+        "Làm việc cùng nhóm nơi bạn được đưa ra các ý tưởng sáng tạo",
+        "Cải thiện khả năng lắng nghe và làm việc với người thuộc nhóm Xây dựng, Suy nghĩ và Tổ chức"
+      ]
+    },
+    {
+      "characterName": "Giúp đỡ",
+      "code": "S",
+      "description": "Nhà bác ái là những người giàu lòng vị tha, biết lắng nghe, chia sẻ, và thường đặt ra mục tiêu cao cả vì lợi ích chung của toàn tập thể. Bạn thích làm việc với con người để quan sát, tìm tòi và đề ra các kế hoạch, hành động để hoàn thiện bản thân và giúp đỡ những người xung quanh. Một khi đã xác định rõ phương hướng, nhiệm vụ, và vai trò của mình, bạn kiên trì và tự tin dùng sự chân thành, trách nhiệm, nhạy cảm và hợp tác của mình để thuyết phục, dẫn dắt và hướng dẫn người khác.",
+      "explain": "là một người hòa đồng, gần gũi, và thích hỗ trợ người khác với tinh thần thiện nguyện và cởi mở như đưa ra lời khuyên hay cung cấp thông tin. Bạn kiên nhẫn, tháo vát, hợp tác, dễ đồng cảm, và biết lắng nghe một cách tính cực, và thường đặt mối quan tâm và lợi ích chung lên trên lợi ích cá nhân trong công việc với mong muốn đóng góp vào một xã hội tốt đẹp hơn. Bạn tìm thấy động lực và sự thỏa mãn nghề nghiệp ở các vị trí và môi trường làm việc đòi hỏi sự giao tiếp khéo léo và tiếp xúc với con người ở mức độ gần gũi, các lĩnh vực và nghề nghiệp liên quan tới hoàn thiện bản thân như giáo dục, tâm lý học, công tác xã hội, và chăm sóc sức khỏe. Tuy vậy, bạn thường né tránh và cảm thấy không phù hợp với các công việc phải sử dụng máy móc thiết bị thường xuyên, hay những công việc bàn giấy đơn giản vì các công việc đó không có nhiều cơ hội giao tiếp với mọi người.",
+      "group": "Nhà Bác Ái",
+      "hollandName": "Xã hội",
+      "id": "4",
+      "trendDescription": "Nghề nghiệp xã hội thường liên quan đến con người như giao tiếp, dạy học, trao nhận thông tin và chăm sóc cộng đồng như tư vấn viên, giảng viên, huấn luyện, tư vấn, hướng nghiệp, công tác xã hội. Người thuộc nhóm này thường thân thiện, hoà đồng, thích đưa ra lời khuyên, cung cấp thông tin và giúp đỡ người khác.",
+      "favoriteActivity": [
+        "Hoạt động cộng đồng, hoạt động xã hội, hoạt động tình nguyện",
+        "Chăm sóc và giúp đỡ người khác",
+        "Giảng dạy, giáo dục, huấn luyện",
+        "Làm việc nhóm",
+        "Tư vấn và đưa ra lời khuyên",
+        "Tư vấn tâm lý",
+        "Hỗ trợ truyền thông",
+        "Du lịch và khám phá văn hóa"
+      ],
+      "highlights": [
+        "Tính kết nối cộng đồng",
+        "Khả năng dẫn dắt",
+        "Tính ảnh hưởng cá nhân/nhóm",
+        "Linh hoạt",
+        "Kiên nhẫn"
+      ],
+      "jobs": [
+        "Nhà tâm lý học",
+        "Nhà ngôn ngữ học",
+        "Nhà đô thị học",
+        "Nhà sử học",
+        "Nhà khảo cổ học",
+        "Nhà nhân học",
+        "Nhà văn hóa học",
+        "Nhà quốc tế học",
+        "Chính trị gia",
+        "Nhà công tác xã hội",
+        "Tình nguyện viên",
+        "Nhân viên chăm sóc khách hàng",
+        "Nhà hoạt động xã hội",
+        "Biên - thông dịch viên",
+        "Nhà tư vấn tâm lý - bác sĩ tâm lý",
+        "Tư vấn hướng nghiệp",
+        "Giáo viên - giảng viên",
+        "Huấn luyện viên thể thao - đào tạo kỹ năng",
+        "Luật sư",
+        "Bác sĩ",
+        "Y tá - điều dưỡng",
+        "Chuyên viên trị liệu",
+        "Nhà nghiên cứu y tế công cộng",
+        "Dinh dưỡng học",
+        "Quản lý du lịch",
+        "Xuất bản và thông tin"
+      ],
+      "keywords": [
+        "Hoà đồng",
+        "Chia sẻ",
+        "Thấu cảm",
+        "Đáng tin cậy",
+        "Dễ tính",
+        "Cởi mở",
+        "Thân mật",
+        "Kiên nhẫn",
+        "Nhanh nhẹn",
+        "Tháo vát",
+        "Hợp tác",
+        "Biết quan tâm và lắng nghe",
+        "Hay quan sát",
+        "Nhiệt tình",
+        "Hào phóng",
+        "Trách nhiệm"
+      ],
+      "majors": [
+        "Khoa học Xã hội: Lịch sử",
+        "Nhân học, Triết học, Văn hóa học, Quốc tế học, Chính trị học",
+        "Ngôn ngữ học",
+        "Truyền thông",
+        "Báo chí",
+        "Giáo dục",
+        "Tư pháp",
+        "Tôn giáo và tâm linh",
+        "Công tác Xã hội",
+        "Nhân sự và quản trị nguồn nhân lực",
+        "Y tế - Y tế công cộng"
+      ],
+      "needValue": [
+        "Khả năng làm việc với tất cả nhóm tính cách khác, đặc biệt là nhóm Sáng tạo và nhóm Thuyết phục"
+      ]
+    },
+    {
+      "characterName": "Thuyết phục",
+      "code": "E",
+      "description": "Nhà tiên phong là những con người toàn diện. Bạn vừa có thể suy ngẫm, nghiên cứu, đánh giá các học thuyết và phương pháp, vừa có khả năng diễn đạt và ứng dụng các phân tích của mình một cách hiệu quả và có sức ảnh hưởng. Bạn thích làm việc với ý tưởng và con người, và thường được miêu tả là dễ gần, năng động, quyết đoán, có nhiều hoài bão và tự tin. Khả năng giao tiếp tốt là điểm mạnh nhất của bạn, và bạn có thể sử dụng năng lực này để thuyết phục, thương lượng, lãnh đạo hay quản lý một đội nhóm vì mục tiêu chung. ",
+      "explain": "tự tin, mạnh mẽ, chủ động, hướng ngoại và có xu hướng thích phiêu lưu mạo hiểm. Bạn phù hợp với các công việc có nhiều áp lực, cạnh tranh, và thay đổi không ngừng. Đây vừa là động lực, vừa là mục tiêu nghề nghiệp bạn tìm kiếm trong các môi trường làm việc chuyên nghiệp. Bạn có khả năng dẫn dắt, tạo ảnh hưởng, và có sức thuyết phục, đồng thời là người có tầm nhìn, mục tiêu, nhiều hoài bão, không ngừng cải thiện và phấn đấu chứ không muốn dừng tại chỗ. Tuy vậy, người thuộc nhóm tính cách này như bạn có xu hướng bỏ qua các quan sát chi tiết, phân tích khoa học và đánh giá phản biện, bởi vậy bạn nên tìm kiếm cho mình một người đồng hành trong công việc có thể giúp bạn đảm trách các nhiệm vụ chuyên môn, và bản thân bạn cũng cần liên tục trau dồi các kiến thức nền căn bản nhất trong lĩnh vực của mình. Bạn là người nhiều năng lượng, quyết đoán, và tham vọng nhưng cũng rất hòa đồng và thích giao du, một phần vì bản tính lạc quan và nhiệt huyết luôn tràn đầy trong bản thân. Bạn phù hợp với các môi trường công việc có sự thăng tiến nhất định trong sự nghiệp hay trong các công việc đòi hỏi sự bắt đầu thực hiện của một dự án trong các lĩnh vực kinh doanh, chính trị, kinh tế, marketing, luật sư.",
+      "group": "Nhà Tiên Phong",
+      "hollandName": "Quản lý",
+      "id": "5",
+      "trendDescription": "Các mảng nghề nghiệp này liên quan đến việc bắt đầu và thực hiện các dự án, các lĩnh vực kinh doanh, marketing, luật sư, chính trị. Người thuộc nhóm nghề này có khả năng dẫn dắt, thuyết phục đám đông và đưa ra quyết định. Họ là những người có khả năng tự doanh cao, mạo hiểm và quyết đoán.",
+      "favoriteActivity": [
+        "Hoạt động chính trị",
+        "Giao tiếp liên văn hoá",
+        "Tìm hiểu nền kinh tế",
+        "Hoạt động cạnh tranh/đàm phán",
+        "Tổ chức các hoạt động/sự kiện",
+        "Thuyết phục người khác làm theo ý kiến cá nhân",
+        "Xây dựng dự án cá nhân (khởi nghiệp)"
+      ],
+      "highlights": [
+        "Giao tiếp tốt",
+        "Giàu năng lượng",
+        "Nhiệt tình",
+        "Nhiều lý tưởng",
+        "Xử lý vấn đề nhanh"
+      ],
+      "jobs": [
+        "Chính trị gia",
+        "Nhà hoạch định tài chính",
+        "Giám đốc thương mại",
+        "Nhà quản lý dự án",
+        "Kỹ sư công nghiệp",
+        "Chuyên viên quy hoạch",
+        "Thông dịch viên",
+        "Luật sư",
+        "Kế toán"
+      ],
+      "keywords": [
+        "Dẫn dắt",
+        "Tự tin",
+        "Quyết đoán",
+        "Hoài bão",
+        "Tham vọng",
+        "Mạnh mẽ",
+        "Có tầm nhìn",
+        "Quyết tâm",
+        "Quảng giao",
+        "Khéo léo",
+        "Thực tế",
+        "Năng động"
+      ],
+      "majors": [
+        "Truyền thông",
+        "Quản trị nguồn nhân lực",
+        "Kinh doanh quốc tế",
+        "Marketing",
+        "Quản lý chuỗi cung ứng",
+        "Luật",
+        "Bất động sản",
+        "Kỹ sư công nghiệp",
+        "Chính trị",
+        "Tư pháp"
+      ],
+      "needValue": [
+        "Khả năng làm việc nhóm dưới tư cách dẫn dắt, trưởng nhóm",
+        "Khả năng làm việc với người thuộc nhóm Giúp đỡ và nhóm Tổ chức"
+      ]
+    },
+    {
+      "characterName": "Tổ chức",
+      "code": "C",
+      "description": "Nhà tổ chức như bạn thường được miêu tả với hình ảnh loài kiến chăm chỉ, cần mẫn xây tổ. Bạn là người có khả năng quản lý ở mức độ vi mô, các công việc liên quan tới dữ liệu, con số, văn bản, giấy tờ bởi bạn thường chú ý tới các tiểu tiết và góc nhìn quan trọng ít ai nghĩ tới. Bạn tiếp cận công việc chuyên môn với một sự thận trọng, cân nhắc, đa chiều, và thường có một kế hoạch từng bước rõ ràng để giải quyết vấn đề. Điều này yêu cầu bạn có một sự tự chủ và tự quyết nhất định với phần việc của mình trong một môi trường có tính cấu trúc cao và tổ chức chặt chẽ, nhưng điều đó cũng giới hạn khả năng thích ứng nhanh của bạn với các công việc và tình huống bất ngờ và không có cấu trúc.",
+      "explain": "thường rất được tin cậy do tính cẩn thận, tỉ mỉ, ngăn nắp, thực tế, và có tổ chức. Bạn thường đúng hẹn, tuân thủ quy định, quy trình, ứng xử chừng mực, ôn hòa, và coi trọng truyền thống. Do đó bạn sẽ thể hiện khả năng của bản thân xuất sắc nhất ở các công việc và môi trường nghề đòi hỏi sự chuẩn chỉnh, rõ ràng, và có quy trình như quản lý dữ liệu, quản trị văn phòng và hành chính, kế toán, thống kế, tổ chức, đầu tư. Bạn thích và phù hợp môi trường lao động có cấu trúc và ổn định với lộ trình thăng tiến rõ ràng. Bạn thích làm việc với các con số và công cụ, thích quản lý hồ sơ, lên kế hoạch công việc một cách có hệ thống và tận hưởng cảm giác từng bước chắc chắn đạt được yêu cầu đề ra. Bạn nhìn nhận công việc với sự nghiêm túc và yêu cầu chuẩn mực nhất định, và có khả năng hòa đồng vào môi trường xung quanh nhanh. Tuy nhiên đôi lúc bạn cũng có thể trở nên ngoan cố và thiếu linh hoạt trong công việc nếu bản thân tin chắc điều mình đang thực hiện đã đúng hoặc đủ hiệu quả.",
+      "group": "Nhà Tổ Chức",
+      "hollandName": "Nghiệp vụ",
+      "id": "6",
+      "trendDescription": "Các nghề này thường liên quan đến các thủ tục, quy định hoặc các công việc có cấu trúc tái lập như quản lý dữ liệu, tổ chức, đầu tư, hệ thống thông tin: hành chính, quản trị văn phòng, kế toán, thống kê, thanh tra, kiểm toán, thư ký… Người thuộc nhóm này thường điềm tĩnh, tỉ mỉ, ngăn nắp, có tổ chức, sắp xếp, thực tế, có khả năng làm việc với số liệu, dữ liệu.",
+      "favoriteActivity": [
+        "Tổ chức các hoạt động/sự kiện",
+        "Làm viêc theo sự chỉ dẫn, có cấu trúc",
+        "Hoạt động với con số, tính toán, thống kê",
+        "Các phần mềm xử lý dữ liệu",
+        "Thu thập, lưu trữ dữ liệu"
+      ],
+      "highlights": [
+        "Khả năng số học",
+        "Kỹ năng tổ chức",
+        "Làm việc chi tiết trong hệ thống",
+        "Xử lý chính xác vấn đề số"
+      ],
+      "jobs": [
+        "Chuyên gia tín dụng",
+        "Biên tập bài viết",
+        "Nhà hoạch định và phân tích kinh tế - tài chính",
+        "Chuyên gia phát triển con người",
+        "Quản trị nhân sự",
+        "Chuyên viên viễn thông",
+        "Lập trình viên",
+        "Quản trị văn phòng",
+        "Kế toán - kiểm toán viên",
+        "Nhân viên phân tích thị trường",
+        "Giảng viên (đại học)",
+        "Biên - phiên dịch",
+        "Dược sĩ"
+      ],
+      "keywords": [
+        "Hệ thống",
+        "Chi tiết",
+        "Cẩn thận",
+        "Ngăn nắp",
+        "Điềm tĩnh",
+        "Truyền thống",
+        "Rõ ràng",
+        "Có cấu trúc",
+        "Chắc chắn",
+        "Nghiêm túc",
+        "Làm việc hiệu quả"
+      ],
+      "majors": [
+        "Kế toán",
+        "Tài chính",
+        "Kinh tế",
+        "Quản trị hệ thống",
+        "Công nghệ thông tin",
+        "Ngôn ngữ học",
+        "Thư viện và Khoa học Thông tin"
+      ],
+      "needValue": [
+        "Kỹ năng giao tiếp, dẫn dắt, và làm việc nhóm",
+        "Khả năng hợp tác với nhóm Thuyết phục hoặc Xây dựng"
+      ]
+    }
+  ]
+}
