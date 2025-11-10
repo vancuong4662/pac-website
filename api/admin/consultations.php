@@ -1,7 +1,7 @@
 <?php
 /**
- * Products Management API for Admin
- * Handles CRUD operations for products (consultations, courses, tests)
+ * Consultations Management API for Admin
+ * Specialized API for managing career guidance services (consultations + career_test)
  */
 
 // Enable error reporting for debugging
@@ -10,7 +10,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Log request details
-error_log("=== Products API Request ===");
+error_log("=== Consultations API Request ===");
 error_log("Method: " . $_SERVER['REQUEST_METHOD']);
 error_log("URI: " . $_SERVER['REQUEST_URI']);
 error_log("Query: " . ($_SERVER['QUERY_STRING'] ?? 'none'));
@@ -34,43 +34,22 @@ $pdo = $conn;
 
 // Temporarily skip authentication for testing
 error_log("Skipping authentication for testing");
-// Check admin authentication
-// $auth = checkAuth();
-// if (!$auth['success']) {
-//     http_response_code(401);
-//     echo json_encode([
-//         'success' => false,
-//         'message' => 'Unauthorized access'
-//     ]);
-//     exit();
-// }
-
-// For now, we'll skip admin role check for testing
-// TODO: Implement proper admin role verification
-// if ($auth['user']['role'] !== 'admin') {
-//     http_response_code(403);
-//     echo json_encode([
-//         'success' => false,
-//         'message' => 'Admin access required'
-//     ]);
-//     exit();
-// }
 
 try {
     $method = $_SERVER['REQUEST_METHOD'];
     
     switch ($method) {
         case 'GET':
-            handleGet();
+            handleGetConsultations();
             break;
         case 'POST':
-            handlePost();
+            handleCreateConsultation();
             break;
         case 'PUT':
-            handlePut();
+            handleUpdateConsultation();
             break;
         case 'DELETE':
-            handleDelete();
+            handleDeleteConsultation();
             break;
         default:
             http_response_code(405);
@@ -81,7 +60,7 @@ try {
             break;
     }
 } catch (Exception $e) {
-    error_log("Products API Error: " . $e->getMessage());
+    error_log("Consultations API Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -89,14 +68,14 @@ try {
     ]);
 }
 
-function handleGet() {
+function handleGetConsultations() {
     global $pdo;
     
     if (isset($_GET['id'])) {
-        // Get single product with packages
+        // Get single consultation service
         $id = (int)$_GET['id'];
         
-        // Get product details
+        // Get consultation details
         $stmt = $pdo->prepare("
             SELECT id, name, slug, short_description, full_description, type, category,
                    duration, target_audience, learning_outcomes, curriculum,
@@ -104,13 +83,13 @@ function handleGet() {
                    instructor_info, teaching_format,
                    image_url, status, sort_order, created_at, updated_at
             FROM products 
-            WHERE id = ?
+            WHERE id = ? AND (type = 'consultation' OR type = 'career_test')
         ");
         $stmt->execute([$id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($product) {
-            // Get packages for this product
+        if ($consultation) {
+            // Get packages for this consultation
             $package_stmt = $pdo->prepare("
                 SELECT id, package_name, package_slug, package_description,
                        original_price, sale_price, is_free, group_size, 
@@ -135,53 +114,49 @@ function handleGet() {
                 }
             }
             
-            $product['packages'] = $packages;
+            $consultation['packages'] = $packages;
             
             // Parse JSON fields
-            if ($product['target_audience']) {
-                $decoded = json_decode($product['target_audience'], true);
-                $product['target_audience'] = $decoded ?: $product['target_audience'];
+            if ($consultation['target_audience']) {
+                $decoded = json_decode($consultation['target_audience'], true);
+                $consultation['target_audience'] = $decoded ?: $consultation['target_audience'];
             }
             
-            if ($product['learning_outcomes']) {
-                $decoded = json_decode($product['learning_outcomes'], true);
-                $product['learning_outcomes'] = $decoded ?: $product['learning_outcomes'];
+            if ($consultation['learning_outcomes']) {
+                $decoded = json_decode($consultation['learning_outcomes'], true);
+                $consultation['learning_outcomes'] = $decoded ?: $consultation['learning_outcomes'];
             }
             
-            if ($product['curriculum']) {
-                $decoded = json_decode($product['curriculum'], true);
-                $product['curriculum'] = $decoded ?: $product['curriculum'];
+            if ($consultation['curriculum']) {
+                $decoded = json_decode($consultation['curriculum'], true);
+                $consultation['curriculum'] = $decoded ?: $consultation['curriculum'];
+            }
+            
+            // Add consultation type mapping
+            if ($consultation['type'] === 'consultation') {
+                $consultation['consultation_type'] = 'expert';
+            } elseif ($consultation['type'] === 'career_test') {
+                $consultation['consultation_type'] = 'automated';
             }
             
             echo json_encode([
                 'success' => true,
-                'data' => $product
+                'data' => $consultation
             ]);
         } else {
             http_response_code(404);
             echo json_encode([
                 'success' => false,
-                'message' => 'Product not found'
+                'message' => 'Không tìm thấy dịch vụ tư vấn'
             ]);
         }
     } else {
-        // Get products with filters - focus on consultation services
-        $type = $_GET['type'] ?? null;
+        // Get consultation services with filters
         $status = $_GET['status'] ?? null;
         $search = $_GET['search'] ?? null;
         
-        $whereConditions = [];
+        $whereConditions = ["(type = 'consultation' OR type = 'career_test')"];
         $params = [];
-        
-        // Filter for consultation services (career guidance)
-        if ($type) {
-            if ($type === 'consultation') {
-                $whereConditions[] = "(type = 'consultation' OR type = 'career_test')";
-            } else {
-                $whereConditions[] = "type = ?";
-                $params[] = $type;
-            }
-        }
         
         if ($status) {
             $whereConditions[] = "status = ?";
@@ -199,20 +174,16 @@ function handleGet() {
             SELECT id, name, slug, short_description, type, category,
                    duration, image_url, status, sort_order, created_at, updated_at
             FROM products 
+            WHERE " . implode(" AND ", $whereConditions) . "
+            ORDER BY sort_order ASC, created_at DESC
         ";
-        
-        if (!empty($whereConditions)) {
-            $sql .= " WHERE " . implode(" AND ", $whereConditions);
-        }
-        
-        $sql .= " ORDER BY sort_order ASC, created_at DESC";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $consultations = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Get package info for each product
-        foreach ($products as &$product) {
+        // Get package info for each consultation
+        foreach ($consultations as &$consultation) {
             $package_stmt = $pdo->prepare("
                 SELECT COUNT(*) as package_count,
                        MIN(CASE WHEN is_free = 1 THEN 0 ELSE original_price END) as min_price,
@@ -221,37 +192,36 @@ function handleGet() {
                 FROM product_packages 
                 WHERE product_id = ? AND status = 'active'
             ");
-            $package_stmt->execute([$product['id']]);
+            $package_stmt->execute([$consultation['id']]);
             $package_info = $package_stmt->fetch(PDO::FETCH_ASSOC);
             
-            $product['package_count'] = (int)$package_info['package_count'];
-            $product['min_price'] = (float)($package_info['min_price'] ?? 0);
-            $product['max_price'] = (float)($package_info['max_price'] ?? 0);
-            $product['has_free_package'] = (int)$package_info['free_packages'] > 0;
+            $consultation['package_count'] = (int)$package_info['package_count'];
+            $consultation['min_price'] = (float)($package_info['min_price'] ?? 0);
+            $consultation['max_price'] = (float)($package_info['max_price'] ?? 0);
+            $consultation['has_free_package'] = (int)$package_info['free_packages'] > 0;
             
-            // Format consultation type for display
-            if ($product['type'] === 'consultation') {
-                $product['consultation_type'] = 'expert'; // Expert consultation
-            } elseif ($product['type'] === 'career_test') {
-                $product['consultation_type'] = 'automated'; // Automated test
+            // Add consultation type mapping
+            if ($consultation['type'] === 'consultation') {
+                $consultation['consultation_type'] = 'expert';
+            } elseif ($consultation['type'] === 'career_test') {
+                $consultation['consultation_type'] = 'automated';
             }
             
             // Format package type based on price range
-            if ($product['has_free_package'] && $product['max_price'] > 0) {
-                $product['package_type'] = 'mixed'; // Both free and paid
-            } elseif ($product['has_free_package']) {
-                $product['package_type'] = 'basic'; // Free only
+            if ($consultation['has_free_package'] && $consultation['max_price'] > 0) {
+                $consultation['package_type'] = 'mixed'; // Both free and paid
+            } elseif ($consultation['has_free_package']) {
+                $consultation['package_type'] = 'basic'; // Free only
             } else {
-                $product['package_type'] = 'premium'; // Paid only
+                $consultation['package_type'] = 'premium'; // Paid only
             }
         }
         
         echo json_encode([
             'success' => true,
-            'data' => $products,
-            'count' => count($products),
+            'data' => $consultations,
+            'count' => count($consultations),
             'filters' => [
-                'type' => $type,
                 'status' => $status,
                 'search' => $search
             ]
@@ -259,7 +229,7 @@ function handleGet() {
     }
 }
 
-function handlePost() {
+function handleCreateConsultation() {
     global $pdo;
     
     $input = json_decode(file_get_contents('php://input'), true);
@@ -309,7 +279,7 @@ function handlePost() {
         return;
     }
     
-    // Check if product name already exists
+    // Check if consultation name already exists
     $stmt = $pdo->prepare("SELECT id FROM products WHERE name = ?");
     $stmt->execute([$input['name']]);
     if ($stmt->fetch()) {
@@ -339,7 +309,7 @@ function handlePost() {
     try {
         $pdo->beginTransaction();
         
-        // Insert new product
+        // Insert new consultation service
         $stmt = $pdo->prepare("
             INSERT INTO products (
                 name, slug, short_description, full_description, type, category,
@@ -361,7 +331,7 @@ function handlePost() {
         ]);
         
         if (!$success) {
-            throw new Exception('Failed to create product');
+            throw new Exception('Failed to create consultation service');
         }
         
         $newId = $pdo->lastInsertId();
@@ -411,7 +381,7 @@ function handlePost() {
         
         $pdo->commit();
         
-        // Get the created product with package info
+        // Get the created consultation with package info
         $stmt = $pdo->prepare("
             SELECT id, name, slug, short_description, type, category,
                    duration, image_url, status, sort_order, created_at, updated_at
@@ -419,28 +389,275 @@ function handlePost() {
             WHERE id = ?
         ");
         $stmt->execute([$newId]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Add consultation type for response
-        $product['consultation_type'] = $consultation_type;
-        $product['package_type'] = $input['package_type'];
-        $product['price'] = $price;
+        $consultation['consultation_type'] = $consultation_type;
+        $consultation['package_type'] = $input['package_type'];
+        $consultation['price'] = $price;
         
         http_response_code(201);
         echo json_encode([
             'success' => true,
             'message' => 'Tạo dịch vụ tư vấn thành công',
-            'data' => $product
+            'data' => $consultation
         ]);
         
     } catch (Exception $e) {
         $pdo->rollBack();
-        error_log("Product creation error: " . $e->getMessage());
+        error_log("Consultation creation error: " . $e->getMessage());
         
         http_response_code(500);
         echo json_encode([
             'success' => false,
             'message' => 'Lỗi tạo dịch vụ: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function handleUpdateConsultation() {
+    global $pdo;
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (empty($input['id'])) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID dịch vụ là bắt buộc'
+        ]);
+        return;
+    }
+    
+    $id = (int)$input['id'];
+    
+    // Check if consultation exists
+    $stmt = $pdo->prepare("
+        SELECT id, slug, name 
+        FROM products 
+        WHERE id = ? AND (type = 'consultation' OR type = 'career_test')
+    ");
+    $stmt->execute([$id]);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$existing) {
+        http_response_code(404);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Không tìm thấy dịch vụ tư vấn'
+        ]);
+        return;
+    }
+    
+    // Map consultation type to product type
+    $consultation_type = $input['consultation_type'] ?? '';
+    $product_type = '';
+    
+    if ($consultation_type === 'automated') {
+        $product_type = 'career_test';
+    } elseif ($consultation_type === 'expert') {
+        $product_type = 'consultation';
+    } else {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Loại tư vấn không hợp lệ'
+        ]);
+        return;
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Update consultation service
+        $stmt = $pdo->prepare("
+            UPDATE products 
+            SET name = ?, short_description = ?, full_description = ?, 
+                duration = ?, learning_outcomes = ?, type = ?, 
+                image_url = ?, status = ?, updated_at = NOW() 
+            WHERE id = ?
+        ");
+        
+        $success = $stmt->execute([
+            $input['name'],
+            $input['short_description'] ?? null,
+            $input['full_description'] ?? null,
+            $input['duration'] ?? null,
+            $input['learning_outcomes'] ?? null,
+            $product_type,
+            $input['image_url'] ?? null,
+            $input['status'] ?? 'active',
+            $id
+        ]);
+        
+        if (!$success) {
+            throw new Exception('Failed to update consultation service');
+        }
+        
+        // Update default package price if provided
+        if (isset($input['price']) && is_numeric($input['price'])) {
+            $price = (float)$input['price'];
+            $is_free = ($price == 0);
+            
+            // Find the first package for this consultation
+            $package_stmt = $pdo->prepare("
+                SELECT id FROM product_packages 
+                WHERE product_id = ? 
+                ORDER BY sort_order ASC, created_at ASC 
+                LIMIT 1
+            ");
+            $package_stmt->execute([$id]);
+            $package = $package_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($package) {
+                // Update existing package
+                $update_package_stmt = $pdo->prepare("
+                    UPDATE product_packages 
+                    SET original_price = ?, is_free = ?, updated_at = NOW()
+                    WHERE id = ?
+                ");
+                $update_package_stmt->execute([
+                    $price,
+                    $is_free,
+                    $package['id']
+                ]);
+            }
+        }
+        
+        $pdo->commit();
+        
+        // Get the updated consultation
+        $stmt = $pdo->prepare("
+            SELECT id, name, slug, short_description, type, category,
+                   duration, image_url, status, sort_order, created_at, updated_at
+            FROM products 
+            WHERE id = ?
+        ");
+        $stmt->execute([$id]);
+        $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Add consultation type and price for response
+        $consultation['consultation_type'] = $consultation_type;
+        $consultation['package_type'] = $input['package_type'] ?? 'basic';
+        $consultation['price'] = $input['price'] ?? 0;
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Cập nhật dịch vụ tư vấn thành công',
+            'data' => $consultation
+        ]);
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Consultation update error: " . $e->getMessage());
+        
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Lỗi cập nhật dịch vụ: ' . $e->getMessage()
+        ]);
+    }
+}
+
+function handleDeleteConsultation() {
+    global $pdo;
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (empty($input['id'])) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID dịch vụ là bắt buộc'
+        ]);
+        return;
+    }
+    
+    $id = (int)$input['id'];
+    
+    // Check if consultation exists
+    $stmt = $pdo->prepare("
+        SELECT id, name 
+        FROM products 
+        WHERE id = ? AND (type = 'consultation' OR type = 'career_test')
+    ");
+    $stmt->execute([$id]);
+    $consultation = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$consultation) {
+        http_response_code(404);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Không tìm thấy dịch vụ tư vấn'
+        ]);
+        return;
+    }
+    
+    // Check if consultation is being used in orders
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM order_items WHERE product_id = ?");
+    $stmt->execute([$id]);
+    $orderCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    
+    if ($orderCount > 0) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Không thể xóa dịch vụ đã có đơn hàng. Vui lòng đặt trạng thái thành "Không hoạt động".'
+        ]);
+        return;
+    }
+    
+    // Check if consultation has quiz results
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) as count 
+        FROM quiz_exams qe 
+        WHERE qe.product_id = ?
+    ");
+    $stmt->execute([$id]);
+    $examCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    
+    if ($examCount > 0) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Không thể xóa dịch vụ đã có người làm bài test. Vui lòng đặt trạng thái thành "Không hoạt động".'
+        ]);
+        return;
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Delete related packages first (due to foreign key constraints)
+        $stmt = $pdo->prepare("DELETE FROM product_packages WHERE product_id = ?");
+        $stmt->execute([$id]);
+        
+        // Delete the consultation
+        $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
+        $success = $stmt->execute([$id]);
+        
+        if (!$success) {
+            throw new Exception('Failed to delete consultation');
+        }
+        
+        $pdo->commit();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Xóa dịch vụ tư vấn thành công',
+            'data' => [
+                'id' => $id,
+                'name' => $consultation['name']
+            ]
+        ]);
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Consultation deletion error: " . $e->getMessage());
+        
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Lỗi xóa dịch vụ: ' . $e->getMessage()
         ]);
     }
 }
@@ -478,322 +695,5 @@ function generateSlug($text) {
     $slug = trim($slug, '-');
     
     return $slug;
-}
-
-function handlePut() {
-    global $pdo;
-    
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    if (empty($input['id'])) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'ID dịch vụ là bắt buộc'
-        ]);
-        return;
-    }
-    
-    if (empty($input['name'])) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Tên dịch vụ là bắt buộc'
-        ]);
-        return;
-    }
-    
-    if (strlen($input['name']) < 3) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Tên dịch vụ phải có ít nhất 3 ký tự'
-        ]);
-        return;
-    }
-    
-    if (empty($input['description'])) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Mô tả dịch vụ là bắt buộc'
-        ]);
-        return;
-    }
-    
-    $id = (int)$input['id'];
-    
-    // Check if product exists
-    $stmt = $pdo->prepare("SELECT id, slug FROM products WHERE id = ?");
-    $stmt->execute([$id]);
-    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$existing) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Không tìm thấy dịch vụ'
-        ]);
-        return;
-    }
-    
-    // Check if product name already exists (excluding current product)
-    $stmt = $pdo->prepare("SELECT id FROM products WHERE name = ? AND id != ?");
-    $stmt->execute([$input['name'], $id]);
-    if ($stmt->fetch()) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Tên dịch vụ đã tồn tại'
-        ]);
-        return;
-    }
-    
-    // Map consultation type to product type
-    $consultation_type = $input['consultation_type'] ?? '';
-    $product_type = '';
-    
-    if ($consultation_type === 'automated') {
-        $product_type = 'career_test';
-    } elseif ($consultation_type === 'expert') {
-        $product_type = 'consultation';
-    } else {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Loại tư vấn không hợp lệ'
-        ]);
-        return;
-    }
-    
-    // Generate new slug if name changed
-    $new_slug = $existing['slug']; // Keep existing slug by default
-    if ($input['name'] !== $existing['name']) {
-        $new_slug = generateSlug($input['name']);
-        
-        // Ensure unique slug
-        $original_slug = $new_slug;
-        $counter = 1;
-        while (true) {
-            $stmt = $pdo->prepare("SELECT id FROM products WHERE slug = ? AND id != ?");
-            $stmt->execute([$new_slug, $id]);
-            if (!$stmt->fetch()) break;
-            
-            $new_slug = $original_slug . '-' . $counter;
-            $counter++;
-        }
-    }
-    
-    try {
-        $pdo->beginTransaction();
-        
-        // Update product
-        $stmt = $pdo->prepare("
-            UPDATE products 
-            SET name = ?, slug = ?, short_description = ?, full_description = ?, 
-                type = ?, image_url = ?, status = ?, updated_at = NOW() 
-            WHERE id = ?
-        ");
-        
-        $success = $stmt->execute([
-            $input['name'],
-            $new_slug,
-            $input['description'],
-            $input['description'],
-            $product_type,
-            $input['image_url'] ?? null,
-            $input['status'] ?? 'active',
-            $id
-        ]);
-        
-        if (!$success) {
-            throw new Exception('Failed to update product');
-        }
-        
-        // Update default package price if provided
-        if (isset($input['price']) && is_numeric($input['price'])) {
-            $price = (float)$input['price'];
-            $is_free = ($price == 0);
-            
-            // Find the first package for this product
-            $package_stmt = $pdo->prepare("
-                SELECT id FROM product_packages 
-                WHERE product_id = ? 
-                ORDER BY sort_order ASC, created_at ASC 
-                LIMIT 1
-            ");
-            $package_stmt->execute([$id]);
-            $package = $package_stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($package) {
-                // Update existing package
-                $update_package_stmt = $pdo->prepare("
-                    UPDATE product_packages 
-                    SET original_price = ?, is_free = ?, updated_at = NOW()
-                    WHERE id = ?
-                ");
-                $update_package_stmt->execute([
-                    $price,
-                    $is_free,
-                    $package['id']
-                ]);
-            } else {
-                // Create default package if none exists
-                $package_name = ($input['package_type'] === 'premium') ? 'Gói Cao cấp' : 'Gói Cơ bản';
-                $package_slug = generateSlug($package_name);
-                
-                $create_package_stmt = $pdo->prepare("
-                    INSERT INTO product_packages (
-                        product_id, package_name, package_slug, package_description,
-                        original_price, is_free, status, sort_order,
-                        created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
-                ");
-                
-                $create_package_stmt->execute([
-                    $id,
-                    $package_name,
-                    $package_slug,
-                    'Gói dịch vụ mặc định',
-                    $price,
-                    $is_free,
-                    'active',
-                    0
-                ]);
-            }
-        }
-        
-        $pdo->commit();
-        
-        // Get the updated product with package info
-        $stmt = $pdo->prepare("
-            SELECT id, name, slug, short_description, type, category,
-                   duration, image_url, status, sort_order, created_at, updated_at
-            FROM products 
-            WHERE id = ?
-        ");
-        $stmt->execute([$id]);
-        $product = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // Add consultation type and price for response
-        $product['consultation_type'] = $consultation_type;
-        $product['package_type'] = $input['package_type'] ?? 'basic';
-        $product['price'] = $input['price'] ?? 0;
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Cập nhật dịch vụ tư vấn thành công',
-            'data' => $product
-        ]);
-        
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        error_log("Product update error: " . $e->getMessage());
-        
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Lỗi cập nhật dịch vụ: ' . $e->getMessage()
-        ]);
-    }
-}
-
-function handleDelete() {
-    global $pdo;
-    
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    if (empty($input['id'])) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'ID dịch vụ là bắt buộc'
-        ]);
-        return;
-    }
-    
-    $id = (int)$input['id'];
-    
-    // Check if product exists
-    $stmt = $pdo->prepare("SELECT id, name FROM products WHERE id = ?");
-    $stmt->execute([$id]);
-    $product = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$product) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Không tìm thấy dịch vụ'
-        ]);
-        return;
-    }
-    
-    // Check if product is being used in orders
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM order_items WHERE product_id = ?");
-    $stmt->execute([$id]);
-    $orderCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-    
-    if ($orderCount > 0) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Không thể xóa dịch vụ đã có đơn hàng. Vui lòng đặt trạng thái thành "Không hoạt động".'
-        ]);
-        return;
-    }
-    
-    // Check if product has quiz results
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) as count 
-        FROM quiz_exams qe 
-        WHERE qe.product_id = ?
-    ");
-    $stmt->execute([$id]);
-    $examCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
-    
-    if ($examCount > 0) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Không thể xóa dịch vụ đã có người làm bài test. Vui lòng đặt trạng thái thành "Không hoạt động".'
-        ]);
-        return;
-    }
-    
-    try {
-        $pdo->beginTransaction();
-        
-        // Delete related packages first (due to foreign key constraints)
-        $stmt = $pdo->prepare("DELETE FROM product_packages WHERE product_id = ?");
-        $stmt->execute([$id]);
-        
-        // Delete the product
-        $stmt = $pdo->prepare("DELETE FROM products WHERE id = ?");
-        $success = $stmt->execute([$id]);
-        
-        if (!$success) {
-            throw new Exception('Failed to delete product');
-        }
-        
-        $pdo->commit();
-        
-        echo json_encode([
-            'success' => true,
-            'message' => 'Xóa dịch vụ tư vấn thành công',
-            'data' => [
-                'id' => $id,
-                'name' => $product['name']
-            ]
-        ]);
-        
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        error_log("Product deletion error: " . $e->getMessage());
-        
-        http_response_code(500);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Lỗi xóa dịch vụ: ' . $e->getMessage()
-        ]);
-    }
 }
 ?>
