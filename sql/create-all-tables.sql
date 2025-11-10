@@ -738,6 +738,59 @@ ALTER TABLE product_packages ADD INDEX idx_packages_sort_order (sort_order);
 -- Purchased Packages (indexes đã được tạo trong CREATE TABLE)
 
 -- =====================================================
+-- PHẦN 4: MEDIA MANAGEMENT SYSTEM
+-- =====================================================
+
+-- Bảng quản lý media files (uploaded images, documents, etc.)
+CREATE TABLE media_files (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    
+    -- File information
+    original_filename VARCHAR(255) NOT NULL COMMENT 'Tên file gốc do user upload',
+    stored_filename VARCHAR(255) NOT NULL COMMENT 'Tên file được lưu trên server',
+    display_name VARCHAR(255) NULL COMMENT 'Tên hiển thị do user đặt',
+    file_path VARCHAR(500) NOT NULL COMMENT 'Đường dẫn file trên server',
+    
+    -- File properties
+    file_size INT NOT NULL COMMENT 'Kích thước file (bytes)',
+    file_type VARCHAR(100) NOT NULL COMMENT 'MIME type (image/jpeg, etc.)',
+    file_extension VARCHAR(10) NOT NULL COMMENT 'Phần mở rộng file (.jpg, .png, etc.)',
+    
+    -- Image specific properties (nullable for non-images)
+    image_width INT NULL COMMENT 'Chiều rộng ảnh (pixels)',
+    image_height INT NULL COMMENT 'Chiều cao ảnh (pixels)',
+    
+    -- Upload metadata
+    upload_ip VARCHAR(45) NULL COMMENT 'IP address của người upload',
+    user_agent TEXT NULL COMMENT 'User agent string',
+    
+    -- Organization
+    category VARCHAR(50) DEFAULT 'general' COMMENT 'Phân loại media: general, products, users, etc.',
+    tags JSON NULL COMMENT 'Tags để phân loại và tìm kiếm',
+    alt_text VARCHAR(255) NULL COMMENT 'Alt text cho accessibility',
+    
+    -- Status and access
+    status ENUM('active', 'inactive', 'deleted') DEFAULT 'active',
+    is_public BOOLEAN DEFAULT TRUE COMMENT 'File có thể truy cập công khai không',
+    access_count INT DEFAULT 0 COMMENT 'Số lần file được truy cập',
+    
+    -- Tracking
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    -- Indexes
+    UNIQUE KEY unique_stored_filename (stored_filename),
+    INDEX idx_media_original_filename (original_filename),
+    INDEX idx_media_display_name (display_name),
+    INDEX idx_media_file_type (file_type),
+    INDEX idx_media_category (category),
+    INDEX idx_media_status (status),
+    INDEX idx_media_created_at (created_at),
+    FULLTEXT INDEX idx_media_search (display_name, original_filename, alt_text)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Bảng quản lý media files đã upload (images, documents, etc.)';
+
+-- =====================================================
 -- PHẦN 4: BỔ SUNG CÁC CƠ CHẾ ĐỒNG BỘ VÀ RÀNG BUỘC
 -- =====================================================
 

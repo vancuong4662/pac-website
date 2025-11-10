@@ -700,9 +700,16 @@ function showConsultationDetailModal(consultation) {
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="detail-image-url" class="form-label">URL Hình ảnh</label>
-                                    <input type="url" class="form-control" id="detail-image-url" 
-                                           value="${consultation.image_url || ''}"
-                                           placeholder="https://example.com/image.jpg">
+                                    <div class="input-group">
+                                        <input type="url" class="form-control" id="detail-image-url" 
+                                               value="${consultation.image_url || ''}"
+                                               placeholder="https://example.com/image.jpg">
+                                        <button class="btn btn-outline-primary" type="button" onclick="openImageUploader()" 
+                                                title="Upload hình ảnh">
+                                            <i class="fas fa-upload"></i> Upload
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Nhập URL hoặc click Upload để tải ảnh lên</div>
                                 </div>
                                 <div class="image-preview-container">
                                     <label class="form-label">Xem trước:</label>
@@ -881,6 +888,39 @@ function showConsultationDetailModal(consultation) {
 
 function showImageError(img) {
     img.parentElement.innerHTML = '<div class="text-danger"><i class="fas fa-exclamation-triangle fa-2x mb-2"></i><br>Không thể tải ảnh</div>';
+}
+
+function openImageUploader() {
+    // Mở cửa sổ upload ảnh
+    const uploadWindow = window.open(
+        'admin-uploadimg', 
+        'imageUploader',
+        'width=600,height=500,scrollbars=yes,resizable=yes,menubar=no,toolbar=no,status=no'
+    );
+    
+    // Lắng nghe message từ cửa sổ upload
+    window.addEventListener('message', function(event) {
+        // Kiểm tra origin để bảo mật
+        if (event.origin !== window.location.origin) return;
+        
+        // Kiểm tra nếu có URL ảnh được gửi về
+        if (event.data && event.data.type === 'imageUploaded' && event.data.imageUrl) {
+            // Cập nhật URL vào input
+            const imageUrlInput = document.getElementById('detail-image-url');
+            if (imageUrlInput) {
+                imageUrlInput.value = event.data.imageUrl;
+                
+                // Trigger input event để cập nhật preview
+                const inputEvent = new Event('input', { bubbles: true });
+                imageUrlInput.dispatchEvent(inputEvent);
+            }
+            
+            // Đóng cửa sổ upload
+            if (uploadWindow && !uploadWindow.closed) {
+                uploadWindow.close();
+            }
+        }
+    }, { once: false }); // Không dùng once để có thể nhận nhiều message
 }
 
 async function updateConsultationFromModal() {

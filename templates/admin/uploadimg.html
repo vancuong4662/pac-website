@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Hình Ảnh - PAC Admin</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .upload-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin: 1rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f8fafc;
+        }
+        
+        .upload-area:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #3b82f6;
+            background: #dbeafe;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area:hover .upload-icon {
+            color: #3b82f6;
+        }
+        
+        .preview-container {
+            display: none;
+            margin-top: 1.5rem;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .url-result {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+        
+        .progress-container {
+            display: none;
+            margin-top: 1rem;
+        }
+        
+        .btn-copy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .btn-copy:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            color: white;
+        }
+        
+        .header-title {
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-subtitle {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="upload-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h4 class="header-title">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>
+                    Upload Hình Ảnh
+                </h4>
+                <p class="header-subtitle">Tải lên hình ảnh và lấy URL để sử dụng trong dịch vụ</p>
+            </div>
+            
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h5 class="mb-3">Kéo thả file hoặc click để chọn</h5>
+                <p class="text-muted mb-3">Hỗ trợ: JPG, PNG, GIF, WebP (Max: 5MB)</p>
+                <button type="button" class="btn btn-primary" id="selectFileBtn">
+                    <i class="fas fa-folder-open me-2"></i>Chọn File
+                </button>
+                <input type="file" id="fileInput" class="d-none" accept="image/*">
+            </div>
+            
+            <!-- Preview & Name Input -->
+            <div class="preview-step" id="previewStep" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-eye me-2"></i>Xem trước
+                        </h6>
+                        <div class="text-center">
+                            <img id="previewImg" class="preview-image" alt="Preview">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-tag me-2"></i>Thông tin file
+                        </h6>
+                        <div class="mb-3">
+                            <label for="displayName" class="form-label">Tên hiển thị (tuỳ chọn)</label>
+                            <input type="text" class="form-control" id="displayName" 
+                                   placeholder="VD: logo-pac, banner-home...">
+                            <div class="form-text">Để trống sẽ tự động tạo mã 6 ký tự</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Thông tin file:</label>
+                            <div class="file-info bg-light p-2 rounded">
+                                <small id="fileInfo" class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" id="confirmUploadBtn">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Xác nhận Upload
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="cancelUploadBtn">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container" id="progressContainer">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Đang upload...</span>
+                    <span class="text-muted" id="progressPercent">0%</span>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Preview & Result -->
+            <div class="preview-container" id="previewContainer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-eye me-2"></i>Xem trước
+                        </h6>
+                        <div class="text-center">
+                            <img id="previewImage" class="preview-image" alt="Preview">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">
+                            <i class="fas fa-link me-2"></i>URL Hình ảnh
+                        </h6>
+                        <div class="mb-3">
+                            <div class="url-result" id="imageUrl">
+                                <!-- URL will be displayed here -->
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-copy" id="copyUrlBtn">
+                                <i class="fas fa-copy me-2"></i>Copy URL
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action buttons -->
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-outline-primary" id="uploadAnotherBtn">
+                        <i class="fas fa-plus me-2"></i>Upload Ảnh Khác
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Error Display -->
+            <div class="alert alert-danger d-none" id="errorAlert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="errorMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Upload Script -->
+    <script>
+        class ImageUploader {
+            constructor() {
+                this.initElements();
+                this.bindEvents();
+                this.currentImageUrl = null;
+            }
+            
+            initElements() {
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.selectFileBtn = document.getElementById('selectFileBtn');
+                
+                // Preview step
+                this.previewStep = document.getElementById('previewStep');
+                this.previewImg = document.getElementById('previewImg');
+                this.displayNameInput = document.getElementById('displayName');
+                this.fileInfoDiv = document.getElementById('fileInfo');
+                this.confirmUploadBtn = document.getElementById('confirmUploadBtn');
+                this.cancelUploadBtn = document.getElementById('cancelUploadBtn');
+                
+                // Progress
+                this.progressContainer = document.getElementById('progressContainer');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressPercent = document.getElementById('progressPercent');
+                
+                // Result
+                this.previewContainer = document.getElementById('previewContainer');
+                this.previewImage = document.getElementById('previewImage');
+                this.imageUrl = document.getElementById('imageUrl');
+                this.copyUrlBtn = document.getElementById('copyUrlBtn');
+                this.uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+                
+                // Error
+                this.errorAlert = document.getElementById('errorAlert');
+                this.errorMessage = document.getElementById('errorMessage');
+            }
+            
+            bindEvents() {
+                // Click to select file
+                this.uploadArea.addEventListener('click', () => {
+                    this.fileInput.click();
+                });
+                
+                this.selectFileBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.fileInput.click();
+                });
+                
+                // File input change
+                this.fileInput.addEventListener('change', (e) => {
+                    this.handleFileSelect(e.target.files);
+                });
+                
+                // Drag and drop
+                this.uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.classList.add('dragover');
+                });
+                
+                this.uploadArea.addEventListener('dragleave', () => {
+                    this.uploadArea.classList.remove('dragover');
+                });
+                
+                this.uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.classList.remove('dragover');
+                    this.handleFileSelect(e.dataTransfer.files);
+                });
+                
+                // Preview step buttons
+                this.confirmUploadBtn.addEventListener('click', () => {
+                    this.uploadFile();
+                });
+                
+                this.cancelUploadBtn.addEventListener('click', () => {
+                    this.resetUploader();
+                });
+                
+                // Copy URL
+                this.copyUrlBtn.addEventListener('click', () => {
+                    this.copyToClipboard();
+                });
+                
+                // Upload another
+                this.uploadAnotherBtn.addEventListener('click', () => {
+                    this.resetUploader();
+                });
+            }
+            
+            handleFileSelect(files) {
+                if (files.length === 0) return;
+                
+                const file = files[0];
+                
+                // Validate file
+                if (!this.validateFile(file)) {
+                    return;
+                }
+                
+                // Store selected file
+                this.selectedFile = file;
+                
+                // Show preview step
+                this.showPreviewStep(file);
+            }
+            
+            validateFile(file) {
+                // Check file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    this.showError('Chỉ hỗ trợ file ảnh: JPG, PNG, GIF, WebP');
+                    return false;
+                }
+                
+                // Check file size (5MB)
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    this.showError('Kích thước file không được vượt quá 5MB');
+                    return false;
+                }
+                
+                this.hideError();
+                return true;
+            }
+            
+            showPreviewStep(file) {
+                // Hide upload area, show preview step
+                this.uploadArea.style.display = 'none';
+                this.previewStep.style.display = 'block';
+                
+                // Show preview image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.previewImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // Show file info
+                const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+                if (file.size > 1024 * 1024) {
+                    fileSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+                }
+                
+                this.fileInfoDiv.innerHTML = `
+                    <strong>Tên file:</strong> ${file.name}<br>
+                    <strong>Kích thước:</strong> ${fileSize}<br>
+                    <strong>Loại:</strong> ${file.type}
+                `;
+                
+                // Clear previous input
+                this.displayNameInput.value = '';
+            }
+            
+            async uploadFile() {
+                if (!this.selectedFile) return;
+                
+                // Show progress
+                this.previewStep.style.display = 'none';
+                this.progressContainer.style.display = 'block';
+                
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('image', this.selectedFile);
+                
+                const displayName = this.displayNameInput.value.trim();
+                if (displayName) {
+                    formData.append('display_name', displayName);
+                }
+                
+                try {
+                    // Upload file
+                    const response = await fetch('api/admin/upload.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.uploadComplete(result.data);
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                    
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    this.showError(error.message || 'Có lỗi xảy ra khi upload');
+                    this.progressContainer.style.display = 'none';
+                    this.previewStep.style.display = 'block';
+                }
+            }
+            
+            updateProgress(percent) {
+                const roundedPercent = Math.round(percent);
+                this.progressBar.style.width = roundedPercent + '%';
+                this.progressPercent.textContent = roundedPercent + '%';
+            }
+            
+            uploadComplete(data) {
+                // Store uploaded image URL
+                this.currentImageUrl = data.file_path;
+                
+                // Update UI
+                this.progressContainer.style.display = 'none';
+                this.previewContainer.style.display = 'block';
+                
+                // Update preview image
+                this.previewImage.src = this.currentImageUrl;
+                this.imageUrl.textContent = this.currentImageUrl;
+                
+                console.log('Upload successful:', data);
+            }
+            
+            copyToClipboard() {
+                if (!this.currentImageUrl) return;
+                
+                navigator.clipboard.writeText(this.currentImageUrl).then(() => {
+                    // Visual feedback
+                    const originalText = this.copyUrlBtn.innerHTML;
+                    this.copyUrlBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã Copy!';
+                    this.copyUrlBtn.classList.remove('btn-copy');
+                    this.copyUrlBtn.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        this.copyUrlBtn.innerHTML = originalText;
+                        this.copyUrlBtn.classList.remove('btn-success');
+                        this.copyUrlBtn.classList.add('btn-copy');
+                    }, 2000);
+                }).catch(() => {
+                    this.showError('Không thể copy URL');
+                });
+            }
+            
+            resetUploader() {
+                this.currentImageUrl = null;
+                this.selectedFile = null;
+                this.uploadArea.style.display = 'block';
+                this.previewStep.style.display = 'none';
+                this.progressContainer.style.display = 'none';
+                this.previewContainer.style.display = 'none';
+                this.fileInput.value = '';
+                this.displayNameInput.value = '';
+                this.hideError();
+            }
+            
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorAlert.classList.remove('d-none');
+            }
+            
+            hideError() {
+                this.errorAlert.classList.add('d-none');
+            }
+        }
+        
+        // Initialize uploader when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new ImageUploader();
+        });
+    </script>
+</body>
+</html>
