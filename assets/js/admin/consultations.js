@@ -642,8 +642,405 @@ async function viewConsultationDetails(id) {
 }
 
 function managePackages(consultationId) {
-    // Redirect to packages management page or show packages modal
-    window.location.href = `packages.html?consultation_id=${consultationId}`;
+    // Show packages management modal
+    showPackagesModal(consultationId);
+}
+
+async function showPackagesModal(productId) {
+    try {
+        showToast('Đang tải danh sách gói...', 'info');
+        
+        // Fetch packages data
+        const response = await fetch(`api/admin/packages.php?product_id=${productId}`);
+        const result = await response.json();
+        
+        if (!result.success) {
+            showToast(result.message || 'Lỗi tải danh sách gói', 'error');
+            return;
+        }
+        
+        const { product, packages } = result.data;
+        
+        // Create and show packages modal
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'packages-modal';
+        modal.setAttribute('data-product-id', productId);
+        modal.innerHTML = `
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-box me-2"></i>Quản lý gói dịch vụ: ${escapeHtml(product.name)}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Package List Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-list me-2"></i>Danh sách gói (${packages.length})
+                                    </h6>
+                                    <button class="btn btn-sm btn-success" onclick="createNewPackage(${productId})">
+                                        <i class="fas fa-plus me-1"></i>Thêm gói mới
+                                    </button>
+                                </div>
+                                <div class="row" id="packages-list">
+                                    ${renderPackagesGrid(packages)}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Package Details Section -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>Chi tiết gói được chọn
+                                        </h6>
+                                    </div>
+                                    <div class="card-body" id="package-details">
+                                        <div class="text-muted text-center py-5">
+                                            <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
+                                            <p class="mb-0">Chọn một gói bên trên để xem chi tiết</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Initialize modal
+        const bsModal = new bootstrap.Modal(modal);
+        
+        // Auto-select first package if available
+        if (packages.length > 0) {
+            setTimeout(() => {
+                viewPackageDetails(packages[0].id, productId);
+            }, 500);
+        }
+        
+        // Cleanup on close
+        modal.addEventListener('hidden.bs.modal', () => {
+            document.body.removeChild(modal);
+        });
+        
+        bsModal.show();
+        
+    } catch (error) {
+        console.error('Error loading packages:', error);
+        showToast('Lỗi tải danh sách gói dịch vụ', 'error');
+    }
+}
+
+function renderPackagesGrid(packages) {
+    if (packages.length === 0) {
+        return `
+            <div class="col-12">
+                <div class="text-muted text-center py-4">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <h6>Chưa có gói nào</h6>
+                    <p class="mb-0">Nhấn "Thêm gói mới" để tạo gói đầu tiên</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    return packages.map(pkg => `
+        <div class="col-md-4 mb-3">
+            <div class="card package-card h-100" onclick="viewPackageDetails(${pkg.id}, ${pkg.product_id})" 
+                 style="cursor: pointer; transition: all 0.3s;" id="package-item-${pkg.id}"
+                 onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.05)'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="card-title mb-0">${escapeHtml(pkg.package_name)}</h6>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-info" 
+                                    onclick="event.stopPropagation(); viewPackageDetails(${pkg.id}, ${pkg.product_id})" 
+                                    title="Xem chi tiết gói">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onclick="event.stopPropagation(); deletePackage(${pkg.id}, '${escapeHtml(pkg.package_name)}')" 
+                                    title="Xóa gói">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">Giá:</span>
+                            <span class="fw-bold ${pkg.is_free ? 'text-success' : 'text-primary'}">
+                                ${pkg.is_free ? 'Miễn phí' : pkg.price_display}
+                            </span>
+                        </div>
+                        
+                        ${pkg.sale_price ? `
+                            <div class="text-end">
+                                <small class="text-muted text-decoration-line-through">${pkg.original_price_display}</small>
+                            </div>
+                        ` : ''}
+                        
+                        ${pkg.group_size ? `
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">Quy mô:</span>
+                                <span class="small">${escapeHtml(pkg.group_size)}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="d-flex justify-content-end">
+                        <span class="badge ${pkg.status === 'active' ? 'bg-success' : 'bg-secondary'}">
+                            ${pkg.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function viewPackageDetails(packageId, productId) {
+    try {
+        // Highlight selected package
+        document.querySelectorAll('#packages-list .package-card').forEach(card => {
+            card.style.borderColor = '';
+            card.style.backgroundColor = '';
+        });
+        const selectedCard = document.getElementById(`package-item-${packageId}`);
+        if (selectedCard) {
+            selectedCard.style.borderColor = '#0d6efd';
+            selectedCard.style.backgroundColor = '#f8f9ff';
+        }
+        
+        // Show loading
+        const detailsContainer = document.getElementById('package-details');
+        detailsContainer.innerHTML = `
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                Đang tải chi tiết...
+            </div>
+        `;
+        
+        // Fetch package details
+        const response = await fetch(`api/admin/packages.php?id=${packageId}`);
+        const result = await response.json();
+        
+        if (!result.success) {
+            detailsContainer.innerHTML = `
+                <div class="text-danger text-center py-3">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <p class="mb-0">Lỗi tải chi tiết gói</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const pkg = result.data;
+        
+        // Render package details
+        detailsContainer.innerHTML = renderPackageDetails(pkg);
+        
+        // Initialize Quill editor for package description
+        initPackageDescriptionEditor(pkg.package_description);
+        
+        // Initialize toggle listeners
+        initPackageFormListeners();
+        
+    } catch (error) {
+        console.error('Error loading package details:', error);
+        document.getElementById('package-details').innerHTML = `
+            <div class="text-danger text-center py-3">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <p class="mb-0">Lỗi tải chi tiết gói</p>
+            </div>
+        `;
+    }
+}
+
+function renderPackageDetails(pkg) {
+    return `
+        <!-- Package Edit Form -->
+        <form id="package-edit-form" onsubmit="updatePackageFromForm(event, ${pkg.id})">
+            <!-- Package Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="mb-1">
+                        <i class="fas fa-edit me-2 text-primary"></i>Chỉnh sửa gói dịch vụ
+                    </h5>
+                    <small class="text-muted">Thuộc sản phẩm: <strong>${escapeHtml(pkg.product_name)}</strong></small>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success" id="save-package-btn">
+                        <i class="fas fa-save me-1"></i>Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Basic Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Thông tin cơ bản
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pkg-name" class="form-label">Tên gói <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="pkg-name" name="package_name" 
+                                       value="${escapeHtml(pkg.package_name)}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pkg-slug" class="form-label">Keyword (Slug) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="pkg-slug" name="package_slug" 
+                                       value="${escapeHtml(pkg.package_slug)}" required>
+                                <div class="form-text">Chỉ dùng chữ thường, số và dấu gạch ngang (-). VD: goi-cao-cap</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pricing Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-money-bill-wave me-2"></i>Thông tin giá
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="pkg-original-price" class="form-label">Giá gốc (VND)</label>
+                                <input type="number" class="form-control" id="pkg-original-price" name="original_price" 
+                                       value="${pkg.original_price}" min="0" onchange="checkFreeStatus()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="pkg-sale-price" class="form-label">Giá khuyến mãi (VND)</label>
+                                <input type="number" class="form-control" id="pkg-sale-price" name="sale_price" 
+                                       value="${pkg.sale_price || ''}" min="0" onchange="checkFreeStatus()">
+                                <div class="form-text">Để trống nếu không có khuyến mãi</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Miễn phí</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pkg-is-free" name="is_free" 
+                                           ${pkg.is_free ? 'checked' : ''} onchange="toggleFreeStatus()">
+                                    <label class="form-check-label" for="pkg-is-free">
+                                        Gói miễn phí
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image and Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-image me-2"></i>Hình ảnh và trạng thái
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="pkg-image-url" class="form-label">Đường dẫn hình ảnh</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="pkg-image-url" name="image_url" 
+                                           value="${pkg.image_url || ''}" placeholder="assets/img/icon/start.jpg">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="openUploadModal('pkg-image-url')">
+                                        <i class="fas fa-upload"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            ${pkg.image_url ? `
+                                <div class="mb-3">
+                                    <img src="${pkg.image_url}" alt="Package image" class="img-thumbnail" 
+                                         style="max-width: 200px; max-height: 150px;" id="pkg-image-preview"
+                                         onerror="this.style.display='none';">
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái gói</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="pkg-status" name="status" 
+                                           ${pkg.status === 'active' ? 'checked' : ''}>
+                                    <label class="form-check-label" for="pkg-status" id="pkg-status-label">
+                                        ${pkg.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Package Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-align-left me-2"></i>Mô tả gói
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="package-description-editor" style="min-height: 200px;"></div>
+                </div>
+            </div>
+            
+            <!-- Metadata -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Thông tin hệ thống
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>Mã gói:</strong> #${pkg.id}
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Ngày tạo:</strong><br>
+                            <small class="text-muted">${formatDateTime(pkg.created_at)}</small>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Cập nhật cuối:</strong><br>
+                            <small class="text-muted">${formatDateTime(pkg.updated_at)}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    `;
 }
 
 function showConsultationDetailModal(consultation) {
@@ -1014,6 +1411,304 @@ async function updateConsultationFromModal() {
         showToast('Lỗi', 'Lỗi kết nối tới server', 'error', 5000);
     } finally {
         // Re-enable submit button
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    }
+}
+
+// ===========================================
+// HELPER FUNCTIONS FOR PACKAGES MANAGEMENT
+// ===========================================
+
+function createNewPackage(productId) {
+    // TODO: Implement create new package modal
+    showToast('Tính năng đang phát triển', 'info');
+}
+
+function editPackage(packageId) {
+    // TODO: Implement edit package modal
+    showToast('Tính năng đang phát triển', 'info');
+}
+
+async function deletePackage(packageId, packageName) {
+    // Confirm deletion with user
+    if (!confirm(`Bạn có chắc chắn muốn xóa gói "${packageName}"?\n\nHành động này không thể hoàn tác!`)) {
+        return;
+    }
+    
+    try {
+        // Show loading toast
+        showToast('Đang xóa gói...', 'info');
+        
+        const response = await fetch('api/admin/packages.php', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: packageId })
+        });
+        
+        const result = await response.json();
+        console.log('Delete response:', result);
+        
+        if (result.success) {
+            showToast('Xóa gói thành công', 'success');
+            
+            // Reload the page after a short delay to show the toast
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast(result.message || 'Lỗi xóa gói', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error deleting package:', error);
+        showToast('Lỗi kết nối tới server', 'error');
+    }
+}
+
+function number_format(number, decimals, dec_point, thousands_sep) {
+    // JavaScript equivalent of PHP's number_format
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+    const n = !isFinite(+number) ? 0 : +number;
+    const prec = !isFinite(+decimals) ? 0 : Math.abs(decimals);
+    const sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep;
+    const dec = (typeof dec_point === 'undefined') ? '.' : dec_point;
+    let s = '';
+    
+    const toFixedFix = function (n, prec) {
+        const k = Math.pow(10, prec);
+        return '' + Math.round(n * k) / k;
+    };
+    
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+    if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+    }
+    if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+    }
+    
+    return s.join(dec);
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return 'Không xác định';
+    
+    try {
+        const date = new Date(dateString);
+        const options = { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+        };
+        return date.toLocaleString('vi-VN', options);
+    } catch (error) {
+        return dateString;
+    }
+}
+
+// ===========================================
+// PACKAGE FORM MANAGEMENT FUNCTIONS
+// ===========================================
+
+let packageDescriptionEditor = null;
+
+function initPackageDescriptionEditor(htmlContent) {
+    // Clean up existing editor
+    if (packageDescriptionEditor) {
+        packageDescriptionEditor = null;
+    }
+    
+    // Initialize Quill editor for package description
+    const editorElement = document.getElementById('package-description-editor');
+    if (editorElement) {
+        packageDescriptionEditor = new Quill('#package-description-editor', {
+            theme: 'snow',
+            placeholder: 'Nhập mô tả chi tiết cho gói dịch vụ...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'blockquote'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        // Load HTML content into editor
+        if (htmlContent) {
+            setTimeout(() => {
+                try {
+                    // Use clipboard API for better HTML parsing
+                    packageDescriptionEditor.clipboard.dangerouslyPasteHTML(0, htmlContent);
+                } catch (error) {
+                    // Fallback to root.innerHTML
+                    console.warn('Using fallback HTML loading method');
+                    packageDescriptionEditor.root.innerHTML = htmlContent;
+                }
+            }, 100);
+        }
+    }
+}
+
+function initPackageFormListeners() {
+    // Status toggle listener
+    const statusToggle = document.getElementById('pkg-status');
+    if (statusToggle) {
+        statusToggle.addEventListener('change', function() {
+            const label = document.getElementById('pkg-status-label');
+            if (label) {
+                label.textContent = this.checked ? 'Hoạt động' : 'Tạm dừng';
+            }
+        });
+    }
+    
+    // Image URL listener for preview
+    const imageUrlInput = document.getElementById('pkg-image-url');
+    if (imageUrlInput) {
+        imageUrlInput.addEventListener('input', function() {
+            updateImagePreview(this.value);
+        });
+    }
+}
+
+function checkFreeStatus() {
+    const originalPrice = parseFloat(document.getElementById('pkg-original-price').value) || 0;
+    const salePrice = parseFloat(document.getElementById('pkg-sale-price').value) || 0;
+    const freeToggle = document.getElementById('pkg-is-free');
+    
+    // If user enters any price, uncheck the free option
+    if (originalPrice > 0 || salePrice > 0) {
+        freeToggle.checked = false;
+    }
+}
+
+function toggleFreeStatus() {
+    const freeToggle = document.getElementById('pkg-is-free');
+    const originalPriceInput = document.getElementById('pkg-original-price');
+    const salePriceInput = document.getElementById('pkg-sale-price');
+    
+    if (freeToggle.checked) {
+        // If free is checked, clear price inputs
+        originalPriceInput.value = '0';
+        salePriceInput.value = '';
+    }
+}
+
+function updateImagePreview(url) {
+    let preview = document.getElementById('pkg-image-preview');
+    
+    if (url && url.trim()) {
+        if (!preview) {
+            // Create preview element if it doesn't exist
+            const container = document.getElementById('pkg-image-url').closest('.col-md-6');
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'mb-3';
+            previewDiv.innerHTML = `
+                <img src="${url}" alt="Package image" class="img-thumbnail" 
+                     style="max-width: 200px; max-height: 150px;" id="pkg-image-preview"
+                     onerror="this.style.display='none';">
+            `;
+            container.appendChild(previewDiv);
+        } else {
+            preview.src = url;
+            preview.style.display = 'block';
+        }
+    } else if (preview) {
+        preview.style.display = 'none';
+    }
+}
+
+function openUploadModal(targetInputId) {
+    // Store target input ID for callback
+    window.uploadTargetInputId = targetInputId;
+    
+    // Open upload window
+    const uploadWindow = window.open('admin-uploadimg', 'uploadimg', 'width=800,height=600');
+    
+    // Listen for upload completion
+    const messageHandler = (event) => {
+        if (event.data && event.data.type === 'imageUploaded') {
+            const targetInput = document.getElementById(window.uploadTargetInputId);
+            if (targetInput) {
+                targetInput.value = event.data.imageUrl;
+                
+                // Update preview if it's the image URL input
+                if (window.uploadTargetInputId === 'pkg-image-url') {
+                    updateImagePreview(event.data.imageUrl);
+                }
+            }
+            
+            // Clean up
+            window.removeEventListener('message', messageHandler);
+            delete window.uploadTargetInputId;
+        }
+    };
+    
+    window.addEventListener('message', messageHandler);
+}
+
+async function updatePackageFromForm(event, packageId) {
+    event.preventDefault();
+    
+    const submitButton = document.getElementById('save-package-btn');
+    const originalText = submitButton.innerHTML;
+    
+    try {
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="spinner-border spinner-border-sm me-1" role="status"></i>Đang lưu...';
+        
+        // Collect form data
+        const formData = new FormData(event.target);
+        const packageData = {
+            id: packageId,
+            package_name: formData.get('package_name'),
+            package_slug: formData.get('package_slug'),
+            original_price: parseFloat(formData.get('original_price')) || 0,
+            sale_price: formData.get('sale_price') ? parseFloat(formData.get('sale_price')) : null,
+            is_free: document.getElementById('pkg-is-free').checked,
+            image_url: formData.get('image_url') || null,
+            status: document.getElementById('pkg-status').checked ? 'active' : 'inactive',
+            package_description: packageDescriptionEditor ? packageDescriptionEditor.root.innerHTML : null
+        };
+        
+        console.log('Updating package with data:', packageData);
+        
+        // Send update request
+        const response = await fetch('api/admin/packages.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(packageData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Cập nhật gói thành công', 'success');
+            
+            // Reload the page after a short delay to show the toast
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showToast(result.message || 'Lỗi cập nhật gói', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error updating package:', error);
+        showToast('Lỗi kết nối tới server', 'error');
+    } finally {
+        // Reset button
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
     }
