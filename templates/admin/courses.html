@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Quản lý Khóa học</title>
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Quill Editor CSS -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-graduation-cap me-2 text-primary"></i>Quản lý Khóa học</h2>
+                <p class="text-muted mb-0">Thêm, sửa, xóa các khóa học cho website</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-secondary me-2" id="view-packages-btn">
+                  <i class="fas fa-box me-2"></i>Xem Packages
+                </button>
+                <button class="btn btn-primary" id="add-course-btn">
+                  <i class="fas fa-plus me-2"></i>Thêm Khóa học
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filter Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Trạng thái</label>
+                  <select class="form-select" id="filter-status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active">Hoạt động</option>
+                    <option value="inactive">Không hoạt động</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Tìm kiếm</label>
+                  <input type="text" class="form-control" id="search-input" placeholder="Tên khóa học...">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">&nbsp;</label>
+                  <div>
+                    <button class="btn btn-outline-primary" id="apply-filters">
+                      <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                    <button class="btn btn-outline-secondary" id="reset-filters">
+                      <i class="fas fa-undo me-1"></i>Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Courses Table Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="courses-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 250px;">Tên Khóa học</th>
+                      <th style="width: 120px;">Hình ảnh</th>
+                      <th style="width: auto;">Mô tả</th>
+                      <th style="width: 120px;">Thời lượng</th>
+                      <th style="width: 120px;">Packages</th>
+                      <th style="width: 200px;">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="courses-tbody">
+                    <tr>
+                      <td colspan="6" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Course Modal -->
+  <div class="modal fade" id="courseModal" tabindex="-1" aria-labelledby="courseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="courseModalTitle">
+            <i class="fas fa-plus-circle me-2"></i>Thêm Khóa học
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="course-form">
+            <!-- Basic Information -->
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label for="course-name" class="form-label">
+                    <i class="fas fa-tag me-1"></i>Tên Khóa học <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="course-name" required 
+                         placeholder="Nhập tên khóa học...">
+                  <div class="form-text">Tên hiển thị của khóa học trên website</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="course-duration" class="form-label">
+                    <i class="fas fa-clock me-1"></i>Thời lượng
+                  </label>
+                  <input type="text" class="form-control" id="course-duration" 
+                         placeholder="Ví dụ: 6 tháng, 40 giờ...">
+                  <div class="form-text">Thời lượng khóa học</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="course-image-url" class="form-label">
+                <i class="fas fa-image me-1"></i>Hình ảnh Banner
+              </label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="course-image-url" 
+                       placeholder="Nhập đường dẫn hình ảnh banner...">
+                <button type="button" class="btn btn-outline-secondary" id="upload-course-image-btn">
+                  <i class="fas fa-upload me-1"></i>Upload
+                </button>
+              </div>
+              <div class="form-text">Hình ảnh banner hiển thị trên card khóa học (khuyến nghị kích thước: 400x250px)</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="course-short-description" class="form-label">
+                <i class="fas fa-align-left me-1"></i>Mô tả ngắn <span class="text-danger">*</span>
+              </label>
+              <textarea class="form-control" id="course-short-description" rows="3" required
+                        placeholder="Mô tả ngắn gọn về khóa học..."></textarea>
+              <div class="form-text">Mô tả hiển thị trên card khóa học (tối đa 200 ký tự)</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="course-full-description" class="form-label">
+                <i class="fas fa-file-alt me-1"></i>Mô tả chi tiết <span class="text-danger">*</span>
+              </label>
+              <div id="course-description-editor" style="height: 200px;"></div>
+              <input type="hidden" id="course-full-description" required>
+              <div class="form-text">Mô tả chi tiết sẽ hiển thị khi người dùng xem chi tiết khóa học</div>
+            </div>
+
+            <!-- Course Details -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-target-audience" class="form-label">
+                    <i class="fas fa-users me-1"></i>Đối tượng học viên
+                  </label>
+                  <textarea class="form-control" id="course-target-audience" rows="3"
+                            placeholder="Sinh viên mới ra trường, người đi làm muốn chuyển nghề..."></textarea>
+                  <div class="form-text">Mô tả đối tượng phù hợp với khóa học</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-learning-outcomes" class="form-label">
+                    <i class="fas fa-trophy me-1"></i>Kết quả học tập
+                  </label>
+                  <textarea class="form-control" id="course-learning-outcomes" rows="3"
+                            placeholder="Sau khóa học, học viên sẽ có thể..."></textarea>
+                  <div class="form-text">Những gì học viên đạt được sau khi hoàn thành</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="course-curriculum" class="form-label">
+                <i class="fas fa-list me-1"></i>Chương trình học
+              </label>
+              <div id="course-curriculum-editor" style="height: 150px;"></div>
+              <input type="hidden" id="course-curriculum">
+              <div class="form-text">Danh sách các chủ đề, bài học trong khóa học</div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-instructor" class="form-label">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>Thông tin giảng viên
+                  </label>
+                  <textarea class="form-control" id="course-instructor" rows="3"
+                            placeholder="Tên, kinh nghiệm, thành tích của giảng viên..."></textarea>
+                  <div class="form-text">Thông tin về người dạy khóa học</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-teaching-format" class="form-label">
+                    <i class="fas fa-video me-1"></i>Hình thức dạy học
+                  </label>
+                  <select class="form-select" id="course-teaching-format">
+                    <option value="">Chọn hình thức</option>
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                    <option value="hybrid">Kết hợp Online & Offline</option>
+                  </select>
+                  <div class="form-text">Cách thức tổ chức khóa học</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-category" class="form-label">
+                    <i class="fas fa-folder me-1"></i>Danh mục
+                  </label>
+                  <select class="form-select" id="course-category">
+                    <option value="">Chọn danh mục</option>
+                    <option value="technology">Công nghệ</option>
+                    <option value="business">Kinh doanh</option>
+                    <option value="design">Thiết kế</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="personal_development">Phát triển bản thân</option>
+                    <option value="language">Ngoại ngữ</option>
+                    <option value="other">Khác</option>
+                  </select>
+                  <div class="form-text">Phân loại khóa học</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="course-status" class="form-label">
+                    <i class="fas fa-toggle-on me-1"></i>Trạng thái
+                  </label>
+                  <select class="form-select" id="course-status">
+                    <option value="active">Hoạt động</option>
+                    <option value="inactive">Không hoạt động</option>
+                    <option value="draft">Nháp</option>
+                  </select>
+                  <div class="form-text">Trạng thái hiển thị của khóa học</div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Hủy bỏ
+          </button>
+          <button type="button" class="btn btn-primary" id="save-course-btn">
+            <i class="fas fa-save me-1"></i>Lưu Khóa học
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Packages Modal (reuse from consultations) -->
+  <div class="modal fade" id="packagesModal" tabindex="-1" aria-labelledby="packagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="packagesModalTitle">
+            <i class="fas fa-box me-2"></i>Quản lý Packages
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div id="packages-content">
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2 text-muted">Đang tải packages...</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+          <p>Bạn có chắc chắn muốn xóa khóa học này?</p>
+          <p class="small text-muted">Hành động này không thể hoàn tác!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+            <i class="fas fa-trash me-1"></i>Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Quill Editor JS -->
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/courses.js"></script>
+</body>
+</html>
