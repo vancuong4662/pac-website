@@ -342,6 +342,13 @@
         const response = await fetch('components/admin/sidebar.html');
         const html = await response.text();
         document.getElementById('admin-sidebar').innerHTML = html;
+        
+        // Initialize sidebar after loading
+        if (window.AdminSidebar && typeof window.AdminSidebar.setActiveMenu === 'function') {
+          setTimeout(() => {
+            window.AdminSidebar.setActiveMenu();
+          }, 100);
+        }
       } catch (error) {
         console.error('Error loading sidebar:', error);
       }

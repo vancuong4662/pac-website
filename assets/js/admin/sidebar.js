@@ -82,8 +82,10 @@ function setActiveMenu() {
     navLinks.forEach(link => {
         link.classList.remove('active');
         const page = link.dataset.page;
-        if (currentPath.includes(`admin/${page}`) || 
-            (currentPath.includes('admin/consultations') && page === 'consultations')) {
+        
+        // Check if current URL matches the page
+        // URLs are in format: /pac-new/admin-courses, /pac-new/admin-consultations, etc.
+        if (currentPath.includes(`admin-${page}`)) {
             link.classList.add('active');
         }
     });
