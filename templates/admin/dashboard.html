@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Tổng quan Hệ thống</title>
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-tachometer-alt me-2 text-primary"></i>Tổng quan Hệ thống</h2>
+                <p class="text-muted mb-0">Dashboard quản trị - Thống kê tổng quan</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-outline-primary" id="refresh-dashboard-btn">
+                  <i class="fas fa-sync me-2"></i>Làm mới
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Overview Statistics -->
+          <div class="row mb-4">
+            <!-- Total Users -->
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng người dùng</h6>
+                      <h3 class="mb-0" id="stat-total-users">-</h3>
+                      <small class="text-success">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        <span id="stat-users-growth">-</span> hoạt động
+                      </small>
+                    </div>
+                    <div class="text-primary">
+                      <i class="fas fa-users fa-3x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng đơn hàng</h6>
+                      <h3 class="mb-0" id="stat-total-orders">-</h3>
+                      <small class="text-success">
+                        <i class="fas fa-check-circle me-1"></i>
+                        <span id="stat-orders-paid">-</span> đã thanh toán
+                      </small>
+                    </div>
+                    <div class="text-success">
+                      <i class="fas fa-shopping-cart fa-3x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng doanh thu</h6>
+                      <h3 class="mb-0 text-success" id="stat-total-revenue">-</h3>
+                      <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>
+                        Tất cả thời gian
+                      </small>
+                    </div>
+                    <div class="text-warning">
+                      <i class="fas fa-dollar-sign fa-3x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Courses -->
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Khóa học</h6>
+                      <h3 class="mb-0" id="stat-total-courses">-</h3>
+                      <small class="text-info">
+                        <i class="fas fa-check me-1"></i>
+                        <span id="stat-courses-active">-</span> đang hoạt động
+                      </small>
+                    </div>
+                    <div class="text-info">
+                      <i class="fas fa-graduation-cap fa-3x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Consultations & Tests -->
+          <div class="row mb-4">
+            <!-- Consultations Statistics -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0">
+                    <i class="fas fa-user-tie me-2 text-primary"></i>Dịch vụ Tư vấn
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="row text-center">
+                    <div class="col-6">
+                      <div class="p-3">
+                        <h3 class="mb-1 text-primary" id="stat-total-consultations">-</h3>
+                        <small class="text-muted">Tổng dịch vụ</small>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-3">
+                        <h3 class="mb-1 text-success" id="stat-consultations-active">-</h3>
+                        <small class="text-muted">Đang hoạt động</small>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="my-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Tỷ lệ hoạt động</span>
+                    <span class="badge bg-success" id="stat-consultations-percentage">-%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tests Statistics -->
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0">
+                    <i class="fas fa-clipboard-check me-2 text-warning"></i>Bài Trắc nghiệm
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="row text-center">
+                    <div class="col-6">
+                      <div class="p-3">
+                        <h3 class="mb-1 text-warning" id="stat-total-tests">-</h3>
+                        <small class="text-muted">Tổng bài test</small>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-3">
+                        <h3 class="mb-1 text-info" id="stat-tests-completed">-</h3>
+                        <small class="text-muted">Đã hoàn thành</small>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="my-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted">Tỷ lệ hoàn thành</span>
+                    <span class="badge bg-info" id="stat-tests-percentage">-%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="mb-0">
+                <i class="fas fa-bolt me-2 text-danger"></i>Thao tác nhanh
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <a href="admin-users" class="btn btn-outline-primary w-100 p-3">
+                    <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                    <span>Quản lý Người dùng</span>
+                  </a>
+                </div>
+                <div class="col-md-3">
+                  <a href="admin-orders" class="btn btn-outline-success w-100 p-3">
+                    <i class="fas fa-shopping-cart fa-2x mb-2 d-block"></i>
+                    <span>Quản lý Đơn hàng</span>
+                  </a>
+                </div>
+                <div class="col-md-3">
+                  <a href="admin-courses" class="btn btn-outline-info w-100 p-3">
+                    <i class="fas fa-graduation-cap fa-2x mb-2 d-block"></i>
+                    <span>Quản lý Khóa học</span>
+                  </a>
+                </div>
+                <div class="col-md-3">
+                  <a href="admin-settings" class="btn btn-outline-warning w-100 p-3">
+                    <i class="fas fa-cog fa-2x mb-2 d-block"></i>
+                    <span>Cài đặt Hệ thống</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+        
+        // Initialize sidebar after loading
+        if (window.AdminSidebar && typeof window.AdminSidebar.setActiveMenu === 'function') {
+          setTimeout(() => {
+            window.AdminSidebar.setActiveMenu();
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/dashboard.js"></script>
+</body>
+</html>

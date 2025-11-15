@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Cài đặt Hệ thống</title>
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-cog me-2 text-primary"></i>Cài đặt Hệ thống</h2>
+                <p class="text-muted mb-0">Quản lý cấu hình và bảo trì hệ thống</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- System Maintenance Section -->
+          <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-tools me-2"></i>Bảo trì Hệ thống
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h6 class="mb-2">Chế độ bảo trì</h6>
+                  <p class="text-muted mb-0">
+                    Tạm ngưng hoạt động của website để thực hiện bảo trì. 
+                    Người dùng sẽ thấy thông báo bảo trì khi truy cập.
+                  </p>
+                </div>
+                <div class="col-md-4 text-end">
+                  <div class="form-check form-switch d-inline-block">
+                    <input class="form-check-input" type="checkbox" id="maintenance-mode" style="width: 3em; height: 1.5em;">
+                    <label class="form-check-label ms-2" for="maintenance-mode">
+                      <span class="badge bg-secondary" id="maintenance-status">Tắt</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <hr class="my-3">
+              <div class="alert alert-warning mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Cảnh báo:</strong> Khi bật chế độ bảo trì, tất cả người dùng (trừ admin) sẽ không thể truy cập website.
+              </div>
+            </div>
+          </div>
+
+          <!-- VNPay Configuration Section -->
+          <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-credit-card me-2"></i>Cấu hình VNPay
+              </h5>
+            </div>
+            <div class="card-body">
+              <form id="vnpay-config-form">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">TMN Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="vnpay-tmn-code" placeholder="Mã TMN Code từ VNPay" readonly>
+                    <small class="text-muted">Mã định danh website được cấp bởi VNPay</small>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Hash Secret <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" id="vnpay-hash-secret" placeholder="Hash Secret Key" readonly>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('vnpay-hash-secret')">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                    <small class="text-muted">Mã bảo mật để mã hóa dữ liệu giao dịch</small>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">URL Return</label>
+                    <input type="url" class="form-control" id="vnpay-return-url" placeholder="https://yoursite.com/vnpay-return" readonly>
+                    <small class="text-muted">URL callback sau khi thanh toán</small>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Môi trường</label>
+                    <select class="form-select" id="vnpay-environment" disabled>
+                      <option value="sandbox" selected>Sandbox (Test)</option>
+                      <option value="production">Production (Live)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <button type="button" class="btn btn-primary" onclick="saveVNPayConfig()">
+                    <i class="fas fa-save me-2"></i>Lưu cấu hình
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary" onclick="testVNPayConnection()">
+                    <i class="fas fa-plug me-2"></i>Test kết nối
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Data Backup Section -->
+          <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-database me-2"></i>Sao lưu Dữ liệu
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <!-- Backup Users -->
+                <div class="col-md-4">
+                  <div class="card border h-100">
+                    <div class="card-body text-center">
+                      <div class="mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                      </div>
+                      <h6 class="mb-3">Người dùng</h6>
+                      <p class="text-muted small mb-3">
+                        Sao lưu thông tin tất cả người dùng, tài khoản, quyền hạn
+                      </p>
+                      <button class="btn btn-outline-primary btn-sm w-100" onclick="backupData('users')">
+                        <i class="fas fa-download me-2"></i>Sao lưu
+                      </button>
+                      <div class="mt-2">
+                        <small class="text-muted">Lần cuối: Chưa có</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Backup Payments -->
+                <div class="col-md-4">
+                  <div class="card border h-100">
+                    <div class="card-body text-center">
+                      <div class="mb-3">
+                        <i class="fas fa-receipt fa-3x text-success"></i>
+                      </div>
+                      <h6 class="mb-3">Thanh toán</h6>
+                      <p class="text-muted small mb-3">
+                        Sao lưu đơn hàng, giao dịch VNPay, lịch sử thanh toán
+                      </p>
+                      <button class="btn btn-outline-success btn-sm w-100" onclick="backupData('payments')">
+                        <i class="fas fa-download me-2"></i>Sao lưu
+                      </button>
+                      <div class="mt-2">
+                        <small class="text-muted">Lần cuối: Chưa có</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Backup Quiz Results -->
+                <div class="col-md-4">
+                  <div class="card border h-100">
+                    <div class="card-body text-center">
+                      <div class="mb-3">
+                        <i class="fas fa-clipboard-list fa-3x text-warning"></i>
+                      </div>
+                      <h6 class="mb-3">Bài trắc nghiệm</h6>
+                      <p class="text-muted small mb-3">
+                        Sao lưu kết quả test, câu trả lời, phân tích Holland Code
+                      </p>
+                      <button class="btn btn-outline-warning btn-sm w-100" onclick="backupData('quiz')">
+                        <i class="fas fa-download me-2"></i>Sao lưu
+                      </button>
+                      <div class="mt-2">
+                        <small class="text-muted">Lần cuối: Chưa có</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4">
+
+              <!-- Full Backup -->
+              <div class="text-center">
+                <h6 class="mb-3">Sao lưu toàn bộ hệ thống</h6>
+                <p class="text-muted mb-3">
+                  Tạo bản sao lưu đầy đủ bao gồm tất cả dữ liệu (người dùng, thanh toán, bài test, sản phẩm, cấu hình)
+                </p>
+                <button class="btn btn-success btn-lg" onclick="backupData('full')">
+                  <i class="fas fa-save me-2"></i>Sao lưu toàn bộ
+                </button>
+              </div>
+
+              <div class="alert alert-info mt-4 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Lưu ý:</strong> File sao lưu sẽ được tải xuống dưới dạng SQL hoặc JSON. 
+                Lưu trữ an toàn và thường xuyên sao lưu để đảm bảo an toàn dữ liệu.
+              </div>
+            </div>
+          </div>
+
+          <!-- System Info Section -->
+          <div class="card">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Thông tin Hệ thống
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <table class="table table-sm">
+                    <tr>
+                      <td class="text-muted" style="width: 40%;">Phiên bản PHP:</td>
+                      <td><strong><?php echo PHP_VERSION; ?></strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Database:</td>
+                      <td><strong>MySQL/MariaDB</strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Web Server:</td>
+                      <td><strong>Apache/XAMPP</strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Dung lượng Upload:</td>
+                      <td><strong>64MB</strong></td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <table class="table table-sm">
+                    <tr>
+                      <td class="text-muted" style="width: 40%;">Tổng người dùng:</td>
+                      <td><strong>-</strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Tổng đơn hàng:</td>
+                      <td><strong>-</strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Tổng bài test:</td>
+                      <td><strong>-</strong></td>
+                    </tr>
+                    <tr>
+                      <td class="text-muted">Dung lượng DB:</td>
+                      <td><strong>~</strong></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+        
+        // Initialize sidebar after loading
+        if (window.AdminSidebar && typeof window.AdminSidebar.setActiveMenu === 'function') {
+          setTimeout(() => {
+            window.AdminSidebar.setActiveMenu();
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/settings.js"></script>
+</body>
+</html>
