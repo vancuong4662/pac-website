@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Quản lý Đơn hàng</title>
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-shopping-cart me-2 text-primary"></i>Quản lý Đơn hàng</h2>
+                <p class="text-muted mb-0">Xem và quản lý tất cả đơn hàng đã thanh toán</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-outline-primary" id="refresh-orders-btn">
+                  <i class="fas fa-sync me-2"></i>Làm mới
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filter Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Trạng thái thanh toán</label>
+                  <select class="form-select" id="filter-payment-status">
+                    <option value="">Tất cả</option>
+                    <option value="paid" selected>Đã thanh toán</option>
+                    <option value="pending">Chờ thanh toán</option>
+                    <option value="failed">Thất bại</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Loại sản phẩm</label>
+                  <select class="form-select" id="filter-product-type">
+                    <option value="">Tất cả loại</option>
+                    <option value="career_test">Trắc nghiệm</option>
+                    <option value="course">Khóa học</option>
+                    <option value="consultation">Tư vấn</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Tìm kiếm</label>
+                  <input type="text" class="form-control" id="search-input" placeholder="Mã đơn, tên khách hàng, email...">
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">&nbsp;</label>
+                  <div>
+                    <button class="btn btn-primary w-100" id="apply-filters">
+                      <i class="fas fa-search me-1"></i>Lọc
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Statistics Cards -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng đơn hàng</h6>
+                      <h3 class="mb-0" id="stat-total-orders">-</h3>
+                    </div>
+                    <div class="text-primary">
+                      <i class="fas fa-shopping-cart fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng doanh thu</h6>
+                      <h3 class="mb-0 text-success" id="stat-total-revenue">-</h3>
+                    </div>
+                    <div class="text-success">
+                      <i class="fas fa-dollar-sign fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Khách hàng</h6>
+                      <h3 class="mb-0" id="stat-unique-customers">-</h3>
+                    </div>
+                    <div class="text-warning">
+                      <i class="fas fa-users fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Orders Table Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="orders-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 120px;">Mã đơn</th>
+                      <th style="width: 200px;">Khách hàng</th>
+                      <th style="width: auto;">Sản phẩm</th>
+                      <th style="width: 140px;">Ngày thanh toán</th>
+                      <th style="width: 120px;" class="text-end">Tổng tiền</th>
+                      <th style="width: 120px;">Thanh toán</th>
+                      <th style="width: 100px;">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orders-tbody">
+                    <tr>
+                      <td colspan="7" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-file-invoice me-2"></i>Chi tiết đơn hàng
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="order-detail-content">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+        
+        // Initialize sidebar after loading
+        if (window.AdminSidebar && typeof window.AdminSidebar.setActiveMenu === 'function') {
+          setTimeout(() => {
+            window.AdminSidebar.setActiveMenu();
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/orders.js"></script>
+</body>
+</html>
