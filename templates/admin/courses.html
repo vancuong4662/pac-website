@@ -190,27 +190,22 @@
             </div>
 
             <!-- Course Details -->
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="course-target-audience" class="form-label">
-                    <i class="fas fa-users me-1"></i>Đối tượng học viên
-                  </label>
-                  <textarea class="form-control" id="course-target-audience" rows="3"
-                            placeholder="Sinh viên mới ra trường, người đi làm muốn chuyển nghề..."></textarea>
-                  <div class="form-text">Mô tả đối tượng phù hợp với khóa học</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="course-learning-outcomes" class="form-label">
-                    <i class="fas fa-trophy me-1"></i>Kết quả học tập
-                  </label>
-                  <textarea class="form-control" id="course-learning-outcomes" rows="3"
-                            placeholder="Sau khóa học, học viên sẽ có thể..."></textarea>
-                  <div class="form-text">Những gì học viên đạt được sau khi hoàn thành</div>
-                </div>
-              </div>
+            <div class="mb-3">
+              <label for="course-target-audience" class="form-label">
+                <i class="fas fa-users me-1"></i>Đối tượng học viên
+              </label>
+              <textarea class="form-control" id="course-target-audience" rows="3"
+                        placeholder="Sinh viên mới ra trường, người đi làm muốn chuyển nghề..."></textarea>
+              <div class="form-text">Mô tả đối tượng phù hợp với khóa học</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="course-learning-outcomes" class="form-label">
+                <i class="fas fa-trophy me-1"></i>Kết quả học tập
+              </label>
+              <div id="course-learning-outcomes-editor" style="height: 150px;"></div>
+              <input type="hidden" id="course-learning-outcomes">
+              <div class="form-text">Những gì học viên đạt được sau khi hoàn thành</div>
             </div>
 
             <div class="mb-3">
@@ -250,25 +245,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label for="course-category" class="form-label">
-                    <i class="fas fa-folder me-1"></i>Danh mục
-                  </label>
-                  <select class="form-select" id="course-category">
-                    <option value="">Chọn danh mục</option>
-                    <option value="technology">Công nghệ</option>
-                    <option value="business">Kinh doanh</option>
-                    <option value="design">Thiết kế</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="personal_development">Phát triển bản thân</option>
-                    <option value="language">Ngoại ngữ</option>
-                    <option value="other">Khác</option>
-                  </select>
-                  <div class="form-text">Phân loại khóa học</div>
-                </div>
-              </div>
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="mb-3">
                   <label for="course-status" class="form-label">
                     <i class="fas fa-toggle-on me-1"></i>Trạng thái

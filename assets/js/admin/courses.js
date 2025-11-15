@@ -8,6 +8,7 @@ let currentCourseId = null;
 let coursesData = [];
 let quillFullDescription = null;
 let quillCurriculum = null;
+let quillLearningOutcomes = null;
 let deleteTargetId = null;
 
 // Initialize when DOM is loaded
@@ -73,6 +74,29 @@ function initializeQuillEditors() {
         quillCurriculum.on('text-change', function() {
             const html = quillCurriculum.root.innerHTML;
             document.getElementById('course-curriculum').value = html;
+        });
+    }
+
+    // Learning Outcomes Editor
+    if (document.getElementById('course-learning-outcomes-editor')) {
+        quillLearningOutcomes = new Quill('#course-learning-outcomes-editor', {
+            theme: 'snow',
+            placeholder: 'Sau khóa học, học viên sẽ có thể...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+
+        // Sync with hidden input
+        quillLearningOutcomes.on('text-change', function() {
+            const html = quillLearningOutcomes.root.innerHTML;
+            document.getElementById('course-learning-outcomes').value = html;
         });
     }
 }
@@ -223,11 +247,8 @@ function renderCoursesTable() {
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-info" onclick="viewCourseDetails(${course.id})" title="Xem chi tiết">
-                            <i class="fas fa-eye"></i>
-                        </button>
                         <button type="button" class="btn btn-outline-primary" onclick="editCourse(${course.id})" title="Chỉnh sửa">
-                            <i class="fas fa-edit"></i>
+                            <i class="fas fa-eye"></i>
                         </button>
                         <button type="button" class="btn btn-outline-secondary" onclick="viewCoursePackages(${course.id})" title="Xem Packages">
                             <i class="fas fa-box"></i>
@@ -304,21 +325,40 @@ function populateCourseForm(course) {
     document.getElementById('course-duration').value = course.duration || '';
     document.getElementById('course-image-url').value = course.image_url || '';
     document.getElementById('course-short-description').value = course.short_description || '';
-    document.getElementById('course-category').value = course.category || '';
     document.getElementById('course-status').value = course.status || 'active';
     
-    // Rich text fields
+    // Rich text fields - use clipboard API for better HTML parsing
     if (quillFullDescription && course.full_description) {
-        quillFullDescription.root.innerHTML = course.full_description;
-        document.getElementById('course-full-description').value = course.full_description;
+        setTimeout(() => {
+            try {
+                // Use clipboard.dangerouslyPasteHTML for proper HTML parsing
+                quillFullDescription.clipboard.dangerouslyPasteHTML(0, course.full_description);
+                document.getElementById('course-full-description').value = course.full_description;
+            } catch (error) {
+                console.warn('Failed to parse HTML with clipboard, using root.innerHTML:', error);
+                // Fallback to root.innerHTML
+                quillFullDescription.root.innerHTML = course.full_description;
+                document.getElementById('course-full-description').value = course.full_description;
+            }
+        }, 100);
     }
     
     if (quillCurriculum && course.curriculum) {
         const curriculumHtml = typeof course.curriculum === 'string' 
             ? course.curriculum 
             : JSON.stringify(course.curriculum);
-        quillCurriculum.root.innerHTML = curriculumHtml;
-        document.getElementById('course-curriculum').value = curriculumHtml;
+        setTimeout(() => {
+            try {
+                // Use clipboard.dangerouslyPasteHTML for proper HTML parsing
+                quillCurriculum.clipboard.dangerouslyPasteHTML(0, curriculumHtml);
+                document.getElementById('course-curriculum').value = curriculumHtml;
+            } catch (error) {
+                console.warn('Failed to parse HTML with clipboard, using root.innerHTML:', error);
+                // Fallback to root.innerHTML
+                quillCurriculum.root.innerHTML = curriculumHtml;
+                document.getElementById('course-curriculum').value = curriculumHtml;
+            }
+        }, 100);
     }
     
     // Additional fields
@@ -326,11 +366,25 @@ function populateCourseForm(course) {
         typeof course.target_audience === 'string' 
             ? course.target_audience 
             : (Array.isArray(course.target_audience) ? course.target_audience.join('\n') : '');
-            
-    document.getElementById('course-learning-outcomes').value = 
-        typeof course.learning_outcomes === 'string' 
+    
+    // Learning Outcomes Editor
+    if (quillLearningOutcomes && course.learning_outcomes) {
+        const learningOutcomesHtml = typeof course.learning_outcomes === 'string' 
             ? course.learning_outcomes 
             : (Array.isArray(course.learning_outcomes) ? course.learning_outcomes.join('\n') : '');
+        setTimeout(() => {
+            try {
+                // Use clipboard.dangerouslyPasteHTML for proper HTML parsing
+                quillLearningOutcomes.clipboard.dangerouslyPasteHTML(0, learningOutcomesHtml);
+                document.getElementById('course-learning-outcomes').value = learningOutcomesHtml;
+            } catch (error) {
+                console.warn('Failed to parse HTML with clipboard, using root.innerHTML:', error);
+                // Fallback to root.innerHTML
+                quillLearningOutcomes.root.innerHTML = learningOutcomesHtml;
+                document.getElementById('course-learning-outcomes').value = learningOutcomesHtml;
+            }
+        }, 100);
+    }
             
     document.getElementById('course-instructor').value = course.instructor_info || '';
     document.getElementById('course-teaching-format').value = course.teaching_format || '';
@@ -343,10 +397,8 @@ function clearCourseForm() {
     document.getElementById('course-image-url').value = '';
     document.getElementById('course-short-description').value = '';
     document.getElementById('course-target-audience').value = '';
-    document.getElementById('course-learning-outcomes').value = '';
     document.getElementById('course-instructor').value = '';
     document.getElementById('course-teaching-format').value = '';
-    document.getElementById('course-category').value = '';
     document.getElementById('course-status').value = 'active';
     
     // Clear Quill editors
@@ -358,6 +410,11 @@ function clearCourseForm() {
     if (quillCurriculum) {
         quillCurriculum.setContents([]);
         document.getElementById('course-curriculum').value = '';
+    }
+    
+    if (quillLearningOutcomes) {
+        quillLearningOutcomes.setContents([]);
+        document.getElementById('course-learning-outcomes').value = '';
     }
 }
 
@@ -382,7 +439,6 @@ async function saveCourse() {
             curriculum: document.getElementById('course-curriculum').value,
             instructor_info: document.getElementById('course-instructor').value.trim(),
             teaching_format: document.getElementById('course-teaching-format').value,
-            category: document.getElementById('course-category').value,
             status: document.getElementById('course-status').value,
             type: 'course' // Specify this is a course
         };
@@ -627,8 +683,12 @@ async function loadPackagesForProduct(productId) {
         const response = await fetch(`api/admin/packages.php?product_id=${productId}`);
         const result = await response.json();
         
+        console.log('Packages API response:', result);
+        
         if (result.success) {
-            renderPackagesGrid(result.data, productId);
+            // API returns data.packages array
+            const packages = result.data?.packages || [];
+            renderPackagesGrid(packages, productId);
         } else {
             content.innerHTML = `
                 <div class="text-center py-5">
@@ -666,8 +726,12 @@ async function loadAllPackages() {
         const response = await fetch('api/admin/packages.php');
         const result = await response.json();
         
+        console.log('All Packages API response:', result);
+        
         if (result.success) {
-            renderPackagesGrid(result.data);
+            // API returns data.packages array
+            const packages = result.data?.packages || [];
+            renderPackagesGrid(packages);
         } else {
             content.innerHTML = `
                 <div class="text-center py-5">
@@ -821,34 +885,39 @@ function initPackageDescriptionEditor(initialContent = '') {
     const editorContainer = document.getElementById('pkg-description-editor');
     if (!editorContainer) return;
     
-    // Add delay to ensure proper initialization
-    setTimeout(() => {
-        if (quillPackageDescription) {
+    // Clean up existing editor
+    if (quillPackageDescription) {
+        quillPackageDescription = null;
+    }
+    
+    // Initialize Quill editor for package description
+    quillPackageDescription = new Quill('#pkg-description-editor', {
+        theme: 'snow',
+        placeholder: 'Mô tả chi tiết về gói khóa học...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'blockquote'],
+                ['clean']
+            ]
+        }
+    });
+    
+    // Load HTML content into editor using clipboard API for better HTML parsing
+    if (initialContent && initialContent.trim()) {
+        setTimeout(() => {
             try {
-                quillPackageDescription = null;
-            } catch (e) {
-                console.log('Error cleaning up Quill editor:', e);
+                // Use clipboard API for better HTML parsing
+                quillPackageDescription.clipboard.dangerouslyPasteHTML(0, initialContent);
+            } catch (error) {
+                // Fallback to root.innerHTML
+                console.warn('Using fallback HTML loading method:', error);
+                quillPackageDescription.root.innerHTML = initialContent;
             }
-        }
-        
-        quillPackageDescription = new Quill('#pkg-description-editor', {
-            theme: 'snow',
-            placeholder: 'Mô tả chi tiết về gói dịch vụ...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link'],
-                    ['clean']
-                ]
-            }
-        });
-        
-        if (initialContent && initialContent.trim()) {
-            quillPackageDescription.root.innerHTML = initialContent;
-        }
-    }, 100);
+        }, 100);
+    }
 }
 
 function initPackageFormListeners() {
