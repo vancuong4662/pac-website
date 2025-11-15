@@ -44,6 +44,14 @@
               <span id="user-display-name">Người dùng</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <!-- Admin menu item (hidden by default, shown only for admin users) -->
+              <li id="admin-menu-item" style="display: none;">
+                <a class="dropdown-item text-danger fw-bold" href="admin-dashboard">
+                  <i class="bi bi-shield-lock me-2"></i>Quản trị web
+                </a>
+              </li>
+              <li id="admin-divider" style="display: none;"><hr class="dropdown-divider"></li>
+              
               <li>
                 <a class="dropdown-item" href="profile">
                   <i class="bi bi-person me-2"></i>Hồ sơ cá nhân
@@ -256,6 +264,9 @@
         this.userDisplayName.textContent = displayName;
       }
       
+      // Check if user is admin and show admin menu
+      this.checkAndShowAdminMenu(userInfo);
+      
       // Hide not logged in state
       this.notLoggedInElement.style.display = 'none';
       
@@ -266,11 +277,65 @@
     showNotAuthenticatedState() {
       if (!this.notLoggedInElement || !this.loggedInElement) return;
       
+      // Hide admin menu
+      this.hideAdminMenu();
+      
       // Hide logged in state
       this.loggedInElement.style.display = 'none';
       
       // Show not logged in state
       this.notLoggedInElement.style.display = 'block';
+    }
+    
+    checkAndShowAdminMenu(userInfo) {
+      // Check localStorage for user_info
+      try {
+        const localUserInfo = localStorage.getItem('user_info');
+        if (localUserInfo) {
+          const userData = JSON.parse(localUserInfo);
+          
+          // Check if username is 'admin'
+          if (userData.username && userData.username.toLowerCase() === 'admin') {
+            this.showAdminMenu();
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('[Header Auth] Error checking admin status from localStorage:', error);
+      }
+      
+      // Fallback: check from userInfo parameter
+      if (userInfo && userInfo.username && userInfo.username.toLowerCase() === 'admin') {
+        this.showAdminMenu();
+        return;
+      }
+      
+      // Hide admin menu if not admin
+      this.hideAdminMenu();
+    }
+    
+    showAdminMenu() {
+      const adminMenuItem = document.getElementById('admin-menu-item');
+      const adminDivider = document.getElementById('admin-divider');
+      
+      if (adminMenuItem) {
+        adminMenuItem.style.display = 'block';
+      }
+      if (adminDivider) {
+        adminDivider.style.display = 'block';
+      }
+    }
+    
+    hideAdminMenu() {
+      const adminMenuItem = document.getElementById('admin-menu-item');
+      const adminDivider = document.getElementById('admin-divider');
+      
+      if (adminMenuItem) {
+        adminMenuItem.style.display = 'none';
+      }
+      if (adminDivider) {
+        adminDivider.style.display = 'none';
+      }
     }
     
     updateAuthDisplay(authData) {
