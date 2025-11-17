@@ -11,13 +11,51 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 // VNPay Sandbox Credentials - Official registered credentials (vancuong4662@gmail.com)
 // Merchant Admin: https://sandbox.vnpayment.vn/merchantv2/
 // Test Site: https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login
-$vnp_TmnCode    = "UNLOCKY1";                                    // Your registered TMN Code
-$vnp_HashSecret = "LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU";              // Your registered Hash Secret
-$vnp_Url        = "https://pay.vnpay.vn/vpcpay.html"; // VNPay Sandbox Payment URL
-// TEST :
-// $vnp_TmnCode    = "VJGIXB0L";                                    // Your registered TMN Code
-// $vnp_HashSecret = "2OT3OL8CMQ4ACR2YBU8TTH66BK5HLLXI";              // Your registered Hash Secret
-// $vnp_Url        = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; // VNPay Sandbox Payment URL
+
+// VNPay Credentials Configuration
+// Switch between Sandbox and Production - CHỈ CẦN THAY ĐỔI DÒNG NÀY!
+$vnp_test = true; // true = Sandbox (VJGIXB0L), false = Production (UNLOCKY1)
+
+/**
+ * Get VNPay credentials based on test mode
+ * @param bool $testMode - true for Sandbox, false for Production
+ * @return array - Credentials array with tmn_code, hash_secret, url, hash_type
+ */
+function vnpay_get_credentials($testMode = null) {
+    global $vnp_test;
+    
+    // Use provided test mode or fall back to global
+    $mode = $testMode ?? $vnp_test;
+    
+    if ($mode) {
+        // SANDBOX - R9BKC8DJ
+        return [
+            'tmn_code' => 'R9BKC8DJ',
+            'hash_secret' => '5TZT9X8NNLWW7S4SP04YOPADLOL8GEMN',
+            'url' => 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
+            'hash_type' => 'SHA512',
+            'test_mode' => true,
+            'type' => 'Sandbox'
+        ];
+    } else {
+        // PRODUCTION - UNLOCKY1
+        return [
+            'tmn_code' => 'UNLOCKY1',
+            'hash_secret' => 'LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU',
+            'url' => 'https://pay.vnpay.vn/vpcpay.html',
+            'hash_type' => 'SHA256',
+            'test_mode' => false,
+            'type' => 'Production'
+        ];
+    }
+}
+
+// Apply credentials based on $vnp_test
+$credentials = vnpay_get_credentials();
+$vnp_TmnCode    = $credentials['tmn_code'];
+$vnp_HashSecret = $credentials['hash_secret'];
+$vnp_Url        = $credentials['url'];
+$vnp_HashType   = $credentials['hash_type'];
 
 // Determine base URL dynamically
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
@@ -49,7 +87,8 @@ $vnp_Version = "2.1.0";
 $vnp_Command = "pay";
 $vnp_CurrCode = "VND";
 $vnp_Locale = "vn";
-$vnp_SecureHashType = "SHA256"; // Updated to SHA512 per VNPay 2024 spec
+// $vnp_SecureHashType is now set above based on $vnp_test
+$vnp_SecureHashType = $vnp_HashType; // For backward compatibility
 
 // Test Payment Amounts (in VND)
 $vnpay_test_amounts = [
@@ -58,9 +97,42 @@ $vnpay_test_amounts = [
 ];
 
 /**
- * Hash order info for VNPay
+ * Hash order info for VNPay (Flexible - supports both SHA256 and SHA512)
+ * @param array $data - Data to hash
+ * @param string $hashSecret - Secret key
+ * @param string|null $hashType - Hash algorithm (SHA256, SHA512). If null, uses $vnp_SecureHashType
+ * @return string - Hashed string
  */
-function vnpay_hash_data($data, $hashSecret) {
+function vnpay_hash_data($data, $hashSecret, $hashType = null) {
+    global $vnp_SecureHashType;
+    
+    // Use provided hash type or fall back to global config
+    $algorithm = $hashType ?? $vnp_SecureHashType ?? 'SHA256';
+    $algorithm = strtolower($algorithm); // Convert to lowercase for hash_hmac
+    
+    $hashdata = "";
+    ksort($data);
+    $i = 0;
+    foreach ($data as $key => $value) {
+        if ($i == 1) {
+            $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+        } else {
+            $hashdata .= urlencode($key) . "=" . urlencode($value);
+            $i = 1;
+        }
+    }
+    
+    return hash_hmac($algorithm, $hashdata, $hashSecret);
+}
+
+/**
+ * Hash order info for VNPay with SHA512 (Legacy/Sandbox)
+ * Hàm này dùng cho sandbox cũ hoặc khi cần test với SHA512
+ * @param array $data - Data to hash
+ * @param string $hashSecret - Secret key
+ * @return string - SHA512 hashed string
+ */
+function vnpay_hash_data_sha512($data, $hashSecret) {
     $hashdata = "";
     ksort($data);
     $i = 0;

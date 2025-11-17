@@ -77,6 +77,25 @@ if (!isset($input['order_id'])) {
 $orderId = (int)$input['order_id'];
 $orderInfo = isset($input['order_info']) ? trim($input['order_info']) : '';
 $bankCode = isset($input['bank_code']) ? trim($input['bank_code']) : '';
+$credentialType = isset($input['credential_type']) ? trim($input['credential_type']) : null;
+
+// Determine test mode
+if ($credentialType === 'sandbox') {
+    $testMode = true;
+} elseif ($credentialType === 'production') {
+    $testMode = false;
+} else {
+    // Use global config from vnpay-config.php
+    $testMode = $vnp_test;
+}
+
+// Get credentials from vnpay-config.php helper function
+$credentials = vnpay_get_credentials($testMode);
+$vnp_TmnCode = $credentials['tmn_code'];
+$vnp_HashSecret = $credentials['hash_secret'];
+$vnp_Url = $credentials['url'];
+$vnp_HashType = $credentials['hash_type'];
+$actualCredentialType = $credentials['type'];
 
 if ($orderId <= 0) {
     http_response_code(400);
@@ -232,9 +251,16 @@ try {
         $inputData['vnp_Bill_State'] = $vnp_Bill_State;
     }
     
-    // Tạo secure hash
-    $hashdata = vnpay_hash_data($inputData, $vnp_HashSecret);
-    $inputData['vnp_SecureHashType'] = $vnp_SecureHashType;
+    // Tạo secure hash - Tự động chọn hash function dựa vào $vnp_HashType
+    if ($vnp_HashType === 'SHA512') {
+        // Sandbox sử dụng SHA512
+        $hashdata = vnpay_hash_data_sha512($inputData, $vnp_HashSecret);
+    } else {
+        // Production sử dụng SHA256
+        $hashdata = vnpay_hash_data($inputData, $vnp_HashSecret, 'SHA256');
+    }
+    
+    $inputData['vnp_SecureHashType'] = $vnp_HashType;
     $inputData['vnp_SecureHash'] = $hashdata;
     
     // Tạo URL thanh toán
@@ -242,6 +268,12 @@ try {
     $vnpayUrl = $vnp_Url . "?" . $query;
     
     // Debug: Log the request data for debugging
+    error_log("=== VNPay Request Debug ===");
+    error_log("Credential Type: " . $actualCredentialType);
+    error_log("Test Mode: " . ($testMode ? 'YES' : 'NO'));
+    error_log("TMN Code: " . $vnp_TmnCode);
+    error_log("Hash Type: " . $vnp_HashType);
+    error_log("Payment URL: " . $vnp_Url);
     error_log("VNPay Request Data: " . json_encode($inputData));
     error_log("VNPay Return URL: " . $vnp_Returnurl);
     error_log("VNPay Full Payment URL: " . $vnpayUrl);
@@ -280,12 +312,16 @@ try {
             'txn_ref' => $vnp_TxnRef,
             'order_id' => $orderId,
             'order_code' => $order['order_code'],
-            'amount' => $vnp_Amount / 100, // Convert back to VND
+            'amount' => $vnp_Amount / 100,
             'amount_formatted' => number_format($vnp_Amount / 100, 0, ',', '.') . ' VND',
             'order_info' => $vnp_OrderInfo,
             'create_date' => $vnp_CreateDate,
             'expire_date' => $vnp_ExpireDate,
-            'expire_in_minutes' => 15
+            'expire_in_minutes' => 15,
+            'credential_type' => $actualCredentialType,
+            'tmn_code' => $vnp_TmnCode,
+            'hash_type' => $vnp_HashType,
+            'test_mode' => $testMode
         ],
         'message' => 'VNPay payment URL created successfully'
     ];

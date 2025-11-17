@@ -154,6 +154,58 @@
             margin-bottom: 5px;
         }
         
+        .credential-selector {
+            margin-bottom: 20px;
+        }
+        
+        .credential-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .credential-option:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .credential-option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .credential-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+        
+        .credential-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-production {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-sandbox {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .credential-details {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        
         .spinner {
             display: none;
             width: 20px;
@@ -194,7 +246,7 @@
     <div class="test-container">
         <div class="test-header">
             <h1><i class="fas fa-credit-card me-2"></i>Test VNPay Payment</h1>
-            <p>Thanh toán thử nghiệm với VNPay Sandbox</p>
+            <p>Thanh toán thử nghiệm với VNPay</p>
         </div>
         
         <div class="amount-display">
@@ -202,17 +254,49 @@
             <div class="amount">10,000 đ</div>
         </div>
         
-        <div class="info-box">
-            <h6><i class="fas fa-info-circle me-2"></i>Thông tin Test</h6>
-            <ul>
-                <li>Môi trường: <strong>VNPay Sandbox</strong></li>
-                <li>Số tiền: <strong>10,000 VND</strong> (hạn mức tối thiểu)</li>
-                <li>Mã đơn hàng sẽ được tạo tự động</li>
-                <li>Sử dụng thẻ test của VNPay để thanh toán</li>
-            </ul>
-        </div>
-        
         <form id="testPaymentForm">
+            <div class="form-group credential-selector">
+                <label>
+                    <i class="fas fa-server me-1"></i>Chọn môi trường test
+                </label>
+                
+                <div class="credential-option selected" data-credential="sandbox">
+                    <label style="margin: 0; cursor: pointer; width: 100%;">
+                        <input type="radio" name="credential" value="sandbox" checked>
+                        <strong>VJGIXB0L</strong>
+                        <span class="credential-badge badge-sandbox">SANDBOX</span>
+                        <div class="credential-details">
+                            🧪 Môi trường test VNPay Sandbox<br>
+                            🔐 Hash: SHA512<br>
+                            💳 Sử dụng thẻ test của VNPay
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="credential-option" data-credential="production">
+                    <label style="margin: 0; cursor: pointer; width: 100%;">
+                        <input type="radio" name="credential" value="production">
+                        <strong>UNLOCKY1</strong>
+                        <span class="credential-badge badge-production">PRODUCTION</span>
+                        <div class="credential-details">
+                            🚀 Môi trường thật (yêu cầu thẻ thật)<br>
+                            🔐 Hash: SHA256<br>
+                            ⚠️ Giao dịch thật - cần xác nhận kỹ
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="info-box" id="infoBox">
+                <h6><i class="fas fa-info-circle me-2"></i>Thông tin Test</h6>
+                <ul id="infoList">
+                    <li>Môi trường: <strong>VNPay Sandbox (VJGIXB0L)</strong></li>
+                    <li>Hash Algorithm: <strong>SHA512</strong></li>
+                    <li>Số tiền: <strong>10,000 VND</strong> (hạn mức tối thiểu)</li>
+                    <li>Mã đơn hàng sẽ được tạo tự động</li>
+                    <li>Sử dụng thẻ test của VNPay để thanh toán</li>
+                </ul>
+            </div>
             <div class="form-group">
                 <label for="orderInfo">
                     <i class="fas fa-file-alt me-1"></i>Nội dung thanh toán
@@ -266,6 +350,8 @@
         
         <div class="back-link">
             <a href="home"><i class="fas fa-arrow-left me-1"></i>Quay về trang chủ</a>
+            <span style="margin: 0 10px;">|</span>
+            <a href="api/orders/debug-vnpay-hash.php" target="_blank"><i class="fas fa-bug me-1"></i>Debug Hash Tool</a>
         </div>
     </div>
     
@@ -277,12 +363,88 @@
     <script src="assets/js/toastbar.js"></script>
     
     <script>
+        // Credential configuration
+        const credentialConfig = {
+            sandbox: {
+                name: 'VJGIXB0L',
+                type: 'VNPay Sandbox',
+                hash: 'SHA512',
+                testCard: true,
+                info: [
+                    'Môi trường: <strong>VNPay Sandbox (VJGIXB0L)</strong>',
+                    'Hash Algorithm: <strong>SHA512</strong>',
+                    'Số tiền: <strong>10,000 VND</strong> (hạn mức tối thiểu)',
+                    'Mã đơn hàng sẽ được tạo tự động',
+                    'Sử dụng thẻ test của VNPay để thanh toán'
+                ]
+            },
+            production: {
+                name: 'UNLOCKY1',
+                type: 'VNPay Production',
+                hash: 'SHA256',
+                testCard: false,
+                info: [
+                    'Môi trường: <strong>VNPay Production (UNLOCKY1)</strong>',
+                    'Hash Algorithm: <strong>SHA256</strong>',
+                    'Số tiền: <strong>10,000 VND</strong>',
+                    '⚠️ <strong>GD THẬT</strong> - Cần thẻ ngân hàng thật',
+                    '⚠️ Tiền sẽ bị trừ thực tế từ tài khoản',
+                    'Kiểm tra kỹ trước khi thanh toán'
+                ]
+            }
+        };
+        
+        // Handle credential selection
+        document.querySelectorAll('.credential-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all
+                document.querySelectorAll('.credential-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked
+                this.classList.add('selected');
+                
+                // Check the radio button
+                this.querySelector('input[type="radio"]').checked = true;
+                
+                // Update info box
+                const credential = this.dataset.credential;
+                updateInfoBox(credential);
+            });
+        });
+        
+        // Update info box based on selected credential
+        function updateInfoBox(credential) {
+            const config = credentialConfig[credential];
+            const infoList = document.getElementById('infoList');
+            
+            infoList.innerHTML = config.info.map(item => `<li>${item}</li>`).join('');
+        }
+        
         document.getElementById('testPaymentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const payBtn = document.getElementById('payBtn');
             const orderInfo = document.getElementById('orderInfo').value;
             const bankCode = document.getElementById('bankCode').value;
+            const selectedCredential = document.querySelector('input[name="credential"]:checked').value;
+            const config = credentialConfig[selectedCredential];
+            
+            // Warning for production
+            if (selectedCredential === 'production') {
+                const confirmed = confirm(
+                    `⚠️ CẢNH BÁO: Bạn đang test với môi trường PRODUCTION (UNLOCKY1)\n\n` +
+                    `- Đây là giao dịch THẬT\n` +
+                    `- Tiền sẽ bị trừ từ tài khoản thật\n` +
+                    `- Số tiền: 10,000 VND\n\n` +
+                    `Bạn có chắc chắn muốn tiếp tục?`
+                );
+                
+                if (!confirmed) {
+                    return;
+                }
+            }
             
             // Disable button and show loading
             payBtn.disabled = true;
@@ -290,7 +452,7 @@
             
             try {
                 // Step 1: Create test order
-                showToast('Đang tạo đơn hàng test...', 'info');
+                showToast(`Đang tạo đơn hàng test (${config.name})...`, 'info');
                 
                 const createOrderResponse = await fetch('/0/pac-new/api/orders/test-vnpay-order.php', {
                     method: 'POST',
@@ -299,7 +461,8 @@
                     },
                     credentials: 'include',
                     body: JSON.stringify({
-                        payment_method: 'vnpay'
+                        payment_method: 'vnpay',
+                        credential_type: selectedCredential
                     })
                 });
                 
@@ -312,7 +475,7 @@
                 const orderId = orderData.data.order_id;
                 
                 // Step 2: Create VNPay payment URL
-                showToast('Đang tạo liên kết thanh toán VNPay...', 'info');
+                showToast(`Đang tạo liên kết thanh toán VNPay (${config.hash})...`, 'info');
                 
                 const vnpayResponse = await fetch('/0/pac-new/api/orders/vnpay-create.php', {
                     method: 'POST',
@@ -323,7 +486,8 @@
                     body: JSON.stringify({
                         order_id: orderId,
                         order_info: orderInfo,
-                        bank_code: bankCode
+                        bank_code: bankCode,
+                        credential_type: selectedCredential
                     })
                 });
                 
@@ -348,10 +512,11 @@
                     order_id: orderId,
                     txn_ref: vnpayData.data.txn_ref,
                     amount: 10000,
+                    credential: selectedCredential,
                     timestamp: new Date().getTime()
                 }));
                 
-                showToast('Chuyển hướng đến VNPay...', 'success');
+                showToast(`Chuyển hướng đến VNPay ${config.type}...`, 'success');
                 
                 // Redirect to VNPay
                 setTimeout(() => {
