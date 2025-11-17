@@ -120,6 +120,8 @@ RewriteRule ^test-demo-quiz/?$ test-demo/quiz-api-test.html [L]
 # Admin pages (with authentication check) - All at root level
 RewriteRule ^admin-dashboard/?$ templates/admin/dashboard.html [L]
 RewriteRule ^admin-consultations/?$ templates/admin/consultations.html [L]
+RewriteRule ^admin-booking-courses/?$ templates/admin/booking-courses.html [L]
+RewriteRule ^admin-booking-consultations/?$ templates/admin/booking-consultations.html [L]
 RewriteRule ^admin-courses/?$ templates/admin/courses.html [L]
 RewriteRule ^admin-tests/?$ templates/admin/tests.html [L]
 RewriteRule ^admin-orders/?$ templates/admin/orders.html [L]

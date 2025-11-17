@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Quản lý Bài Trắc Nghiệm</title>
+  
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-clipboard-list me-2 text-primary"></i>Quản lý Bài Trắc Nghiệm</h2>
+                <p class="text-muted mb-0">Xem và quản lý tất cả bài trắc nghiệm của người dùng</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-outline-primary" id="refresh-btn">
+                  <i class="fas fa-sync-alt me-2"></i>Làm mới
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Statistics Cards -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng bài thi</h6>
+                      <h3 class="mb-0" id="total-exams">0</h3>
+                    </div>
+                    <div class="text-primary">
+                      <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Đã hoàn thành</h6>
+                      <h3 class="mb-0 text-success" id="completed-exams">0</h3>
+                    </div>
+                    <div class="text-success">
+                      <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Đang làm</h6>
+                      <h3 class="mb-0 text-warning" id="draft-exams">0</h3>
+                    </div>
+                    <div class="text-warning">
+                      <i class="fas fa-edit fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Hôm nay</h6>
+                      <h3 class="mb-0 text-info" id="today-exams">0</h3>
+                    </div>
+                    <div class="text-info">
+                      <i class="fas fa-calendar-day fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filter Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Trạng thái</label>
+                  <select class="form-select" id="filter-status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="completed">Hoàn thành</option>
+                    <option value="draft">Chưa hoàn thành</option>
+                    <option value="processing">Đang xử lý</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Loại bài thi</label>
+                  <select class="form-select" id="filter-type">
+                    <option value="">Tất cả loại</option>
+                    <option value="0">Miễn phí (30 câu)</option>
+                    <option value="1">Trả phí (120 câu)</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Tìm kiếm</label>
+                  <input type="text" class="form-control" id="search-input" placeholder="Mã bài thi, tên người dùng, email...">
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">&nbsp;</label>
+                  <div>
+                    <button class="btn btn-outline-primary w-100" id="apply-filters">
+                      <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tests Table Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="tests-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 120px;">Mã bài thi</th>
+                      <th style="width: 180px;">Người dùng</th>
+                      <th style="width: 100px;">Loại</th>
+                      <th style="width: 100px;">Trạng thái</th>
+                      <th style="width: 120px;">Tiến độ</th>
+                      <th style="width: 100px;">Kết quả</th>
+                      <th style="width: 140px;">Thời gian</th>
+                      <th style="width: 180px;">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tests-tbody">
+                    <tr>
+                      <td colspan="8" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination -->
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted small">
+                  Hiển thị <span id="showing-from">0</span> - <span id="showing-to">0</span> trong tổng số <span id="total-count">0</span> bài thi
+                </div>
+                <nav aria-label="Page navigation">
+                  <ul class="pagination pagination-sm mb-0" id="pagination">
+                    <!-- Pagination will be rendered by JavaScript -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Exam Detail Modal -->
+  <div class="modal fade" id="examDetailModal" tabindex="-1" aria-labelledby="examDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="examDetailModalTitle">
+            <i class="fas fa-info-circle me-2"></i>Chi tiết bài thi
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="exam-detail-content">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Đang tải thông tin...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+          <p>Bạn có chắc chắn muốn xóa bài thi này?</p>
+          <p class="small text-muted">Hành động này sẽ xóa bài thi, câu trả lời và kết quả (nếu có)!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+            <i class="fas fa-trash me-1"></i>Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/tests.js"></script>
+</body>
+</html>

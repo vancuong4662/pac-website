@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Dashboard - Quản lý Đăng ký Khóa học</title>
+  
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Flatpickr for Date/Time Picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+  <!-- Main CSS Files -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/admin.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css" rel="stylesheet">
+</head>
+
+<body class="admin-page">
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar-wrapper">
+      <div id="admin-sidebar"></div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Content Area -->
+      <div class="content-area">
+        <div id="admin-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h2><i class="fas fa-calendar-check me-2 text-primary"></i>Quản lý Đăng ký Khóa học</h2>
+                <p class="text-muted mb-0">Quản lý và theo dõi các đăng ký khóa học của học viên</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-outline-primary" id="refresh-btn">
+                  <i class="fas fa-sync-alt me-2"></i>Làm mới
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Statistics Cards -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Tổng đăng ký</h6>
+                      <h3 class="mb-0" id="total-bookings">0</h3>
+                    </div>
+                    <div class="text-primary">
+                      <i class="fas fa-book fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Đang hoạt động</h6>
+                      <h3 class="mb-0 text-success" id="active-bookings">0</h3>
+                    </div>
+                    <div class="text-success">
+                      <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-2">Đã vận hành</h6>
+                      <h3 class="mb-0 text-info" id="scheduled-bookings">0</h3>
+                    </div>
+                    <div class="text-info">
+                      <i class="fas fa-calendar-check fa-2x"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Filter Section -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label">Trạng thái</label>
+                  <select class="form-select" id="filter-status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="pending">Chờ xử lý</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="completed">Đã hoàn thành</option>
+                    <option value="expired">Hết hạn</option>
+                    <option value="cancelled">Đã hủy</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Hỗ trợ</label>
+                  <select class="form-select" id="filter-support">
+                    <option value="">Tất cả</option>
+                    <option value="none">Chưa liên hệ</option>
+                    <option value="contacted">Đã liên hệ</option>
+                    <option value="scheduled">Đã hẹn lịch</option>
+                    <option value="in_progress">Đang xử lý</option>
+                    <option value="resolved">Đã giải quyết</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Tìm kiếm</label>
+                  <input type="text" class="form-control" id="search-input" placeholder="Tên học viên, email, số điện thoại...">
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">&nbsp;</label>
+                  <div>
+                    <button class="btn btn-outline-primary w-100" id="apply-filters">
+                      <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bookings Table Card -->
+          <div class="card">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="bookings-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">ID</th>
+                      <th style="width: 200px;">Học viên</th>
+                      <th style="width: 120px;">Số điện thoại</th>
+                      <th style="width: 250px;">Khóa học</th>
+                      <th style="width: 110px;">Trạng thái</th>
+                      <th style="width: 120px;">Hỗ trợ</th>
+                      <th style="width: 130px;">Lịch hẹn</th>
+                      <th style="width: 130px;">Ngày đăng ký</th>
+                      <th style="width: 150px;">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bookings-tbody">
+                    <tr>
+                      <td colspan="9" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination -->
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted small">
+                  Hiển thị <span id="showing-from">0</span> - <span id="showing-to">0</span> trong tổng số <span id="total-count">0</span> đăng ký
+                </div>
+                <nav aria-label="Page navigation">
+                  <ul class="pagination pagination-sm mb-0" id="pagination">
+                    <!-- Pagination will be rendered by JavaScript -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Booking Modal -->
+  <div class="modal fade" id="editBookingModal" tabindex="-1" aria-labelledby="editBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editBookingModalTitle">
+            <i class="fas fa-edit me-2"></i>Cập nhật thông tin đăng ký
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-booking-form">
+            <input type="hidden" id="edit-booking-id">
+            
+            <!-- User Info (Read-only) -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Thông tin học viên</label>
+              <div class="card bg-light">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="mb-2"><strong>Họ tên:</strong> <span id="edit-user-name">-</span></p>
+                      <p class="mb-0"><strong>Email:</strong> <span id="edit-user-email">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p class="mb-2"><strong>SĐT:</strong> <span id="edit-user-phone">-</span></p>
+                      <p class="mb-0"><strong>Access Code:</strong> <span id="edit-access-code" class="font-monospace">-</span></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Course Info (Read-only) -->
+            <div class="mb-3">
+              <label class="form-label fw-bold">Thông tin khóa học</label>
+              <div class="card bg-light">
+                <div class="card-body">
+                  <p class="mb-2"><strong>Khóa học:</strong> <span id="edit-product-name">-</span></p>
+                  <p class="mb-2"><strong>Gói:</strong> <span id="edit-package-name">-</span></p>
+                  <p class="mb-0"><strong>Giá:</strong> <span id="edit-package-price">-</span> VNĐ</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-status" class="form-label">
+                    <i class="fas fa-info-circle me-1"></i>Trạng thái <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" id="edit-status" required>
+                    <option value="pending">Chờ xử lý</option>
+                    <option value="active">Đang hoạt động</option>
+                    <option value="completed">Đã hoàn thành</option>
+                    <option value="expired">Hết hạn</option>
+                    <option value="cancelled">Đã hủy</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="edit-support-status" class="form-label">
+                    <i class="fas fa-headset me-1"></i>Trạng thái hỗ trợ <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" id="edit-support-status" required>
+                    <option value="none">Chưa liên hệ</option>
+                    <option value="contacted">Đã liên hệ</option>
+                    <option value="scheduled">Đã hẹn lịch</option>
+                    <option value="in_progress">Đang xử lý</option>
+                    <option value="resolved">Đã giải quyết</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="edit-scheduled-at" class="form-label">
+                <i class="fas fa-calendar me-1"></i>Lịch hẹn
+              </label>
+              <input type="text" class="form-control" id="edit-scheduled-at" placeholder="Chọn ngày giờ hẹn...">
+              <div class="form-text">Thời gian hẹn học viên (nếu có)</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="edit-staff-notes" class="form-label">
+                <i class="fas fa-sticky-note me-1"></i>Ghi chú của nhân viên
+              </label>
+              <textarea class="form-control" id="edit-staff-notes" rows="4" 
+                        placeholder="Nhập ghi chú nội bộ về đăng ký này..."></textarea>
+              <div class="form-text">Ghi chú chỉ dành cho nội bộ, học viên không thấy</div>
+            </div>
+            
+            <!-- Client Notes (Read-only) -->
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="fas fa-comment me-1"></i>Ghi chú từ học viên
+              </label>
+              <div class="form-control bg-light" id="edit-client-notes" style="min-height: 60px;">
+                <em class="text-muted">Không có ghi chú</em>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Hủy bỏ
+          </button>
+          <button type="button" class="btn btn-primary" id="save-booking-btn">
+            <i class="fas fa-save me-1"></i>Cập nhật
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  <div class="modal fade" id="bookingDetailModal" tabindex="-1" aria-labelledby="bookingDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookingDetailModalTitle">
+            <i class="fas fa-info-circle me-2"></i>Chi tiết đăng ký
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="booking-detail-content">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Đang tải thông tin...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i>Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/toastbar.js"></script>
+  
+  <!-- Flatpickr for Date/Time Picker -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  
+  <!-- Component Loader for Sidebar -->
+  <script>
+    // Load sidebar component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('components/admin/sidebar.html');
+        const html = await response.text();
+        document.getElementById('admin-sidebar').innerHTML = html;
+      } catch (error) {
+        console.error('Error loading sidebar:', error);
+      }
+    });
+  </script>
+  
+  <!-- Admin JS Files -->
+  <script src="assets/js/admin/sidebar.js"></script>
+  <script src="assets/js/admin/booking-courses.js"></script>
+</body>
+</html>

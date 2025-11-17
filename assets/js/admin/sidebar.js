@@ -2,6 +2,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar functionality after component load
     setTimeout(initSidebar, 100);
+    
+    // Also listen for componentsLoaded event from component-loader
+    document.addEventListener('componentsLoaded', function() {
+        setTimeout(initSidebar, 100);
+    });
 });
 
 function initSidebar() {
@@ -47,18 +52,21 @@ function initSidebar() {
 function initSidebarEvents() {
     // Navigation links
     const navLinks = document.querySelectorAll('.nav-link[data-page]');
+    
+    if (navLinks.length === 0) {
+        // Sidebar not loaded yet, try again
+        setTimeout(initSidebarEvents, 200);
+        return;
+    }
+    
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Remove active class from all links
+            // Don't prevent default - let the link navigate normally
+            // Just update active state before navigation
             navLinks.forEach(l => l.classList.remove('active'));
-            // Add active class to clicked link
             this.classList.add('active');
             
-            // Navigate to page
-            const page = this.dataset.page;
-            navigateToPage(page);
+            // The browser will handle navigation via href attribute
         });
     });
     
@@ -77,15 +85,21 @@ function initSidebarEvents() {
 
 function setActiveMenu() {
     const currentPath = window.location.pathname;
+    const currentUrl = window.location.href;
     const navLinks = document.querySelectorAll('.nav-link[data-page]');
     
     navLinks.forEach(link => {
         link.classList.remove('active');
         const page = link.dataset.page;
+        const href = link.getAttribute('href');
         
-        // Check if current URL matches the page
-        // URLs are in format: /pac-new/admin-courses, /pac-new/admin-consultations, etc.
-        if (currentPath.includes(`admin-${page}`)) {
+        // Check multiple ways to ensure accurate matching
+        // 1. Check if URL contains the full admin page path
+        if (currentPath.includes(`admin-${page}`) || currentUrl.includes(`admin-${page}`)) {
+            link.classList.add('active');
+        }
+        // 2. Also check direct href match (for cases like admin-dashboard vs admin-booking-courses)
+        else if (href && (currentPath.endsWith(href) || currentUrl.endsWith(href))) {
             link.classList.add('active');
         }
     });
