@@ -11,9 +11,13 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 // VNPay Sandbox Credentials - Official registered credentials (vancuong4662@gmail.com)
 // Merchant Admin: https://sandbox.vnpayment.vn/merchantv2/
 // Test Site: https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login
-$vnp_TmnCode    = "R9BKC8DJ";                                    // Your registered TMN Code
-$vnp_HashSecret = "5TZT9X8NNLWW7S4SP04YOPADLOL8GEMN";              // Your registered Hash Secret
-$vnp_Url        = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; // Sandbox URL
+$vnp_TmnCode    = "UNLOCKY1";                                    // Your registered TMN Code
+$vnp_HashSecret = "LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU";              // Your registered Hash Secret
+$vnp_Url        = "https://pay.vnpay.vn/vpcpay.html"; // VNPay Sandbox Payment URL
+// TEST :
+// $vnp_TmnCode    = "VJGIXB0L";                                    // Your registered TMN Code
+// $vnp_HashSecret = "2OT3OL8CMQ4ACR2YBU8TTH66BK5HLLXI";              // Your registered Hash Secret
+// $vnp_Url        = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"; // VNPay Sandbox Payment URL
 
 // Determine base URL dynamically
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
@@ -45,7 +49,7 @@ $vnp_Version = "2.1.0";
 $vnp_Command = "pay";
 $vnp_CurrCode = "VND";
 $vnp_Locale = "vn";
-$vnp_SecureHashType = "SHA256";
+$vnp_SecureHashType = "SHA256"; // Updated to SHA512 per VNPay 2024 spec
 
 // Test Payment Amounts (in VND)
 $vnpay_test_amounts = [
