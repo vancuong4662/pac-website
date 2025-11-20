@@ -366,6 +366,23 @@ h6 {
     padding: 8px; /* Thêm padding cho dễ touch */
   }
   
+  /* Mobile home button - xếp bên phải cùng với profile và cart */
+  .topbar .mobile-home-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 8px;
+    margin: 0;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .topbar .mobile-home-btn:hover {
+    color: var(--brand-accent);
+  }
+  
   .topbar .cart-count {
     font-size: 12px; /* Tăng từ 10px */
     width: 18px; /* Tăng từ 16px */

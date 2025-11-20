@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguồn Dữ Liệu - PAC Website</title>
+    <meta name="description" content="Hệ thống tra cứu thông tin trường học THCS, THPT và Đại học toàn quốc - Unlock Your Career">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css?v=20112025" rel="stylesheet">
+    <link href="assets/css/toastbar.css?v=20112025" rel="stylesheet">
+    <link href="assets/css/about-models.css?v=20112025" rel="stylesheet">
+</head>
+<body class="about-page data-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Coming Soon Section -->
+    <section class="mission-section" style="min-height: 80vh; display: flex; align-items: center;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center" data-aos="fade-up">
+                    <div class="coming-soon-content">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-database" style="font-size: 120px; color: var(--brand-primary); opacity: 0.3;"></i>
+                        </div>
+                        <h1 class="display-4 fw-bold mb-4" style="color: var(--brand-secondary);">
+                            Tính Năng Chưa Khả Dụng
+                        </h1>
+                        <p class="lead mb-4" style="color: #666; font-size: 1.25rem;">
+                            Hệ thống nguồn dữ liệu giáo dục về trường THCS, THPT và Đại học 
+                            đang trong giai đoạn phát triển và sẽ sớm được ra mắt.
+                        </p>
+                        <div class="alert alert-info d-inline-block" role="alert" style="border-left: 4px solid var(--brand-primary);">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Chúng tôi đang tích cực xây dựng cơ sở dữ liệu toàn diện nhất cho bạn.
+                        </div>
+                        <div class="mt-5 button-group">
+                            <a href="home" class="btn btn-primary btn-lg px-4 me-3 mb-3">
+                                <i class="fas fa-home me-2"></i>Về Trang Chủ
+                            </a>
+                            <a href="huongnghiep" class="btn btn-outline-primary btn-lg px-4 mb-3">
+                                <i class="fas fa-compass me-2"></i>Khám Phá Hướng Nghiệp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/js/toastbar.js?v=20112025"></script>
+    <script src="assets/js/component-loader.js?v=20112025"></script>
+    <script src="assets/js/header-cart.js?v=20112025"></script>
+    <script src="assets/js/pac-services.js?v=20112025"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+        });
+    </script>
+    
+    <style>
+        /* Button styles matching profile page */
+        .coming-soon-content .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .coming-soon-content .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .coming-soon-content .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--brand-secondary) 100%);
+            border: none;
+            color: var(--contrast-color);
+        }
+
+        .coming-soon-content .btn-primary:hover {
+            background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--accent-color) 100%);
+            color: var(--contrast-color);
+        }
+
+        .coming-soon-content .btn-outline-primary {
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            background: transparent;
+        }
+
+        .coming-soon-content .btn-outline-primary:hover {
+            background: var(--accent-color);
+            color: var(--contrast-color);
+            border-color: var(--accent-color);
+        }
+        
+        /* Responsive spacing for buttons */
+        @media (max-width: 576px) {
+            .coming-soon-content .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .coming-soon-content .btn.me-3 {
+                margin-right: 0 !important;
+            }
+        }
+    </style>
+</body>
+</html>
