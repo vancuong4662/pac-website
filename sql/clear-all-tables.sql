@@ -25,6 +25,7 @@ DROP VIEW IF EXISTS pending_payments;
 DROP VIEW IF EXISTS purchased_courses_view;
 DROP VIEW IF EXISTS purchased_tests_view;
 DROP VIEW IF EXISTS consultation_bookings_view;
+DROP VIEW IF EXISTS quiz_package_details;
 
 -- 3. Xóa tất cả triggers
 DROP TRIGGER IF EXISTS update_order_vnpay_ref;
@@ -34,20 +35,26 @@ DROP TRIGGER IF EXISTS validate_vnpay_transaction;
 DROP TRIGGER IF EXISTS auto_create_purchased_packages;
 DROP TRIGGER IF EXISTS generate_access_code;
 DROP TRIGGER IF EXISTS update_access_tracking;
+DROP TRIGGER IF EXISTS tr_quiz_exams_set_exam_type;
 
 -- 4. Xóa tất cả functions và procedures
 DROP FUNCTION IF EXISTS check_payment_status;
+DROP FUNCTION IF EXISTS GetExamTypeFromQuestionCount;
 DROP PROCEDURE IF EXISTS sync_payment_status;
 
 -- 5. Xóa tất cả tables (theo thứ tự tránh foreign key)
 
--- Quiz system tables (new)
+-- Quiz system tables (new - package integration)
 DROP TABLE IF EXISTS quiz_suggested_jobs;
 DROP TABLE IF EXISTS quiz_fraud_logs;
+DROP TABLE IF EXISTS quiz_package_configs;
 DROP TABLE IF EXISTS quiz_user_limits;
 DROP TABLE IF EXISTS quiz_results;
 DROP TABLE IF EXISTS quiz_answers;
 DROP TABLE IF EXISTS quiz_exams;
+
+-- Jobs master data table
+DROP TABLE IF EXISTS jobs;
 
 -- Legacy Holland Code tables
 DROP TABLE IF EXISTS test_answers;
@@ -62,6 +69,9 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS cart;
 DROP TABLE IF EXISTS product_packages;
 DROP TABLE IF EXISTS products;
+
+-- Media management table
+DROP TABLE IF EXISTS media_files;
 
 -- User management tables
 DROP TABLE IF EXISTS sessions;

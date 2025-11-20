@@ -11,13 +11,7 @@
 /*--------------------------------------------------------------
 # Font Declaration
 --------------------------------------------------------------*/
-@font-face {
-  font-family: 'SanFranciscoDisplayBold';
-  src: url('font/SanFranciscoDisplayBold.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* Roboto font is loaded via Google Fonts in HTML */
 
 /*--------------------------------------------------------------
 # Font & Color Variables
@@ -25,9 +19,9 @@
 --------------------------------------------------------------*/
 /* Fonts - PAC Group Typography */
 :root {
-  --default-font: "SanFranciscoDisplayBold", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --heading-font: "SanFranciscoDisplayBold", sans-serif;
-  --nav-font: "SanFranciscoDisplayBold", sans-serif;
+  --default-font: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen, Ubuntu, Cantarell, sans-serif;
+  --heading-font: "Roboto", sans-serif;
+  --nav-font: "Roboto", sans-serif;
 }
 
 /* Global Colors - PAC Group Educational Consulting Color Scheme */
@@ -8979,4 +8973,128 @@ section,
 .breadcrumb .breadcrumb-item.active {
   color: var(--default-color);
   font-weight: 500;
+}
+
+/*--------------------------------------------------------------
+# YouTube Video Modal
+--------------------------------------------------------------*/
+.youtube-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.youtube-modal.active {
+  display: block;
+}
+
+.youtube-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+}
+
+.youtube-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 1200px;
+  z-index: 10001;
+  animation: scaleIn 0.3s ease-in-out;
+}
+
+.youtube-modal-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.youtube-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+.youtube-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  background: #000;
+  border-radius: 12px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.youtube-video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+  .youtube-modal-content {
+    width: 95%;
+  }
+  
+  .youtube-modal-close {
+    top: -45px;
+    font-size: 1.5rem;
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 576px) {
+  .youtube-modal-close {
+    top: -40px;
+    right: -5px;
+  }
 }

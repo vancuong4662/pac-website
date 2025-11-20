@@ -252,20 +252,33 @@ try {
     }
     
     // Tạo secure hash - Tự động chọn hash function dựa vào $vnp_HashType
-    if ($vnp_HashType === 'SHA512') {
-        // Sandbox sử dụng SHA512
-        $hashdata = vnpay_hash_data_sha512($inputData, $vnp_HashSecret);
-    } else {
-        // Production sử dụng SHA256
-        $hashdata = vnpay_hash_data($inputData, $vnp_HashSecret, 'SHA256');
+    ksort($inputData); // Sort array by key
+    $hashdata = "";
+    $i = 0;
+    foreach ($inputData as $key => $value) {
+        if ($i == 1) {
+            $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+        } else {
+            $hashdata .= urlencode($key) . "=" . urlencode($value);
+            $i = 1;
+        }
     }
     
-    $inputData['vnp_SecureHashType'] = $vnp_HashType;
-    $inputData['vnp_SecureHash'] = $hashdata;
+    // Hash using appropriate algorithm
+    if ($vnp_HashType === 'SHA512') {
+        $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+    } else {
+        $vnpSecureHash = hash_hmac('sha256', $hashdata, $vnp_HashSecret);
+    }
     
-    // Tạo URL thanh toán
-    $query = http_build_query($inputData);
-    $vnpayUrl = $vnp_Url . "?" . $query;
+    // Build query string manually (same as VNPay demo)
+    $query = "";
+    foreach ($inputData as $key => $value) {
+        $query .= urlencode($key) . "=" . urlencode($value) . '&';
+    }
+    
+    // Add secure hash to URL
+    $vnpayUrl = $vnp_Url . "?" . $query . 'vnp_SecureHash=' . $vnpSecureHash;
     
     // Debug: Log the request data for debugging
     error_log("=== VNPay Request Debug ===");
@@ -274,12 +287,14 @@ try {
     error_log("TMN Code: " . $vnp_TmnCode);
     error_log("Hash Type: " . $vnp_HashType);
     error_log("Payment URL: " . $vnp_Url);
-    error_log("VNPay Request Data: " . json_encode($inputData));
+    error_log("Hash Data: " . $hashdata);
+    error_log("Secure Hash: " . $vnpSecureHash);
     error_log("VNPay Return URL: " . $vnp_Returnurl);
     error_log("VNPay Full Payment URL: " . $vnpayUrl);
     error_log("VNPay Order Info: " . $vnp_OrderInfo);
     error_log("VNPay Amount: " . $vnp_Amount);
     error_log("VNPay IP: " . $vnp_IpAddr);
+    error_log("VNPay TxnRef: " . $vnp_TxnRef);
     
     // Lưu thông tin giao dịch vào database
     $stmt = $pdo->prepare("

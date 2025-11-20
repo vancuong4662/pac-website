@@ -1,7 +1,7 @@
 /* Admin Dashboard Styles */
 .admin-page {
   background-color: #f8f9fa;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Roboto', sans-serif;
   min-height: 100vh;
   padding-top: 0 !important; /* Reset main.css padding-top for fixed header */
 }

@@ -258,7 +258,7 @@ class PaymentResultHandler {
                 </div>
                 
                 <div class="result-actions" data-aos="fade-up" data-aos-delay="300">
-                  <a href="my-purchases" class="btn-primary-custom">
+                  <a href="payment-history" class="btn-primary-custom">
                     <i class="fas fa-shopping-bag"></i>
                     Xem sản phẩm đã mua
                   </a>

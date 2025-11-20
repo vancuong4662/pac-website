@@ -1,0 +1,467 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So Sánh Các Gói Hướng Nghiệp - PAC Website</title>
+    <meta name="description" content="So sánh chi tiết 4 gói dịch vụ hướng nghiệp của PAC Group: Khởi động, Tăng tốc, Học đường, và Toàn diện để lựa chọn phù hợp nhất.">
+    
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+    
+    <!-- Vendor CSS -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link href="assets/css/main.css?v=20112025" rel="stylesheet">
+    <link href="assets/css/toastbar.css?v=20112025" rel="stylesheet">
+    <link href="assets/css/about-models.css?v=20112025" rel="stylesheet">
+    
+    <style>
+        .comparison-page {
+            min-height: 100vh;
+            background: var(--bg-light);
+        }
+        
+        /* Comparison Table Styles */
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            margin: 0 -15px;
+            padding: 0 15px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            background: var(--surface-color);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(var(--brand-secondary-rgb), 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .comparison-table table {
+            width: 100%;
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .comparison-table thead {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+        }
+        
+        .comparison-table thead th {
+            padding: 24px 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            border: none;
+        }
+        
+        .comparison-table thead th:first-child {
+            text-align: left;
+            min-width: 200px;
+        }
+        
+        .comparison-table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+        
+        .comparison-table tbody tr:hover {
+            background-color: var(--light-purple);
+        }
+        
+        .comparison-table tbody tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+        
+        .comparison-table tbody td {
+            padding: 20px;
+            border-bottom: 1px solid rgba(var(--brand-secondary-rgb), 0.1);
+            vertical-align: middle;
+        }
+        
+        .comparison-table tbody td:first-child {
+            font-weight: 600;
+            color: var(--heading-color);
+            background: var(--surface-color);
+        }
+        
+        .comparison-table tbody td:not(:first-child) {
+            text-align: center;
+        }
+        
+        /* Package Highlight */
+        .package-highlight {
+            background: linear-gradient(135deg, rgba(var(--brand-primary-rgb), 0.1), rgba(var(--brand-secondary-rgb), 0.05));
+        }
+        
+        /* Price Badge */
+        .price-badge {
+            display: inline-block;
+            background: var(--brand-accent);
+            color: var(--brand-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .price-free {
+            background: linear-gradient(135deg, #059669, #27ae60);
+            color: var(--contrast-color);
+        }
+        
+        /* Star Rating */
+        .star-rating {
+            color: var(--brand-accent);
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+        
+        /* Suggestions Section */
+        .suggestions-section {
+            background: var(--bg-secondary);
+            padding: 60px 0;
+        }
+        
+        .suggestion-card {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--brand-primary);
+            box-shadow: 0 4px 15px rgba(var(--brand-secondary-rgb), 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 25px rgba(var(--brand-secondary-rgb), 0.15);
+        }
+        
+        .suggestion-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-bottom: 12px;
+        }
+        
+        .suggestion-package {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            color: var(--contrast-color);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 992px) {
+            .comparison-table thead th,
+            .comparison-table tbody td {
+                padding: 16px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .comparison-table thead th:first-child {
+                min-width: 150px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-table {
+                font-size: 0.85rem;
+            }
+            
+            .comparison-table thead th,
+            .comparison-table tbody td {
+                padding: 12px 8px;
+            }
+            
+            .star-rating {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="comparison-page">
+    <!-- Preloader -->
+    <div id="preloader"></div>
+    
+    <!-- Header Section Container -->
+    <div id="header-section">
+        <!-- Header component will be loaded here -->
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        So Sánh Các Gói Hướng Nghiệp
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        PAC cung cấp 4 gói dịch vụ hướng nghiệp nhằm đồng hành cùng học sinh ở các mức độ khác nhau, 
+                        từ khám phá ban đầu đến định hướng chuyên sâu cùng chuyên gia.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Comparison Table Section -->
+    <section class="comparison-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Bảng So Sánh Chi Tiết</h2>
+                <p class="section-description">
+                    Khám phá sự khác biệt giữa 4 gói dịch vụ để tìm ra giải pháp phù hợp nhất với nhu cầu của bạn
+                </p>
+            </div>
+            
+            <div class="comparison-table-wrapper" data-aos="fade-up" data-aos-delay="200">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nội dung</th>
+                                <th>Khởi động</th>
+                                <th>Tăng tốc</th>
+                                <th>Học đường</th>
+                                <th>Toàn diện</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hình thức</td>
+                                <td>Trực tuyến<br>(Quiz + Báo cáo)</td>
+                                <td>Trực tuyến<br>(Quiz + Báo cáo)</td>
+                                <td>Trực tiếp cùng<br>chuyên gia</td>
+                                <td>Trực tiếp cùng<br>chuyên gia</td>
+                            </tr>
+                            <tr>
+                                <td>Mức độ cá nhân hoá</td>
+                                <td>Thấp</td>
+                                <td>Trung bình</td>
+                                <td>Cao</td>
+                                <td>Rất cao</td>
+                            </tr>
+                            <tr class="package-highlight">
+                                <td>Chi phí</td>
+                                <td><span class="price-badge price-free">Miễn phí</span></td>
+                                <td><span class="price-badge">1.975.000đ</span></td>
+                                <td><span class="price-badge">14.750.000đ</span></td>
+                                <td><span class="price-badge">24.750.000đ</span></td>
+                            </tr>
+                            <tr>
+                                <td>Số lượng câu hỏi /<br>bài đánh giá</td>
+                                <td>30 câu</td>
+                                <td>120 câu</td>
+                                <td>3 bài đánh giá<br>bản quyền</td>
+                                <td>3 bài đánh giá<br>bản quyền</td>
+                            </tr>
+                            <tr>
+                                <td>Ngôn ngữ</td>
+                                <td>Tiếng Việt</td>
+                                <td>Tiếng Việt</td>
+                                <td>Anh & Việt</td>
+                                <td>Anh & Việt</td>
+                            </tr>
+                            <tr>
+                                <td>Lứa tuổi phù hợp</td>
+                                <td>14 – 18</td>
+                                <td>14 – 22</td>
+                                <td>15 – 18</td>
+                                <td>14 – 17</td>
+                            </tr>
+                            <tr>
+                                <td>Buổi tư vấn 1:1</td>
+                                <td>Không</td>
+                                <td>Không</td>
+                                <td><strong>5 buổi 1:1</strong></td>
+                                <td><strong>6 buổi 1:1<br>+ buổi trao đổi<br>phụ huynh</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Mục tiêu chính</td>
+                                <td>Xác định nhóm nghề<br>phù hợp ban đầu</td>
+                                <td>Xác định ngành học<br>& lĩnh vực phù hợp<br>sâu hơn</td>
+                                <td>Xây dựng lộ trình<br>ngành học & nghề<br>rõ ràng</td>
+                                <td>Định hướng nghề dài hạn<br>+ lộ trình môn quốc tế<br>+ theo dõi tiến triển</td>
+                            </tr>
+                            <tr>
+                                <td>Báo cáo</td>
+                                <td>5 trang</td>
+                                <td>25–26 trang</td>
+                                <td>3 báo cáo<br>cá nhân hóa</td>
+                                <td>3 báo cáo cá nhân hóa<br>+ tổng kết giai đoạn 2</td>
+                            </tr>
+                            <tr>
+                                <td>Giá trị nổi bật</td>
+                                <td>Khám phá nhanh</td>
+                                <td>Hiểu rõ điểm mạnh – yếu<br>– ngành phù hợp</td>
+                                <td>Chốt ngành học và<br>định hướng du học<br>cùng chuyên gia</td>
+                                <td>Đánh giá – định hướng<br>– theo dõi – điều chỉnh<br>lộ trình lâu dài</td>
+                            </tr>
+                            <tr>
+                                <td>Ưu điểm</td>
+                                <td>Miễn phí – nhanh<br>– dễ bắt đầu</td>
+                                <td>Báo cáo chi tiết<br>– định hướng rõ ràng</td>
+                                <td>Đồng hành chuyên sâu<br>với chuyên gia</td>
+                                <td>Tối ưu lộ trình học tập<br>& nghề nghiệp trong<br>nhiều giai đoạn</td>
+                            </tr>
+                            <tr>
+                                <td>Hạn chế</td>
+                                <td>Chỉ đánh giá sơ bộ</td>
+                                <td>Không có tư vấn 1:1</td>
+                                <td>Phù hợp người đã có<br>định hướng ban đầu</td>
+                                <td>Chi phí cao – cần<br>cam kết tham gia<br>lâu dài</td>
+                            </tr>
+                            <tr>
+                                <td>Đánh giá phù hợp khi<br>học sinh chưa rõ nghề</td>
+                                <td><span class="star-rating">⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐⭐⭐</span></td>
+                            </tr>
+                            <tr>
+                                <td>Đánh giá phù hợp khi<br>học sinh đã có dự định<br>ban đầu</td>
+                                <td><span class="star-rating">⭐⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐⭐⭐</span></td>
+                                <td><span class="star-rating">⭐⭐⭐⭐</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Đăng ký ngay</strong></td>
+                                <td>
+                                    <button class="suggestion-package" onclick="location.href='goihuongnghiep-1'">
+                                        <i class="fas fa-rocket me-1"></i>Lựa chọn
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="suggestion-package" onclick="location.href='goihuongnghiep-2'">
+                                        <i class="fas fa-bolt me-1"></i>Lựa chọn
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="suggestion-package" onclick="location.href='goihuongnghiep-9'">
+                                        <i class="fas fa-graduation-cap me-1"></i>Lựa chọn
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="suggestion-package" onclick="location.href='goihuongnghiep-10'">
+                                        <i class="fas fa-crown me-1"></i>Lựa chọn
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Suggestions Section -->
+    <section class="suggestions-section">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Gợi Ý Lựa Chọn Gói</h2>
+                <p class="section-description">
+                    Dựa vào bảng phân tích trên để tìm ra gói phù hợp nhất. Tuy nhiên để dễ hiểu, dưới đây là các gợi ý tóm lược.
+                </p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="suggestion-card">
+                        <div class="suggestion-title">
+                            <i class="fas fa-compass text-brand-primary me-2"></i>
+                            Chưa biết bản thân phù hợp nghề gì
+                        </div>
+                        <p class="mb-2">Nên chọn: <span class="suggestion-package" onclick="location.href='goihuongnghiep-1'">Khởi động</span></p>
+                        <p class="text-muted mb-0">Bắt đầu khám phá nhanh chóng và miễn phí về xu hướng nghề nghiệp phù hợp</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="suggestion-card">
+                        <div class="suggestion-title">
+                            <i class="fas fa-chart-line text-brand-primary me-2"></i>
+                            Muốn có kết quả phân tích sâu và tự định hướng
+                        </div>
+                        <p class="mb-2">Nên chọn: <span class="suggestion-package" onclick="location.href='goihuongnghiep-2'">Tăng tốc</span></p>
+                        <p class="text-muted mb-0">Nhận báo cáo chi tiết với 120 câu hỏi đánh giá toàn diện</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="suggestion-card">
+                        <div class="suggestion-title">
+                            <i class="fas fa-user-tie text-brand-primary me-2"></i>
+                            Đã có định hình ban đầu, muốn gặp chuyên gia
+                        </div>
+                        <p class="mb-2">Nên chọn: <span class="suggestion-package" onclick="location.href='goihuongnghiep-9'">Học đường</span></p>
+                        <p class="text-muted mb-0">Được tư vấn 1:1 để chốt kế hoạch học tập và nghề nghiệp cụ thể</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="suggestion-card">
+                        <div class="suggestion-title">
+                            <i class="fas fa-trophy text-brand-primary me-2"></i>
+                            Chưa xác định gì, cần phát triển dài hạn
+                        </div>
+                        <p class="mb-2">Nên chọn: <span class="suggestion-package" onclick="location.href='goihuongnghiep-10'">Toàn diện</span></p>
+                        <p class="text-muted mb-0">Chương trình đồng hành toàn diện với theo dõi và điều chỉnh liên tục</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer Section Container -->
+    <div id="footer-section">
+        <!-- Footer component will be loaded here -->
+    </div>
+    
+    <!-- Scripts -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/js/toastbar.js?v=20112025"></script>
+    <script src="assets/js/component-loader.js?v=20112025"></script>
+    <script src="assets/js/main.js?v=20112025"></script>
+    
+    <script>
+        // Configure components for this page
+        window.pageComponentsConfig = [
+            { name: 'header', target: '#header-section' },
+            { name: 'footer', target: '#footer-section' }
+        ];
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS
+            AOS.init({
+                duration: 1000,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -23,13 +23,33 @@
     <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
     
     <!-- Main CSS -->
-    <link href="assets/css/main.css" rel="stylesheet">
-    <link href="assets/css/toastbar.css" rel="stylesheet">
+    <link href="assets/css/main.css?v=20112025" rel="stylesheet">
+    <link href="assets/css/toastbar.css?v=20112025" rel="stylesheet">
     
     <style>
         .career-guidance-page {
             min-height: 100vh;
             background: var(--bg-light);
+        }
+        
+        /* Anchor highlight animation */
+        @keyframes highlightPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(150, 75, 223, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(150, 75, 223, 0);
+            }
+        }
+        
+        .highlight-anchor {
+            animation: highlightPulse 1s ease-in-out 2;
+        }
+        
+        /* Ensure AOS elements are visible for anchor navigation */
+        [data-aos].aos-animate {
+            opacity: 1 !important;
+            transform: none !important;
         }
         
         .page-hero {
@@ -586,8 +606,8 @@
                 </div>
                 <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
                     <div class="stat-card">
-                        <div class="stat-number">50+</div>
-                        <div class="stat-label">Test trắc nghiệm</div>
+                        <div class="stat-number">100+</div>
+                        <div class="stat-label">Test trắc nghiệm<br/>đã thực hiện</div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
@@ -629,10 +649,10 @@
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="assets/vendor/aos/aos.js"></script>
     <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="assets/js/toastbar.js"></script>
-    <script src="assets/js/component-loader.js"></script>
-    <script src="assets/js/header-cart.js"></script>
-    <script src="assets/js/pac-services.js"></script>
+    <script src="assets/js/toastbar.js?v=20112025"></script>
+    <script src="assets/js/component-loader.js?v=20112025"></script>
+    <script src="assets/js/header-cart.js?v=20112025"></script>
+    <script src="assets/js/pac-services.js?v=20112025"></script>
     
     <script>
         // Configure components for this page
@@ -640,6 +660,34 @@
             { name: 'header', target: '#header-section' },
             { name: 'footer', target: '#footer-section' }
         ];
+        
+        // Handle anchor scrolling with AOS
+        function scrollToAnchor() {
+            const hash = window.location.hash;
+            if (hash) {
+                // Wait for AOS to complete initialization
+                setTimeout(() => {
+                    const element = document.querySelector(hash);
+                    if (element) {
+                        // Calculate offset for fixed header
+                        const headerHeight = document.querySelector('header')?.offsetHeight || 80;
+                        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - headerHeight - 20;
+                        
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Optional: Add highlight effect
+                        element.classList.add('highlight-anchor');
+                        setTimeout(() => {
+                            element.classList.remove('highlight-anchor');
+                        }, 2000);
+                    }
+                }, 1500); // Wait for AOS and component loading
+            }
+        }
         
         // Load services from API
         async function loadServices() {
@@ -788,7 +836,7 @@
 
                         servicesHTML += `
                             <div class="col-12 mb-5" data-aos="fade-up" data-aos-delay="${(index + 1) * 200}">
-                                <div class="service-card service-card-full">
+                                <div class="service-card service-card-full" id="tuvan-${service.slug}">
                                     <div class="row g-0 h-100">
                                         ${service.image_url ? `
                                         <div class="col-md-4">
@@ -847,6 +895,9 @@
                     AOS.refresh();
                 }
                 
+                // After loading services, handle anchor scrolling
+                scrollToAnchor();
+                
             } catch (error) {
                 console.error('❌ Error loading services:', error);
                 servicesGrid.innerHTML = `
@@ -888,7 +939,9 @@
                 duration: 1000,
                 easing: 'ease-in-out',
                 once: true,
-                mirror: false
+                mirror: false,
+                disable: false, // Don't disable AOS
+                anchorPlacement: 'top-bottom'
             });
             
             // Load services after components are loaded
@@ -896,6 +949,9 @@
                 loadServices();
             }, 1000);
         });
+        
+        // Also handle hash changes for SPA-like navigation
+        window.addEventListener('hashchange', scrollToAnchor);
     </script>
 </body>
 </html>

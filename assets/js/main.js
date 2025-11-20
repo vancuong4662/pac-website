@@ -623,4 +623,102 @@
     initTeamWithFallback();
   }, 2500);
 
+  /**
+   * YouTube Video Modal Handler
+   */
+  function initYouTubeModal() {
+    const modal = document.getElementById('youtubeModal');
+    const openBtn = document.getElementById('openYoutubeModal');
+    const closeBtn = document.querySelector('.youtube-modal-close');
+    const overlay = document.querySelector('.youtube-modal-overlay');
+    const iframe = document.getElementById('youtubeIframe');
+
+    if (!modal || !openBtn) return;
+
+    // Open modal
+    openBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const videoId = this.getAttribute('data-video-id');
+      
+      if (videoId) {
+        // Set iframe src with autoplay
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+
+    // Close modal function
+    function closeModal() {
+      modal.classList.remove('active');
+      iframe.src = ''; // Stop video by removing src
+      document.body.style.overflow = '';
+    }
+
+    // Close on button click
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+
+    // Close on overlay click
+    if (overlay) {
+      overlay.addEventListener('click', closeModal);
+    }
+
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  }
+
+  // Initialize YouTube modal with multiple strategies (similar to team section)
+  function initYouTubeModalWithFallback() {
+    const modal = document.getElementById('youtubeModal');
+    const openBtn = document.getElementById('openYoutubeModal');
+    
+    if (modal && openBtn) {
+      initYouTubeModal();
+      return true;
+    }
+    return false;
+  }
+
+  // Strategy 1: DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (!initYouTubeModalWithFallback()) {
+          setTimeout(initYouTubeModalWithFallback, 500);
+        }
+      }, 100);
+    });
+  } else {
+    setTimeout(() => {
+      if (!initYouTubeModalWithFallback()) {
+        setTimeout(initYouTubeModalWithFallback, 500);
+      }
+    }, 100);
+  }
+
+  // Strategy 2: Window load
+  window.addEventListener('load', function() {
+    setTimeout(() => {
+      if (!initYouTubeModalWithFallback()) {
+        setTimeout(initYouTubeModalWithFallback, 500);
+      }
+    }, 200);
+  });
+
+  // Strategy 3: Delayed fallback for cached pages
+  setTimeout(() => {
+    initYouTubeModalWithFallback();
+  }, 1000);
+
+  // Strategy 4: Final safety net
+  setTimeout(() => {
+    initYouTubeModalWithFallback();
+  }, 2500);
+
 })();

@@ -14,7 +14,7 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 // VNPay Credentials Configuration
 // Switch between Sandbox and Production - CHỈ CẦN THAY ĐỔI DÒNG NÀY!
-$vnp_test = true; // true = Sandbox (VJGIXB0L), false = Production (UNLOCKY1)
+$vnp_test = true; // true = Sandbox (R9BKC8DJ), false = Production (UNLOCKY1)
 
 /**
  * Get VNPay credentials based on test mode

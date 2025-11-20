@@ -40,13 +40,13 @@
 
           <div class="cta-section">
             <div class="cta-buttons">
-              <a href="" class="btn btn-pac-accent glightbox">
+              <a href="goihuongnghiep-1" class="btn btn-pac-accent">
                 Làm thử trắc nghiệm ngay
               </a>
-              <a href="https://www.youtube.com/watch?v=6By4kxLKI2w" class="btn btn-pac-primary">
+              <button type="button" class="btn btn-pac-primary" id="openYoutubeModal" data-video-id="6By4kxLKI2w">
                 <i class="bi bi-play-circle"></i>
                 Câu chuyện hướng nghiệp
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -54,3 +54,21 @@
     </div>
   </div>
 </section><!-- /Hero Section -->
+
+<!-- YouTube Video Modal -->
+<div id="youtubeModal" class="youtube-modal">
+  <div class="youtube-modal-overlay"></div>
+  <div class="youtube-modal-content">
+    <button class="youtube-modal-close" aria-label="Đóng video">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="youtube-video-wrapper">
+      <iframe id="youtubeIframe" 
+              src="" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</div>

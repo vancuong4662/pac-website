@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -26,10 +26,10 @@
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Main CSS File -->
-  <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/main.css?v=20112025" rel="stylesheet">
   
   <!-- Toastbar CSS for notifications -->
-  <link href="assets/css/toastbar.css" rel="stylesheet">
+  <link href="assets/css/toastbar.css?v=20112025" rel="stylesheet">
   
   <!-- Custom CSS for Payment Result Page -->
   <style>
@@ -431,16 +431,16 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
   <!-- Component Loader -->
-  <script src="assets/js/component-loader.js?v=1.1"></script>
+  <script src="assets/js/component-loader.js?v=20112025"></script>
 
   <!-- Toastbar for notifications -->
-  <script src="assets/js/toastbar.js"></script>
+  <script src="assets/js/toastbar.js?v=20112025"></script>
 
   <!-- Payment Result JS -->
   <script>
     // Payment result handling
     // If VNPay return parameters are present we defer rendering to the
-    // external verifier script (assets/js/payment-result.js) which will
+    // external verifier script (assets/js/payment-result.js?v=20112025 which will
     // call the server to verify and then render the correct UI.
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
@@ -542,7 +542,7 @@
         </div>
         
         <div class="result-actions" data-aos="fade-up" data-aos-delay="300">
-          <a href="my-purchases" class="btn-primary-custom">
+          <a href="payment-history" class="btn-primary-custom">
             <i class="fas fa-shopping-bag"></i>
             Xem sản phẩm đã mua
           </a>
@@ -666,8 +666,8 @@
   </script>
 
   <!-- Main JS File -->
-  <script src="assets/js/main.js?v=1.1"></script>
-  <script src="assets/js/payment-result.js?v=1.2"></script>
+  <script src="assets/js/main.js?v=20112025"></script>
+  <script src="assets/js/payment-result.js?v=20112025"></script>
 
 </body>
 
