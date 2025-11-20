@@ -8386,6 +8386,7 @@ section,
 .profile-form .btn-outline-secondary:hover {
   background-color: #6b7280;
   border-color: #6b7280;
+  color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2);
 }
