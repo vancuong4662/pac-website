@@ -578,8 +578,8 @@ async function handleVNPayPayment(orderId, formData) {
         const vnpayData = {
             order_id: orderId,
             order_info: `Thanh toan don hang PAC Group #${orderId}`,
-            bank_code: bankCode || '',
-            credential_type: 'sandbox' // Chỉ định rõ môi trường sandbox để tránh lỗi chữ ký
+            bank_code: bankCode || ''
+            // credential_type removed - will use server config (vnpay-config.php)
         };
         
         const response = await fetch('api/orders/vnpay-create.php', {

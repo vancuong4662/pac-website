@@ -8,7 +8,7 @@ echo "<pre>";
 
 // PRODUCTION credentials
 $vnp_TmnCode = "UNLOCKY1";
-$vnp_HashSecret = "LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU"; // ⚠️ VERIFY THIS!
+$vnp_HashSecret = "LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU";
 $vnp_Url = "https://pay.vnpay.vn/vpcpay.html";
 
 echo "=== PRODUCTION CREDENTIALS ===\n";

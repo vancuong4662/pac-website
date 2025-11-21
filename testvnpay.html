@@ -454,7 +454,7 @@
                 // Step 1: Create test order
                 showToast(`Đang tạo đơn hàng test (${config.name})...`, 'info');
                 
-                const createOrderResponse = await fetch('/0/pac-new/api/orders/test-vnpay-order.php', {
+                const createOrderResponse = await fetch('api/orders/test-vnpay-order.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -465,6 +465,8 @@
                         credential_type: selectedCredential
                     })
                 });
+
+                console.log('Create Order Response:', createOrderResponse);
                 
                 const orderData = await createOrderResponse.json();
                 
@@ -477,7 +479,7 @@
                 // Step 2: Create VNPay payment URL
                 showToast(`Đang tạo liên kết thanh toán VNPay (${config.hash})...`, 'info');
                 
-                const vnpayResponse = await fetch('/0/pac-new/api/orders/vnpay-create.php', {
+                const vnpayResponse = await fetch('api/orders/vnpay-create.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -501,7 +503,18 @@
                     throw new Error(`HTTP ${vnpayResponse.status}: ${errorText || 'Không thể tạo liên kết VNPay'}`);
                 }
                 
-                const vnpayData = await vnpayResponse.json();
+                // Get response text first for debugging
+                const responseText = await vnpayResponse.text();
+                console.log('VNPay Raw Response:', responseText);
+                
+                let vnpayData;
+                try {
+                    vnpayData = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response was:', responseText.substring(0, 500));
+                    throw new Error('Server trả về dữ liệu không hợp lệ. Kiểm tra console để xem chi tiết.');
+                }
                 
                 if (!vnpayData.success) {
                     throw new Error(vnpayData.message || vnpayData.error || 'Không thể tạo liên kết VNPay');

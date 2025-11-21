@@ -38,6 +38,15 @@ Tên chủ thẻ	NGUYEN VAN A
 Ngày phát hành	07/15
 Mật khẩu OTP	123456
 
+
+
+Sau khi hoàn thiện, phải thực hiện nghiệm thu xem có đạt về return url và ipn url không. 
+- Link: https://sandbox.vnpayment.vn/vnpaygw-sit-testing/user/login 
+- Tên đăng nhập: vancuong4662@gmail.com  
+- Mật khẩu: VnpCtt@12345
+- Hướng dẫn thực hiện: https://sandbox.vnpayment.vn/vnpaygw-sit-testing/order/instruction
+
+
 Ngoài ra anh/chị có thể dùng thử demo Cổng thanh toán VNPAY tại: https://sandbox.vnpayment.vn/apis/vnpay-demo/để có những trải nghiệm đầu tiên khi tích hợp với Cổng thanh toán VNPAYQR.
 Cần thêm thông tin, anh/chị có thể trao đổi trực tiếp với em qua thông tin ở phần chữ ký của email này.
 Cảm ơn anh/chị.

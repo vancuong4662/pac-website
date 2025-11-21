@@ -1,20 +1,28 @@
 <?php
 // VNPay IPN Handler - xử lý thông báo thanh toán tức thời từ VNPay
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-require_once '../../config/db-pdo.php';
-require_once '../../config/vnpay-config.php';
+require_once __DIR__ . '/../../config/db-pdo.php';
+require_once __DIR__ . '/../../config/vnpay-config.php';
 
-// Get POST data from VNPay
-$inputData = json_decode(file_get_contents('php://input'), true);
+// VNPay sends IPN via GET parameters
+$inputData = $_GET;
 
-// If no JSON data, try to get from $_POST
-if (!$inputData) {
+// Fallback: try POST or JSON body
+if (empty($inputData)) {
     $inputData = $_POST;
+}
+if (empty($inputData)) {
+    $jsonInput = json_decode(file_get_contents('php://input'), true);
+    if ($jsonInput) {
+        $inputData = $jsonInput;
+    }
 }
 
 // Log the IPN request for debugging
-error_log('VNPay IPN Request: ' . json_encode($inputData));
+error_log('VNPay IPN Request Method: ' . $_SERVER['REQUEST_METHOD']);
+error_log('VNPay IPN Request Data: ' . json_encode($inputData));
+error_log('VNPay IPN Raw Query: ' . ($_SERVER['QUERY_STRING'] ?? 'No query string'));
 
 // Required parameters
 $vnp_TxnRef = $inputData['vnp_TxnRef'] ?? '';
@@ -75,8 +83,10 @@ try {
     
     // Check if order is already processed
     if ($transaction['payment_status'] === 'paid') {
-        // Order already processed, but still confirm to VNPay
-        error_log('VNPay IPN: Order already processed for TxnRef: ' . $vnp_TxnRef);
+        // Order already processed, return RspCode 02
+        error_log('VNPay IPN: Order already confirmed for TxnRef: ' . $vnp_TxnRef);
+        $returnData['RspCode'] = '02';
+        $returnData['Message'] = 'Order already confirmed';
         echo json_encode($returnData);
         exit;
     }

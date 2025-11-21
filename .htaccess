@@ -52,6 +52,10 @@ RewriteRule ^ - [L]
 RewriteCond %{REQUEST_URI} ^/pac-new/components/ [NC]
 RewriteRule ^ - [L]
 
+# VNPay IPN special handling - MUST come before general API skip
+RewriteRule ^0/pac-new/api/orders/vnpay-ipn$ /0/pac-new/api/orders/vnpay-ipn.php [L,QSA]
+RewriteRule ^api/orders/vnpay-ipn$ api/orders/vnpay-ipn.php [L,QSA]
+
 # Skip rewriting for API endpoints - let PHP handle these
 RewriteCond %{REQUEST_URI} ^/pac-new/api/ [NC]
 RewriteRule ^ - [L]
@@ -106,6 +110,7 @@ RewriteRule ^payment-cancel/?$ templates/payment-result.html?status=cancelled [L
 # VNPay Integration Routes (for API callbacks)
 RewriteRule ^vnpay-return/?$ api/orders/vnpay-return.php [L]
 RewriteRule ^vnpay-ipn/?$ api/orders/vnpay-ipn.php [L]
+RewriteRule ^api/orders/vnpay-ipn/?$ api/orders/vnpay-ipn.php [L,QSA]
 RewriteRule ^vnpay-test/?$ test/vnpay-test.html [L]
 
 # Profile Management pages

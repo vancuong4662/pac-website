@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
@@ -57,11 +59,21 @@ function removeVietnameseAccents($str) {
 }
 
 // Kiểm tra authentication
-$user = verifySession();
-if (!$user) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
-    exit;
+// Allow test user session from test-vnpay-order.php
+if (isset($_SESSION['user_id']) && $_SESSION['email'] === 'test@vnpay.com') {
+    $user = [
+        'id' => $_SESSION['user_id'],
+        'username' => $_SESSION['username'],
+        'email' => $_SESSION['email'],
+        'role' => $_SESSION['role']
+    ];
+} else {
+    $user = verifySession();
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+        exit;
+    }
 }
 
 // Lấy dữ liệu JSON
@@ -185,7 +197,13 @@ try {
     $vnp_Bill_State = '';
     
     // Client IP - ensure valid format and force IPv4
-    $vnp_IpAddr = $host_ip; // Default fallback
+    // Default fallback IP
+    $default_ip = '127.0.0.1';
+    if (isset($host_ip)) {
+        $default_ip = $host_ip;
+    }
+    
+    $vnp_IpAddr = $default_ip; // Default fallback
     
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $vnp_IpAddr = $_SERVER['HTTP_CLIENT_IP'];
@@ -198,7 +216,7 @@ try {
     
     // Validate IP address format and convert IPv6 localhost to IPv4
     if ($vnp_IpAddr === '::1' || !filter_var($vnp_IpAddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        $vnp_IpAddr = $host_ip;
+        $vnp_IpAddr = $default_ip;
     }
     
     // Tạo array input data
@@ -225,7 +243,9 @@ try {
         $inputData['vnp_BankCode'] = $bankCode;
     }
     
+    // DISABLE billing info for production testing - VNPay demo doesn't use these
     // Thêm thông tin bill nếu có
+    /*
     if (!empty($vnp_Bill_Mobile)) {
         $inputData['vnp_Bill_Mobile'] = $vnp_Bill_Mobile;
     }
@@ -250,6 +270,7 @@ try {
     if (!empty($vnp_Bill_State)) {
         $inputData['vnp_Bill_State'] = $vnp_Bill_State;
     }
+    */
     
     // Tạo secure hash - Tự động chọn hash function dựa vào $vnp_HashType
     ksort($inputData); // Sort array by key
@@ -335,7 +356,7 @@ try {
             'expire_in_minutes' => 15,
             'credential_type' => $actualCredentialType,
             'tmn_code' => $vnp_TmnCode,
-            'hash_type' => $vnp_HashType,
+            'hash_type' => $credentials['hash_type'], // Use from credentials, not global
             'test_mode' => $testMode
         ],
         'message' => 'VNPay payment URL created successfully'

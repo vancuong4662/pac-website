@@ -3,7 +3,7 @@
 // ⚠️ SANDBOX MODE - Chỉ dành cho testing và development
 
 // Sandbox Mode Flag - Define this first
-define('VNPAY_SANDBOX_MODE', true);
+define('VNPAY_SANDBOX_MODE', false);
 
 // Timezone
 date_default_timezone_set('Asia/Ho_Chi_Minh');
@@ -14,7 +14,7 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 // VNPay Credentials Configuration
 // Switch between Sandbox and Production - CHỈ CẦN THAY ĐỔI DÒNG NÀY!
-$vnp_test = true; // true = Sandbox (R9BKC8DJ), false = Production (UNLOCKY1)
+$vnp_test = false; // true = Sandbox (R9BKC8DJ), false = Production (UNLOCKY1)
 
 /**
  * Get VNPay credentials based on test mode
@@ -41,9 +41,9 @@ function vnpay_get_credentials($testMode = null) {
         // PRODUCTION - UNLOCKY1
         return [
             'tmn_code' => 'UNLOCKY1',
-            'hash_secret' => 'LJIIDDXSEFHJHEXYZNATSCHPSFSXVYRU',
+            'hash_secret' => '5U1DBZKMQOX0QTV5YZT02KVSGQIFRJC5',
             'url' => 'https://pay.vnpay.vn/vpcpay.html',
-            'hash_type' => 'SHA256',
+            'hash_type' => 'SHA512', // Changed to SHA512 - check VNPay production docs
             'test_mode' => false,
             'type' => 'Production'
         ];
@@ -67,19 +67,20 @@ $project_path = '/0/pac-new'; // Adjust if your path is different
 // For VNPay sandbox testing
 if (VNPAY_SANDBOX_MODE) {
     // Use your actual localhost URL with registered credentials
-    // $host_ip = "103.200.23.126";
-    // $base_url = 'https://unlockyourcareer.vn';
+    $host_ip = "103.200.23.126";
+    $base_url = 'https://unlockyourcareer.vn';
     // LOCALHOST :
-    $host_ip = "127.0.0.1";
-    $base_url = 'http://127.0.0.1/0/pac-new';
+    // $host_ip = "127.0.0.1";
+    // $base_url = 'http://127.0.0.1/0/pac-new';
 
     $vnp_Returnurl = $base_url . "/payment-result";  // Your return URL
-    $vnp_IpnUrl = $base_url . "/api/orders/vnpay-ipn";     // Your IPN URL - send this to VNPay
+    $vnp_IpnUrl = $base_url . "/0/pac-new/vnpay-ipn.php";     // Your IPN URL - send this to VNPay (direct file access)
 } else {
     // Production URLs
-    $base_url = $protocol . '://' . $host . $project_path;
+    $host_ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'; // Get real client IP
+    $base_url = $protocol . '://' . $host;
     $vnp_Returnurl = $base_url . "/payment-result";
-    $vnp_IpnUrl = $base_url . "/api/orders/vnpay-ipn";
+    $vnp_IpnUrl = $base_url . "/0/pac-new/vnpay-ipn.php";  // Direct file access
 }
 
 // VNPay API Configuration
